@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Escape City EMDCG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ui-bg: rgba(0, 0, 0, 0.8);
+            --ui-border: #fff;
+            --text-color: #fff;
+            --highlight: #facc15;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #111;
+            overflow: hidden;
+            font-family: 'Press Start 2P', cursive;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated; /* Fundamental para estilo retro */
+        }
+        
+        /* Capas de Interfaz (UI) */
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Deja pasar clicks al canvas si es necesario */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .hidden { display: none !important; }
+
+        /* Menú Principal */
+        #mainMenu { background: rgba(10, 20, 10, 0.95); pointer-events: auto; }
+        .title { font-size: 4vw; color: #4ade80; text-shadow: 4px 4px 0 #000; text-align: center; margin-bottom: 2rem; line-height: 1.5; }
+        .subtitle { font-size: 1.5vw; color: #a3e635; margin-bottom: 3rem; }
+        .btn {
+            background: #22c55e; border: 4px solid #fff; color: #000;
+            padding: 15px 30px; font-size: 20px; font-family: inherit;
+            cursor: pointer; text-transform: uppercase;
+            box-shadow: 5px 5px 0 #000; transition: transform 0.1s;
+            pointer-events: auto;
+        }
+        .btn:active { transform: translate(5px, 5px); box-shadow: none; }
+
+        /* Cinemática / Diálogos */
+        #dialogueScreen { background: rgba(0, 0, 0, 0.9); pointer-events: auto; justify-content: flex-end; padding-bottom: 5%; }
+        .dialogue-box {
+            width: 90%; max-width: 800px; background: var(--ui-bg);
+            border: 4px solid var(--ui-border); padding: 20px;
+            display: flex; gap: 20px; align-items: flex-start;
+            cursor: pointer; position: relative;
+        }
+        .avatar-container { width: 100px; height: 100px; border: 2px solid #555; background: #222; flex-shrink: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .avatar-img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+        .dialogue-content { flex-grow: 1; }
+        .speaker-name { color: var(--highlight); margin-bottom: 10px; font-size: 16px; }
+        .dialogue-text { color: var(--text-color); font-size: 14px; line-height: 1.6; }
+        .click-indicator { position: absolute; bottom: 10px; right: 10px; font-size: 10px; animation: blink 1s infinite; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Instrucciones */
+        #instructionsScreen { background: rgba(0, 0, 0, 0.95); pointer-events: auto; padding: 20px; text-align: center; }
+        .inst-content { max-width: 800px; text-align: left; line-height: 1.8; font-size: 12px; }
+        .inst-content h2 { color: var(--highlight); text-align: center; margin-bottom: 20px; }
+        .inst-content ul { list-style-type: square; margin-bottom: 20px; }
+        .inst-content li { margin-bottom: 10px; }
+
+        /* HUD del Juego */
+        #gameHUD { justify-content: space-between; padding: 20px; box-sizing: border-box; }
+        .top-hud { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; }
+        
+        .char-info { background: rgba(0,0,0,0.7); border: 2px solid #fff; padding: 10px; display: flex; gap: 10px; align-items: center; }
+        .hud-avatar { width: 50px; height: 50px; border: 1px solid #777; image-rendering: pixelated; background: #222; object-fit: cover;}
+        .stats { display: flex; flex-direction: column; gap: 5px; font-size: 10px; }
+        
+        .keys-info { background: rgba(0,0,0,0.7); border: 2px solid var(--highlight); padding: 15px; color: var(--highlight); font-size: 16px; }
+
+        /* Controles Móviles / Botones de Acción */
+        .controls-area { width: 100%; height: 100%; position: absolute; pointer-events: none; display: flex; justify-content: space-between; align-items: flex-end; padding: 20px; box-sizing: border-box; z-index: 5;}
+        
+        #joystickZone { width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); position: relative; pointer-events: auto; touch-action: none; display: flex; justify-content: center; align-items: center;}
+        #joystickKnob { width: 60px; height: 60px; background: rgba(255,255,255,0.5); border-radius: 50%; position: absolute; pointer-events: none; }
+
+        .action-buttons { display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
+        .action-btn { 
+            width: 70px; height: 70px; border-radius: 50%; border: 3px solid #fff; 
+            background: rgba(0,0,0,0.6); color: #fff; font-size: 10px; font-family: inherit;
+            display: flex; justify-content: center; align-items: center; text-align: center; cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+        .action-btn:active { background: rgba(255,255,255,0.3); }
+        #btnAvisar { border-color: var(--highlight); color: var(--highlight); animation: pulse 2s infinite; display: none; } /* Oculto hasta hallar llave */
+        
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* Pantalla Final */
+        #endScreen { background: rgba(0,0,0,0.9); pointer-events: auto; flex-direction: column; text-align: center;}
+        
+        /* Ocultar controles en PC si no hay touch, aunque los dejaremos para debug/clicks */
+        @media (min-width: 1024px) {
+            #joystickZone { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- UI Menú -->
+    <div id="mainMenu" class="ui-layer">
+        <h1 class="title">ESCAPE CITY<br>EMDCG</h1>
+        <p class="subtitle">Un fallo en la Matrix...</p>
+        <button class="btn" id="btnStartGame">Iniciar Juego</button>
+    </div>
+
+    <!-- UI Cinemática -->
+    <div id="dialogueScreen" class="ui-layer hidden">
+        <div class="dialogue-box" id="dialogueBox">
+            <div class="avatar-container">
+                <img id="speakerAvatar" class="avatar-img" src="" alt="Avatar">
+            </div>
+            <div class="dialogue-content">
+                <div id="speakerName" class="speaker-name">Nombre</div>
+                <div id="dialogueText" class="dialogue-text">Texto...</div>
+            </div>
+            <div class="click-indicator">Click / Toca para continuar ▼</div>
+        </div>
+    </div>
+
+    <!-- UI Instrucciones -->
+    <div id="instructionsScreen" class="ui-layer hidden">
+        <div class="inst-content">
+            <h2>MISIÓN Y REGLAS</h2>
+            <ul>
+                <li>Están atrapados. Para volver, encuentren <b>3 LLAVES</b> ocultas.</li>
+                <li><b>Llave 1:</b> En edificios destruidos.</li>
+                <li><b>Llave 2:</b> En zonas abiertas.</li>
+                <li><b>Llave 3:</b> En edificios intactos.</li>
+                <li><b>CUIDADO:</b> Las entidades te borrarán si te tocan.</li>
+            </ul>
+            <p style="color:var(--highlight); margin-bottom:5px;"><b>HABILIDADES:</b></p>
+            <ul style="font-size:10px;">
+                <li><b>Jostin (Cambio 1):</b> Pistola. Disparo recto. (Inicio: 12 balas)</li>
+                <li><b>Tavito (Cambio 2):</b> Bazuca. Daño en área. (Inicio: 20 bombas)</li>
+                <li><b>Pepe (Cambio 3):</b> Sigilo. Invisible 120s totales. No puede atacar.</li>
+            </ul>
+            <p>Usa WASD/Flechas o el Joystick para moverte.<br>Espacio o Botón Acción para habilidad.<br>Cuando veas una llave, pisa y pulsa <b>AVISAR</b>.</p>
+            <br>
+            <button class="btn" id="btnPlayNow">¡Entendido!</button>
+        </div>
+    </div>
+
+    <!-- HUD Juego -->
+    <div id="gameHUD" class="ui-layer hidden" style="pointer-events: none;">
+        <div class="top-hud">
+            <div class="char-info">
+                <img id="hudAvatar" class="hud-avatar" src="" alt="">
+                <div class="stats">
+                    <span id="hudName" style="color:var(--highlight);">Jostin</span>
+                    <span id="hudAbility">Balas: 12</span>
+                </div>
+            </div>
+            <div class="keys-info">
+                LLAVES: <span id="keyCount">0</span>/3
+            </div>
+        </div>
+    </div>
+
+    <!-- Controles en Pantalla -->
+    <div id="controlsLayer" class="controls-area hidden">
+        <div id="joystickZone">
+            <div id="joystickKnob"></div>
+        </div>
+        <div class="action-buttons">
+            <div id="btnAvisar" class="action-btn">AVISAR</div>
+            <div id="btnSwap" class="action-btn">CAMBIAR<br>(1,2,3)</div>
+            <div id="btnAction" class="action-btn" style="width:90px; height:90px;">ACCIÓN<br>(Espacio)</div>
+        </div>
+    </div>
+
+    <!-- Pantalla Final -->
+    <div id="endScreen" class="ui-layer hidden">
+        <h1 id="endTitle" class="title"></h1>
+        <p id="endDesc" class="subtitle"></p>
+        <button class="btn" onclick="location.reload()">Reiniciar</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Ajuste responsivo del canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Para mantener el look retro, desactivamos antialiasing
+            ctx.imageSmoothingEnabled = false;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Assets
+        const images = {
+            jostin: new Image(),
+            tavito: new Image(),
+            pepe: new Image()
+        };
+        images.jostin.src = 'image.png';
+        images.tavito.src = 'image_2.png';
+        images.pepe.src = 'image_3.png';
+
+        // Sistema de Estados
+        const STATES = { MENU: 0, CUTSCENE: 1, INSTRUCTIONS: 2, PLAYING: 3, GAMEOVER: 4, VICTORY: 5 };
+        let currentState = STATES.MENU;
+
+        // --- HISTORIA / CINEMÁTICA ---
+        const story = [
+            { s: 'Jostin', img: 'image.png', t: 'Estábamos tranquilos jugando en la compu y de repente... ¿qué pasó?' },
+            { s: 'Tavito', img: 'image_2.png', t: 'El suelo se abrió. Parece un fallo en la Matrix. Mira a tu alrededor, está todo destruido.' },
+            { s: 'Pepe', img: 'image_3.png', t: '*Tiembla* Pío pío... tengo miedo, chicos.' },
+            { s: 'Pollito Guía', img: 'image_3.png', t: '¡Atención viajeros! Han caído en la Ciudad Abandonada EMDCG.' },
+            { s: 'Pollito Guía', img: 'image_3.png', t: 'Para escapar, deben encontrar 3 LLAVES y cruzar la puerta dorada.' },
+            { s: 'Jostin', img: 'image.png', t: '¿Llaves? Suena fácil.' },
+            { s: 'Pollito Guía', img: 'image_3.png', t: 'No lo es. Hay entidades oscuras. Si los tocan, desaparecerán de la existencia.' },
+            { s: 'Tavito', img: 'image_2.png', t: 'Prepararé mi bazuca. Andando.' }
+        ];
+        let currentDialogue = 0;
+
+        // --- VARIABLES DEL JUEGO ---
+        const TILE_SIZE = 64;
+        const MAP_COLS = 30;
+        const MAP_ROWS = 30;
+        let camera = { x: 0, y: 0, w: canvas.width, h: canvas.height };
+        
+        // Input
+        const keys = { w: false, a: false, s: false, d: false, space: false };
+        let joystick = { active: false, dx: 0, dy: 0 };
+        
+        // Datos de Personajes (Party)
+        const party = [
+            { id: 'jostin', name: 'Jostin', color: '#ff0000', speed: 4, ammo: 12, maxAmmo: 12, ability: 'Pistola', icon: 'image.png' },
+            { id: 'tavito', name: 'Tavito', color: '#888888', speed: 3.5, ammo: 20, maxAmmo: 20, ability: 'Bazuca', icon: 'image_2.png' },
+            { id: 'pepe', name: 'Pepe', color: '#ffff00', speed: 5, stealthTime: 120, maxStealth: 120, stealthActive: false, ability: 'Sigilo', icon: 'image_3.png' }
+        ];
+        let activeCharIndex = 0;
+        let globalKeysFound = 0;
+        let keyToAvisar = null; // Guarda la llave sobre la que estamos parados
+
+        // Entidades del mundo
+        let player = { x: TILE_SIZE * 2, y: TILE_SIZE * 2, w: 40, h: 40, dirX: 0, dirY: 1 };
+        let map = [];
+        let items = []; // Llaves y recargas
+        let enemies = [];
+        let projectiles = [];
+        let particles = [];
+        let door = null;
+
+        // Tipos de tiles: 0=Suelo, 1=Edificio Intacto(Pared), 2=Edificio Destruido(Obstáculo bajo)
+        function generateMap() {
+            map = [];
+            for(let r=0; r<MAP_ROWS; r++) {
+                let row = [];
+                for(let c=0; c<MAP_COLS; c++) {
+                    // Bordes
+                    if(r===0 || r===MAP_ROWS-1 || c===0 || c===MAP_COLS-1) {
+                        row.push(1); continue;
+                    }
+                    // Zonas aleatorias
+                    let rand = Math.random();
+                    if(rand < 0.1) row.push(1); // Intacto
+                    else if(rand < 0.25) row.push(2); // Destruido
+                    else row.push(0); // Abierto
+                }
+                map.push(row);
+            }
+            
+            // Limpiar zona de spawn
+            map[1][1] = 0; map[1][2] = 0; map[2][1] = 0; map[2][2] = 0;
+            player.x = TILE_SIZE * 1.5; player.y = TILE_SIZE * 1.5;
+
+            items = [];
+            enemies = [];
+            
+            // Colocar Llave 1 (En zona de destruidos '2')
+            placeItemInZone(2, 'key1', '#ffaa00');
+            // Colocar Llave 2 (En zona abierta '0')
+            placeItemInZone(0, 'key2', '#ffaa00');
+            // Colocar Llave 3 (Cerca de intactos '1', buscamos un '0' al lado de un '1')
+            placeItemNear(1, 'key3', '#ffaa00');
+
+            // Colocar Recargas (Ammo) en edificios (1 o 2)
+            for(let i=0; i<5; i++) {
+                placeItemInZone(2, 'ammo_jostin', '#ff0000'); // Balas pistola (5)
+                placeItemInZone(1, 'ammo_tavito', '#555555'); // Bombas bazuca (10)
+            }
+
+            // Generar Enemigos
+            for(let i=0; i<15; i++) {
+                let ex, ey;
+                do {
+                    let c = Math.floor(Math.random() * MAP_COLS);
+                    let r = Math.floor(Math.random() * MAP_ROWS);
+                    ex = c * TILE_SIZE + TILE_SIZE/2;
+                    ey = r * TILE_SIZE + TILE_SIZE/2;
+                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] !== 0 || distance(player.x, player.y, ex, ey) < TILE_SIZE*5);
+                
+                enemies.push({ x: ex, y: ey, w: 32, h: 32, speed: 1.5 + Math.random(), type: 'glitch' });
+            }
+        }
+
+        function placeItemInZone(tileType, id, color) {
+            let placed = false;
+            while(!placed) {
+                let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
+                let c = Math.floor(Math.random() * (MAP_COLS-2)) + 1;
+                if(map[r][c] === tileType) {
+                    // Si es pared, lo ponemos en un piso adyacente para poder agarrarlo
+                    if(tileType !== 0) {
+                        if(map[r][c+1] === 0) c++;
+                        else if(map[r][c-1] === 0) c--;
+                        else if(map[r+1][c] === 0) r++;
+                        else if(map[r-1][c] === 0) r--;
+                        else continue;
+                    }
+                    items.push({ x: c*TILE_SIZE + TILE_SIZE/2, y: r*TILE_SIZE + TILE_SIZE/2, id: id, color: color, radius: 15 });
+                    placed = true;
+                }
+            }
+        }
+
+        function placeItemNear(tileType, id, color) {
+            let placed = false;
+            while(!placed) {
+                let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
+                let c = Math.floor(Math.random() * (MAP_COLS-2)) + 1;
+                if(map[r][c] === 0) {
+                    if(map[r][c+1]===tileType || map[r][c-1]===tileType || map[r+1][c]===tileType || map[r-1][c]===tileType) {
+                        items.push({ x: c*TILE_SIZE + TILE_SIZE/2, y: r*TILE_SIZE + TILE_SIZE/2, id: id, color: color, radius: 15 });
+                        placed = true;
+                    }
+                }
+            }
+        }
+
+        // Utilidades
+        function distance(x1, y1, x2, y2) { return Math.hypot(x2-x1, y2-y1); }
+        function rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
+            return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+        }
+
+        function update() {
+            if (currentState !== STATES.PLAYING) return;
+
+            const char = party[activeCharIndex];
+            
+            // Movimiento Jugador
+            let dx = 0; let dy = 0;
+            if (joystick.active) {
+                dx = joystick.dx * char.speed;
+                dy = joystick.dy * char.speed;
+            } else {
+                if (keys.w) dy -= char.speed;
+                if (keys.s) dy += char.speed;
+                if (keys.a) dx -= char.speed;
+                if (keys.d) dx += char.speed;
+            }
+            
+            // Normalizar diagonal
+            if(!joystick.active && dx !== 0 && dy !== 0) {
+                const length = Math.sqrt(dx*dx + dy*dy);
+                dx = (dx/length) * char.speed;
+                dy = (dy/length) * char.speed;
+            }
+
+            if(dx !== 0 || dy !== 0) {
+                // Guardar dirección para disparo
+                let mag = Math.hypot(dx, dy);
+                player.dirX = dx/mag; player.dirY = dy/mag;
+            }
+
+            // Colisiones con el mapa (Simple AABB vs Grid)
+            let newX = player.x + dx;
+            let newY = player.y + dy;
+            
+            // Chequeo de esquinas del jugador
+            let rX = newX + player.w/2; let lX = newX - player.w/2;
+            let bY = newY + player.h/2; let tY = newY - player.h/2;
+
+            let colLeft = Math.floor(lX / TILE_SIZE); let colRight = Math.floor(rX / TILE_SIZE);
+            let rowTop = Math.floor(tY / TILE_SIZE); let rowBottom = Math.floor(bY / TILE_SIZE);
+
+            let collide = false;
+            // Solo colisiona con '1' (Pared intacta) o '2' (Destruida)
+            if (map[rowTop] && (map[rowTop][colLeft] > 0 || map[rowTop][colRight] > 0)) collide = true;
+            if (map[rowBottom] && (map[rowBottom][colLeft] > 0 || map[rowBottom][colRight] > 0)) collide = true;
+
+            if(!collide) {
+                player.x = newX;
+                player.y = newY;
+            } else {
+                // Deslizamiento simple
+                let canMoveX = true; let canMoveY = true;
+                if(map[Math.floor(player.y/TILE_SIZE)][colLeft]>0 || map[Math.floor(player.y/TILE_SIZE)][colRight]>0) canMoveX = false;
+                if(map[rowTop][Math.floor(player.x/TILE_SIZE)]>0 || map[rowBottom][Math.floor(player.x/TILE_SIZE)]>0) canMoveY = false;
+                
+                if(canMoveX) player.x += dx;
+                if(canMoveY) player.y += dy;
+            }
+
+            // Cámara sigue al jugador
+            camera.x = player.x - camera.w / 2;
+            camera.y = player.y - camera.h / 2;
+            // Limites cámara
+            camera.x = Math.max(0, Math.min(camera.x, MAP_COLS*TILE_SIZE - camera.w));
+            camera.y = Math.max(0, Math.min(camera.y, MAP_ROWS*TILE_SIZE - camera.h));
+
+            // Lógica Pepe (Sigilo)
+            if (char.id === 'pepe' && char.stealthActive) {
+                char.stealthTime -= 1/60; // Asumiendo 60fps
+                if (char.stealthTime <= 0) {
+                    char.stealthTime = 0;
+                    char.stealthActive = false;
+                }
+                updateHUD();
+            }
+
+            // Recolección de Items
+            keyToAvisar = null;
+            document.getElementById('btnAvisar').style.display = 'none';
+
+            for(let i=items.length-1; i>=0; i--) {
+                let item = items[i];
+                if(distance(player.x, player.y, item.x, item.y) < item.radius + player.w/2) {
+                    if(item.id.startsWith('key')) {
+                        keyToAvisar = item; // Nos paramos sobre una llave
+                        document.getElementById('btnAvisar').style.display = 'flex';
+                    } else if (item.id === 'ammo_jostin' && char.id === 'jostin') {
+                        char.ammo += 5; items.splice(i,1); createParticles(item.x, item.y, '#ff0000'); updateHUD();
+                    } else if (item.id === 'ammo_tavito' && char.id === 'tavito') {
+                        char.ammo += 10; items.splice(i,1); createParticles(item.x, item.y, '#555'); updateHUD();
+                    }
+                }
+            }
+
+            // Victoria (Puerta)
+            if (door && distance(player.x, player.y, door.x, door.y) < 40) {
+                endGame(true);
+            }
+
+            // Actualizar Proyectiles
+            for(let i=projectiles.length-1; i>=0; i--) {
+                let p = projectiles[i];
+                p.x += p.dx; p.y += p.dy; p.life--;
+                
+                // Colisión muro
+                let prC = Math.floor(p.x/TILE_SIZE); let prR = Math.floor(p.y/TILE_SIZE);
+                if(p.life <= 0 || map[prR]===undefined || map[prR][prC]===undefined || map[prR][prC] === 1) {
+                    if(p.type==='bazooka') createExplosion(p.x, p.y);
+                    projectiles.splice(i, 1);
+                    continue;
+                }
+
+                // Colisión enemigos
+                let hit = false;
+                for(let j=enemies.length-1; j>=0; j--) {
+                    let e = enemies[j];
+                    if(distance(p.x, p.y, e.x, e.y) < e.w/2 + p.r) {
+                        if(p.type === 'pistol') {
+                            enemies.splice(j, 1);
+                            createParticles(e.x, e.y, '#0f0');
+                        } else if(p.type === 'bazooka') {
+                            createExplosion(p.x, p.y);
+                        }
+                        hit = true;
+                        break;
+                    }
+                }
+                if(hit) {
+                    if(p.type!=='bazooka') projectiles.splice(i, 1);
+                    else projectiles.splice(i, 1); // La bazooka explota de todas formas
+                }
+            }
+
+            // Actualizar Partículas
+            for(let i=particles.length-1; i>=0; i--) {
+                let pt = particles[i];
+                pt.x += pt.dx; pt.y += pt.dy; pt.life--;
+                if(pt.life <= 0) particles.splice(i,1);
+            }
+
+            // IA Enemigos
+            let isInvisible = (char.id === 'pepe' && char.stealthActive);
+            for(let i=enemies.length-1; i>=0; i--) {
+                let e = enemies[i];
+                let distToPlayer = distance(e.x, e.y, player.x, player.y);
+
+                if(!isInvisible && distToPlayer < 300) {
+                    // Perseguir
+                    let angle = Math.atan2(player.y - e.y, player.x - e.x);
+                    e.x += Math.cos(angle) * e.speed;
+                    e.y += Math.sin(angle) * e.speed;
+                } else {
+                    // Merodear aleatorio (movimiento tipo jitter)
+                    e.x += (Math.random() - 0.5) * 2;
+                    e.y += (Math.random() - 0.5) * 2;
+                }
+
+                // Colision con jugador
+                if(!isInvisible && distToPlayer < (e.w/2 + player.w/2 - 5)) {
+                    endGame(false);
+                }
+            }
+        }
+
+        // Habilidades
+        function triggerAction() {
+            if (currentState !== STATES.PLAYING) return;
+            const char = party[activeCharIndex];
+            
+            if (char.id === 'jostin' && char.ammo > 0) {
+                char.ammo--;
+                projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 10, dy: player.dirY * 10, r: 4, color: '#ffff00', life: 60, type: 'pistol' });
+                updateHUD();
+            } else if (char.id === 'tavito' && char.ammo > 0) {
+                char.ammo--;
+                projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 8, dy: player.dirY * 8, r: 8, color: '#ff5500', life: 80, type: 'bazooka' });
+                updateHUD();
+            } else if (char.id === 'pepe') {
+                if(char.stealthTime > 0) {
+                    char.stealthActive = !char.stealthActive;
+                    updateHUD();
+                } else {
+                    char.stealthActive = false;
+                }
+            }
+        }
+
+        function createExplosion(ex, ey) {
+            createParticles(ex, ey, '#ff5500', 20);
+            // Daño en área (elimina hasta 5)
+            let killed = 0;
+            for(let j=enemies.length-1; j>=0; j--) {
+                if(killed >= 5) break;
+                if(distance(ex, ey, enemies[j].x, enemies[j].y) < 100) {
+                    createParticles(enemies[j].x, enemies[j].y, '#0f0');
+                    enemies.splice(j, 1);
+                    killed++;
+                }
+            }
+        }
+
+        function createParticles(x, y, color, count=10) {
+            for(let i=0; i<count; i++) {
+                particles.push({
+                    x: x, y: y,
+                    dx: (Math.random()-0.5)*5, dy: (Math.random()-0.5)*5,
+                    life: 20 + Math.random()*20, color: color, size: Math.random()*4 + 2
+                });
+            }
+        }
+
+        // "Avisar" - Recoger llave
+        function avisarLlave() {
+            if(keyToAvisar) {
+                globalKeysFound++;
+                // Eliminar llave del mapa
+                let idx = items.indexOf(keyToAvisar);
+                if(idx > -1) items.splice(idx, 1);
+                
+                document.getElementById('keyCount').innerText = globalKeysFound;
+                keyToAvisar = null;
+                document.getElementById('btnAvisar').style.display = 'none';
+                
+                createParticles(player.x, player.y, '#facc15', 30);
+
+                if(globalKeysFound >= 3) {
+                    spawnDoor();
+                }
+            }
+        }
+
+        function spawnDoor() {
+            // Aparece cerca del jugador, pero en un lugar válido
+            door = { x: player.x, y: player.y - TILE_SIZE*3 };
+            // Simple check para que no caiga fuera del mapa
+            door.x = Math.max(TILE_SIZE, Math.min(door.x, (MAP_COLS-1)*TILE_SIZE));
+            door.y = Math.max(TILE_SIZE, Math.min(door.y, (MAP_ROWS-1)*TILE_SIZE));
+        }
+
+        function draw() {
+            if (currentState !== STATES.PLAYING) return;
+
+            camera.w = canvas.width; camera.h = canvas.height;
+
+            // Fondo base (Matrix dark green)
+            ctx.fillStyle = '#051005';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(-camera.x, -camera.y);
+
+            // Dibujar Mapa
+            let startCol = Math.floor(camera.x / TILE_SIZE);
+            let endCol = startCol + (camera.w / TILE_SIZE) + 1;
+            let startRow = Math.floor(camera.y / TILE_SIZE);
+            let endRow = startRow + (camera.h / TILE_SIZE) + 1;
+
+            for(let r = startRow; r <= endRow; r++) {
+                for(let c = startCol; c <= endCol; c++) {
+                    if(map[r] !== undefined && map[r][c] !== undefined) {
+                        let tx = c * TILE_SIZE;
+                        let ty = r * TILE_SIZE;
+                        
+                        if(map[r][c] === 1) {
+                            // Edificio Intacto
+                            ctx.fillStyle = '#223322';
+                            ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
+                            ctx.strokeStyle = '#334433';
+                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
+                        } else if (map[r][c] === 2) {
+                            // Edificio Destruido
+                            ctx.fillStyle = '#111a11';
+                            ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
+                            // Escombros decorativos
+                            ctx.fillStyle = '#334433';
+                            ctx.fillRect(tx+10, ty+10, 20, 20);
+                            ctx.fillRect(tx+40, ty+30, 15, 15);
+                        } else {
+                            // Suelo rejilla sutil
+                            ctx.strokeStyle = 'rgba(0, 255, 0, 0.05)';
+                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
+                        }
+                    }
+                }
+            }
+
+            // Dibujar Puerta
+            if (door) {
+                ctx.fillStyle = '#facc15'; // Dorada
+                ctx.fillRect(door.x - 30, door.y - 40, 60, 80);
+                ctx.fillStyle = '#fff';
+                ctx.font = '10px "Press Start 2P"';
+                ctx.fillText("SALIDA", door.x - 25, door.y - 50);
+            }
+
+            // Dibujar Items
+            for(let item of items) {
+                ctx.beginPath();
+                ctx.arc(item.x, item.y, item.radius, 0, Math.PI*2);
+                ctx.fillStyle = item.color;
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                if(item.id.startsWith('key')) {
+                    ctx.fillStyle = '#000';
+                    ctx.font = '10px "Press Start 2P"';
+                    ctx.fillText("K", item.x - 4, item.y + 4);
+                }
+            }
+
+            // Dibujar Enemigos (Glitch entities)
+            for(let e of enemies) {
+                ctx.fillStyle = (Math.random()>0.8) ? '#fff' : '#0f0'; // Efecto glitch visual
+                ctx.fillRect(e.x - e.w/2, e.y - e.h/2, e.w, e.h);
+                // Ojos
+                ctx.fillStyle = '#000';
+                ctx.fillRect(e.x - 8, e.y - 5, 4, 4);
+                ctx.fillRect(e.x + 4, e.y - 5, 4, 4);
+            }
+
+            // Dibujar Jugador
+            const char = party[activeCharIndex];
+            
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            
+            // Efecto sigilo
+            if(char.id === 'pepe' && char.stealthActive) {
+                ctx.globalAlpha = 0.3;
+            }
+
+            // Orientación basada en dirección
+            if(player.dirX < 0) ctx.scale(-1, 1);
+
+            let img = images[char.id];
+            if(img.complete && img.naturalHeight !== 0) {
+                // Dibujar imagen
+                ctx.drawImage(img, -player.w/2, -player.h/2, player.w, player.h);
+            } else {
+                // Fallback si la imagen no carga
+                ctx.fillStyle = char.color;
+                ctx.fillRect(-player.w/2, -player.h/2, player.w, player.h);
+            }
+            ctx.restore();
+
+            // Puntero de mira
+            if (char.id !== 'pepe') {
+                ctx.fillStyle = 'rgba(255,0,0,0.5)';
+                ctx.fillRect(player.x + player.dirX * 40 - 2, player.y + player.dirY * 40 - 2, 4, 4);
+            }
+
+            // Dibujar Proyectiles
+            for(let p of projectiles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            }
+
+            // Dibujar Partículas
+            for(let pt of particles) {
+                ctx.fillStyle = pt.color;
+                ctx.fillRect(pt.x, pt.y, pt.size, pt.size);
+            }
+
+            ctx.restore();
+        }
+
+        function changeCharacter() {
+            activeCharIndex = (activeCharIndex + 1) % party.length;
+            
+            // Si Pepe estaba en sigilo y cambiamos, desactivar sigilo
+            if(party[2].stealthActive && activeCharIndex !== 2) {
+                party[2].stealthActive = false;
+            }
+            
+            updateHUD();
+            createParticles(player.x, player.y, '#fff', 15); // Efecto cambio
+        }
+
+        function updateHUD() {
+            const char = party[activeCharIndex];
+            document.getElementById('hudAvatar').src = char.icon;
+            document.getElementById('hudName').innerText = char.name;
+            
+            let abilityText = '';
+            if (char.id === 'jostin') abilityText = `Balas: ${char.ammo}`;
+            else if (char.id === 'tavito') abilityText = `Bombas: ${char.ammo}`;
+            else if (char.id === 'pepe') {
+                abilityText = `Sigilo: ${Math.ceil(char.stealthTime)}s`;
+                document.getElementById('hudName').style.color = char.stealthActive ? '#55ff55' : varHighlight;
+            }
+            document.getElementById('hudAbility').innerText = abilityText;
+            
+            const varHighlight = getComputedStyle(document.documentElement).getPropertyValue('--highlight').trim();
+            document.getElementById('hudName').style.color = char.id==='pepe' && char.stealthActive ? '#55ff55' : varHighlight;
+        }
+
+        // Lógica de Menús
+        document.getElementById('btnStartGame').addEventListener('click', () => {
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('dialogueScreen').classList.remove('hidden');
+            currentState = STATES.CUTSCENE;
+            showNextDialogue();
+        });
+
+        document.getElementById('dialogueBox').addEventListener('click', showNextDialogue);
+
+        function showNextDialogue() {
+            if (currentDialogue >= story.length) {
+                document.getElementById('dialogueScreen').classList.add('hidden');
+                document.getElementById('instructionsScreen').classList.remove('hidden');
+                currentState = STATES.INSTRUCTIONS;
+                return;
+            }
+            let d = story[currentDialogue];
+            document.getElementById('speakerAvatar').src = d.img;
+            document.getElementById('speakerName').innerText = d.s;
+            
+            // Efecto máquina de escribir
+            let textEl = document.getElementById('dialogueText');
+            textEl.innerText = '';
+            let i = 0;
+            function typeWriter() {
+                if (i < d.t.length) {
+                    textEl.innerHTML += d.t.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 20);
+                }
+            }
+            typeWriter();
+            
+            currentDialogue++;
+        }
+
+        document.getElementById('btnPlayNow').addEventListener('click', () => {
+            document.getElementById('instructionsScreen').classList.add('hidden');
+            document.getElementById('gameHUD').classList.remove('hidden');
+            document.getElementById('controlsLayer').classList.remove('hidden');
+            generateMap();
+            updateHUD();
+            currentState = STATES.PLAYING;
+        });
+
+        function endGame(win) {
+            currentState = win ? STATES.VICTORY : STATES.GAMEOVER;
+            document.getElementById('gameHUD').classList.add('hidden');
+            document.getElementById('controlsLayer').classList.add('hidden');
+            let endScreen = document.getElementById('endScreen');
+            endScreen.classList.remove('hidden');
+            
+            if(win) {
+                document.getElementById('endTitle').innerText = "¡VICTORIA!";
+                document.getElementById('endTitle').style.color = "#facc15";
+                document.getElementById('endDesc').innerText = "Han regresado a casa sanos y salvos.\nPollito Guía: '¡Completaste el juego!'";
+            } else {
+                document.getElementById('endTitle').innerText = "BORRADOS";
+                document.getElementById('endTitle').style.color = "#ff0000";
+                document.getElementById('endDesc').innerText = "Una entidad los ha borrado de la Matrix.";
+            }
+        }
+
+        // Input Listeners
+        window.addEventListener('keydown', (e) => {
+            if(currentState !== STATES.PLAYING) return;
+            const key = e.key.toLowerCase();
+            if(key === 'w' || e.key === 'ArrowUp') keys.w = true;
+            if(key === 'a' || e.key === 'ArrowLeft') keys.a = true;
+            if(key === 's' || e.key === 'ArrowDown') keys.s = true;
+            if(key === 'd' || e.key === 'ArrowRight') keys.d = true;
+            
+            if(key === '1') { activeCharIndex=0; updateHUD(); createParticles(player.x, player.y, '#fff', 10); }
+            if(key === '2') { activeCharIndex=1; updateHUD(); createParticles(player.x, player.y, '#fff', 10); }
+            if(key === '3') { activeCharIndex=2; updateHUD(); createParticles(player.x, player.y, '#fff', 10); }
+            
+            if(key === ' ' && !keys.space) {
+                keys.space = true; triggerAction();
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if(key === 'w' || e.key === 'ArrowUp') keys.w = false;
+            if(key === 'a' || e.key === 'ArrowLeft') keys.a = false;
+            if(key === 's' || e.key === 'ArrowDown') keys.s = false;
+            if(key === 'd' || e.key === 'ArrowRight') keys.d = false;
+            if(key === ' ') keys.space = false;
+        });
+
+        // Botones UI Móvil
+        document.getElementById('btnAction').addEventListener('touchstart', (e) => { e.preventDefault(); triggerAction(); });
+        document.getElementById('btnAction').addEventListener('mousedown', (e) => { e.preventDefault(); triggerAction(); });
+        
+        document.getElementById('btnSwap').addEventListener('touchstart', (e) => { e.preventDefault(); changeCharacter(); });
+        document.getElementById('btnSwap').addEventListener('mousedown', (e) => { e.preventDefault(); changeCharacter(); });
+
+        document.getElementById('btnAvisar').addEventListener('touchstart', (e) => { e.preventDefault(); avisarLlave(); });
+        document.getElementById('btnAvisar').addEventListener('mousedown', (e) => { e.preventDefault(); avisarLlave(); });
+
+        // Lógica de Joystick Táctil
+        const joystickZone = document.getElementById('joystickZone');
+        const joystickKnob = document.getElementById('joystickKnob');
+        let jzRect = null;
+
+        function handleJoystickMove(e) {
+            e.preventDefault();
+            if(!joystick.active) return;
+            
+            let touch = e.touches ? e.touches[0] : e;
+            if(!jzRect) jzRect = joystickZone.getBoundingClientRect();
+            
+            let centerX = jzRect.left + jzRect.width/2;
+            let centerY = jzRect.top + jzRect.height/2;
+            
+            let dx = touch.clientX - centerX;
+            let dy = touch.clientY - centerY;
+            
+            let mag = Math.hypot(dx, dy);
+            let maxR = jzRect.width/2 - 30; // 30 is knob radius
+            
+            if(mag > maxR) {
+                dx = (dx/mag) * maxR;
+                dy = (dy/mag) * maxR;
+            }
+            
+            joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+            
+            // Normalizar para velocidad
+            joystick.dx = dx / maxR;
+            joystick.dy = dy / maxR;
+        }
+
+        joystickZone.addEventListener('touchstart', (e) => { e.preventDefault(); joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); }, {passive:false});
+        joystickZone.addEventListener('touchmove', handleJoystickMove, {passive:false});
+        joystickZone.addEventListener('touchend', (e) => { e.preventDefault(); joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }, {passive:false});
+        
+        // Mouse fallback for joystick testing
+        joystickZone.addEventListener('mousedown', (e) => { joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); });
+        document.addEventListener('mousemove', (e) => { if(joystick.active) handleJoystickMove(e); });
+        document.addEventListener('mouseup', () => { if(joystick.active) { joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }});
+
+        // Bucle Principal
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Iniciar bucle
+        gameLoop();
+
+    </script>
+</body>
+</html>
