@@ -297,7 +297,6 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Sistema de Audio Web Audio API sin recursos externos
         let audioCtx = null;
         let soundEnabled = true;
 
@@ -356,35 +355,29 @@
             } catch(e) {}
         }
 
-        // Avatares integrados en SVG base64
-        const avatars = {
-            jostin: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="%23dc2626"/><rect x="6" y="6" width="12" height="10" fill="%23fca5a5"/><rect x="8" y="8" width="3" height="3" fill="%23000"/><rect x="13" y="8" width="3" height="3" fill="%23000"/><rect x="9" y="13" width="6" height="2" fill="%23000"/><rect x="5" y="3" width="14" height="4" fill="%237f1d1d"/></svg>',
-            tavito: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="%234b5563"/><rect x="6" y="6" width="12" height="10" fill="%23d1d5db"/><rect x="8" y="8" width="3" height="3" fill="%23000"/><rect x="13" y="8" width="3" height="3" fill="%23000"/><rect x="10" y="13" width="4" height="2" fill="%23000"/><rect x="5" y="3" width="14" height="4" fill="%231f2937"/></svg>',
-            pepe: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="%23ca8a04"/><rect x="6" y="6" width="12" height="10" fill="%23fef08a"/><rect x="8" y="8" width="3" height="3" fill="%23000"/><rect x="13" y="8" width="3" height="3" fill="%23000"/><rect x="10" y="13" width="4" height="2" fill="%23000"/><rect x="9" y="2" width="6" height="4" fill="%23eab308"/></svg>',
-            guide: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="%23eab308"/><circle cx="12" cy="12" r="8" fill="%23fef08a"/><circle cx="10" cy="10" r="1" fill="%23000"/><circle cx="14" cy="10" r="1" fill="%23000"/><polygon points="11,12 13,12 12,14" fill="%23f97316"/></svg>'
-        };
-
-        const images = {
+        const charImages = {
             jostin: new Image(),
             tavito: new Image(),
             pepe: new Image()
         };
-        images.jostin.src = avatars.jostin;
-        images.tavito.src = avatars.tavito;
-        images.pepe.src = avatars.pepe;
+        charImages.jostin.src = 'Jostin.PNG';
+        charImages.tavito.src = 'Tavito.PNG';
+        charImages.pepe.src = 'Pepe.PNG';
+
+        const guideAvatarSVG = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="%23eab308"/><circle cx="12" cy="12" r="8" fill="%23fef08a"/><circle cx="10" cy="10" r="1" fill="%23000"/><circle cx="14" cy="10" r="1" fill="%23000"/><polygon points="11,12 13,12 12,14" fill="%23f97316"/></svg>';
 
         const STATES = { MENU: 0, CUTSCENE: 1, INSTRUCTIONS: 2, PLAYING: 3, PAUSED: 4, GAMEOVER: 5, VICTORY: 6 };
         let currentState = STATES.MENU;
 
         const story = [
-            { s: 'Jostin', img: avatars.jostin, t: 'Estábamos tranquilos jugando y de repente... ¿qué pasó?' },
-            { s: 'Tavito', img: avatars.tavito, t: 'El suelo se abrió. Parece un fallo en la Matrix. Mira a tu alrededor.' },
-            { s: 'Pepe', img: avatars.pepe, t: '*Tiembla* Pío pío... tengo miedo, chicos.' },
-            { s: 'Pollito Guía', img: avatars.guide, t: '¡Atención viajeros! Han caído en la Ciudad Abandonada EMDCG.' },
-            { s: 'Pollito Guía', img: avatars.guide, t: 'Para escapar, deben encontrar 3 LLAVES y cruzar la puerta dorada.' },
-            { s: 'Jostin', img: avatars.jostin, t: '¿Llaves? Suena fácil.' },
-            { s: 'Pollito Guía', img: avatars.guide, t: 'No lo es. Hay entidades oscuras. Si los tocan, desaparecerán.' },
-            { s: 'Tavito', img: avatars.tavito, t: 'Prepararé mi bazuca. Andando.' }
+            { s: 'Jostin', imgRef: 'jostin', t: 'Estábamos tranquilos jugando y de repente... ¿qué pasó?' },
+            { s: 'Tavito', imgRef: 'tavito', t: 'El suelo se abrió. Parece un fallo en la Matrix. Mira a tu alrededor.' },
+            { s: 'Pepe', imgRef: 'pepe', t: '*Tiembla* Pío pío... tengo miedo, chicos.' },
+            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: '¡Atención viajeros! Han caído en la Ciudad Abandonada EMDCG.' },
+            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: 'Para escapar, deben encontrar 3 LLAVES y cruzar la puerta dorada.' },
+            { s: 'Jostin', imgRef: 'jostin', t: '¿Llaves? Suena fácil.' },
+            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: 'No lo es. Hay entidades oscuras. Si los tocan, desaparecerán.' },
+            { s: 'Tavito', imgRef: 'tavito', t: 'Prepararé mi bazuca. Andando.' }
         ];
         let currentDialogue = 0;
         let isTyping = false;
@@ -403,9 +396,9 @@
         let joystick = { active: false, dx: 0, dy: 0 };
         
         const party = [
-            { id: 'jostin', name: 'Jostin', color: '#ff0000', speed: 4, ammo: 12, maxAmmo: 12, ability: 'Pistola', icon: avatars.jostin },
-            { id: 'tavito', name: 'Tavito', color: '#888888', speed: 3.5, ammo: 20, maxAmmo: 20, ability: 'Bazuca', icon: avatars.tavito },
-            { id: 'pepe', name: 'Pepe', color: '#ffff00', speed: 5, stealthTime: 120, maxStealth: 120, stealthActive: false, ability: 'Sigilo', icon: avatars.pepe }
+            { id: 'jostin', name: 'Jostin', color: '#ff0000', speed: 4, ammo: 12, maxAmmo: 12, ability: 'Pistola', img: charImages.jostin },
+            { id: 'tavito', name: 'Tavito', color: '#888888', speed: 3.5, ammo: 20, maxAmmo: 20, ability: 'Bazuca', img: charImages.tavito },
+            { id: 'pepe', name: 'Pepe', color: '#ffff00', speed: 5, stealthTime: 120, maxStealth: 120, stealthActive: false, ability: 'Sigilo', img: charImages.pepe }
         ];
         let activeCharIndex = 0;
         let globalKeysFound = 0;
@@ -822,9 +815,9 @@
 
             if(player.dirX < 0) ctx.scale(-1, 1);
 
-            let img = images[char.id];
-            if(img.complete && img.naturalHeight !== 0) {
-                ctx.drawImage(img, -player.w/2, -player.h/2, player.w, player.h);
+            // Verificación segura para imágenes PNG
+            if(char.img && char.img.complete && char.img.naturalHeight !== 0) {
+                ctx.drawImage(char.img, -player.w/2, -player.h/2, player.w, player.h);
             } else {
                 ctx.fillStyle = char.color;
                 ctx.fillRect(-player.w/2, -player.h/2, player.w, player.h);
@@ -901,7 +894,7 @@
 
         function updateHUD() {
             const char = party[activeCharIndex];
-            document.getElementById('hudAvatar').src = char.icon;
+            document.getElementById('hudAvatar').src = char.img.src;
             document.getElementById('hudName').innerText = char.name;
             
             const varHighlight = getComputedStyle(document.documentElement).getPropertyValue('--highlight').trim();
@@ -948,7 +941,11 @@
             }
             
             let d = story[currentDialogue];
-            document.getElementById('speakerAvatar').src = d.img;
+            if (d.imgRef) {
+                document.getElementById('speakerAvatar').src = charImages[d.imgRef].src;
+            } else if (d.imgSVG) {
+                document.getElementById('speakerAvatar').src = d.imgSVG;
+            }
             document.getElementById('speakerName').innerText = d.s;
             playSound('click');
             
