@@ -7,17 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
-            --ui-bg: rgba(0, 0, 0, 0.85);
+            --ui-bg: rgba(0, 0, 0, 0.88);
             --ui-border: #fff;
             --text-color: #fff;
             --highlight: #facc15;
+            --primary: #22c55e;
         }
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            background-color: #111;
+            background-color: #050a05;
             overflow: hidden;
             font-family: 'Press Start 2P', cursive;
             user-select: none;
@@ -32,7 +33,6 @@
             image-rendering: pixelated;
         }
         
-        /* Capas de Interfaz (UI) */
         .ui-layer {
             position: absolute;
             top: 0;
@@ -49,25 +49,27 @@
         .hidden { display: none !important; }
 
         /* Menú Principal */
-        #mainMenu { background: rgba(10, 20, 10, 0.95); pointer-events: auto; }
+        #mainMenu { background: rgba(10, 20, 10, 0.96); pointer-events: auto; }
         .title { font-size: 7vw; color: #4ade80; text-shadow: 4px 4px 0 #000; text-align: center; margin-bottom: 1.5rem; line-height: 1.4; }
         .subtitle { font-size: 3vw; color: #a3e635; margin-bottom: 2.5rem; text-align: center; padding: 0 15px; }
         .btn {
-            background: #22c55e; border: 4px solid #fff; color: #000;
+            background: var(--primary); border: 4px solid #fff; color: #000;
             padding: 15px 30px; font-size: 14px; font-family: inherit;
             cursor: pointer; text-transform: uppercase;
             box-shadow: 5px 5px 0 #000; transition: transform 0.1s;
             pointer-events: auto;
         }
         .btn:active { transform: translate(5px, 5px); box-shadow: none; }
+        .btn-secondary { background: #3b82f6; color: #fff; }
 
         /* Cinemática / Diálogos */
-        #dialogueScreen { background: rgba(0, 0, 0, 0.9); pointer-events: auto; justify-content: flex-end; padding-bottom: 5%; }
+        #dialogueScreen { background: rgba(0, 0, 0, 0.92); pointer-events: auto; justify-content: flex-end; padding-bottom: 5%; }
         .dialogue-box {
             width: 92%; max-width: 800px; background: var(--ui-bg);
             border: 4px solid var(--ui-border); padding: 15px;
             display: flex; gap: 15px; align-items: flex-start;
             cursor: pointer; position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
         }
         .avatar-container { width: 70px; height: 70px; border: 2px solid #555; background: #222; flex-shrink: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .avatar-img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
@@ -78,9 +80,8 @@
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* Instrucciones */
         #instructionsScreen { 
-            background: rgba(0, 0, 0, 0.95); 
+            background: rgba(0, 0, 0, 0.96); 
             pointer-events: auto; 
             padding: 20px; 
             text-align: center; 
@@ -102,27 +103,40 @@
 
         /* HUD del Juego */
         #gameHUD { justify-content: space-between; padding: 15px; box-sizing: border-box; }
-        .top-hud { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; }
+        .top-hud { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; gap: 10px; }
         
-        .char-info { background: rgba(0,0,0,0.8); border: 2px solid #fff; padding: 8px; display: flex; gap: 8px; align-items: center; }
+        .char-info { background: rgba(0,0,0,0.85); border: 2px solid #fff; padding: 8px; display: flex; gap: 8px; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
         .hud-avatar { width: 40px; height: 40px; border: 1px solid #777; image-rendering: pixelated; background: #222; object-fit: cover;}
         .stats { display: flex; flex-direction: column; gap: 4px; font-size: 9px; color: #fff; }
         
-        .keys-info { background: rgba(0,0,0,0.8); border: 2px solid var(--highlight); padding: 10px 14px; color: var(--highlight); font-size: 11px; }
+        .hud-center { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .timer-badge { background: rgba(0,0,0,0.85); border: 2px solid #3b82f6; padding: 8px 12px; color: #60a5fa; font-size: 10px; }
+        .keys-info { background: rgba(0,0,0,0.85); border: 2px solid var(--highlight); padding: 10px 14px; color: var(--highlight); font-size: 11px; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
 
-        /* Controles Móviles / Botones de Acción corregidos */
+        .minimap-container {
+            width: 90px;
+            height: 90px;
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #fff;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+        #minimapCanvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+
         .controls-area { 
+            position: fixed; 
+            bottom: 0;
+            left: 0;
             width: 100%; 
-            height: 100%; 
-            position: absolute; 
             pointer-events: none; 
             display: flex; 
             justify-content: space-between; 
             align-items: flex-end; 
-            padding: 25px 20px; 
+            padding: 20px; 
             box-sizing: border-box; 
-            z-index: 5;
-            padding-bottom: max(25px, env(safe-area-inset-bottom));
+            z-index: 15;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
         
         #joystickZone { 
@@ -143,18 +157,20 @@
         .action-buttons { display: flex; flex-direction: column; gap: 10px; pointer-events: auto; align-items: flex-end; }
         .action-btn { 
             width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; 
-            background: rgba(0,0,0,0.75); color: #fff; font-size: 8px; font-family: inherit;
+            background: rgba(0,0,0,0.78); color: #fff; font-size: 8px; font-family: inherit;
             display: flex; justify-content: center; align-items: center; text-align: center; cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.6);
         }
         .action-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
         #btnAvisar { border-color: var(--highlight); color: var(--highlight); animation: pulse 2s infinite; display: none; }
-        #btnAction { width: 75px; height: 75px; font-size: 9px; background: rgba(34, 197, 94, 0.4); border-color: #22c55e; }
+        #btnAction { width: 75px; height: 75px; font-size: 9px; background: rgba(34, 197, 94, 0.45); border-color: #22c55e; }
+        #btnPause { width: 45px; height: 45px; position: fixed; top: 15px; right: 15px; pointer-events: auto; z-index: 20; font-size: 10px; }
         
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
-        /* Pantalla Final */
-        #endScreen { background: rgba(0,0,0,0.92); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
+        /* Pantallas de Pausa y Final */
+        #pauseScreen, #endScreen { background: rgba(0,0,0,0.94); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
+        .menu-buttons { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px; }
         
         @media (min-width: 1024px) {
             #joystickZone { opacity: 0.5; }
@@ -167,12 +183,18 @@
 <body>
 
     <canvas id="gameCanvas"></canvas>
+    
+    <!-- Botón de Pausa flotante -->
+    <button class="action-btn hidden" id="btnPause" style="border-color:#3b82f6; color:#60a5fa;">⏸</button>
 
     <!-- UI Menú -->
     <div id="mainMenu" class="ui-layer">
         <h1 class="title">ESCAPE CITY<br>EMDCG</h1>
         <p class="subtitle">Un fallo en la Matrix...</p>
-        <button class="btn" id="btnStartGame">Iniciar Juego</button>
+        <div class="menu-buttons">
+            <button class="btn" id="btnStartGame">Iniciar Juego</button>
+            <button class="btn btn-secondary" id="btnToggleAudio" style="font-size: 10px; padding: 12px 20px;">🔊 Sonido: ON</button>
+        </div>
     </div>
 
     <!-- UI Cinemática -->
@@ -221,8 +243,12 @@
                     <span id="hudAbility">Balas: 12</span>
                 </div>
             </div>
-            <div class="keys-info">
-                LLAVES: <span id="keyCount">0</span>/3
+            <div class="hud-center">
+                <div class="keys-info">LLAVES: <span id="keyCount">0</span>/3</div>
+                <div class="timer-badge" id="gameTimer">00:00</div>
+            </div>
+            <div class="minimap-container">
+                <canvas id="minimapCanvas" width="90" height="90"></canvas>
             </div>
         </div>
     </div>
@@ -239,16 +265,29 @@
         </div>
     </div>
 
+    <!-- Pantalla de Pausa -->
+    <div id="pauseScreen" class="ui-layer hidden">
+        <h1 class="title" style="font-size: 5vw; color: #60a5fa;">JUEGO PAUSADO</h1>
+        <div class="menu-buttons">
+            <button class="btn" id="btnResume">Continuar</button>
+            <button class="btn btn-secondary" id="btnPauseAudio">🔊 Sonido: ON</button>
+            <button class="btn" style="background:#ef4444; color:#fff;" onclick="location.reload()">Menú Principal</button>
+        </div>
+    </div>
+
     <!-- Pantalla Final -->
     <div id="endScreen" class="ui-layer hidden">
         <h1 id="endTitle" class="title"></h1>
         <p id="endDesc" class="subtitle" style="font-size: 12px; line-height: 1.6;"></p>
+        <p id="endStats" style="color:#60a5fa; font-size:10px; margin-bottom: 15px;"></p>
         <button class="btn" onclick="location.reload()" style="margin-top: 15px;">Reiniciar</button>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const minimapCanvas = document.getElementById('minimapCanvas');
+        const minimapCtx = minimapCanvas.getContext('2d');
         
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -258,7 +297,66 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Avatares integrados en SVG base64 para evitar errores de carga de archivos externos
+        // Sistema de Audio Web Audio API sin recursos externos
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'shoot') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'explosion') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.linearRampToValueAtTime(30, now + 0.3);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'pickup') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(500, now);
+                    osc.frequency.setValueAtTime(300, now + 0.05);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+            } catch(e) {}
+        }
+
+        // Avatares integrados en SVG base64
         const avatars = {
             jostin: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="%23dc2626"/><rect x="6" y="6" width="12" height="10" fill="%23fca5a5"/><rect x="8" y="8" width="3" height="3" fill="%23000"/><rect x="13" y="8" width="3" height="3" fill="%23000"/><rect x="9" y="13" width="6" height="2" fill="%23000"/><rect x="5" y="3" width="14" height="4" fill="%237f1d1d"/></svg>',
             tavito: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="%234b5563"/><rect x="6" y="6" width="12" height="10" fill="%23d1d5db"/><rect x="8" y="8" width="3" height="3" fill="%23000"/><rect x="13" y="8" width="3" height="3" fill="%23000"/><rect x="10" y="13" width="4" height="2" fill="%23000"/><rect x="5" y="3" width="14" height="4" fill="%231f2937"/></svg>',
@@ -275,7 +373,7 @@
         images.tavito.src = avatars.tavito;
         images.pepe.src = avatars.pepe;
 
-        const STATES = { MENU: 0, CUTSCENE: 1, INSTRUCTIONS: 2, PLAYING: 3, GAMEOVER: 4, VICTORY: 5 };
+        const STATES = { MENU: 0, CUTSCENE: 1, INSTRUCTIONS: 2, PLAYING: 3, PAUSED: 4, GAMEOVER: 5, VICTORY: 6 };
         let currentState = STATES.MENU;
 
         const story = [
@@ -296,6 +394,10 @@
         const MAP_COLS = 30;
         const MAP_ROWS = 30;
         let camera = { x: 0, y: 0, w: canvas.width, h: canvas.height };
+        let screenShakeTimer = 0;
+        let screenShakeIntensity = 0;
+        let gameTime = 0;
+        let timerInterval = null;
         
         const keys = { w: false, a: false, s: false, d: false, space: false };
         let joystick = { active: false, dx: 0, dy: 0 };
@@ -315,6 +417,7 @@
         let enemies = [];
         let projectiles = [];
         let particles = [];
+        let floatingTexts = [];
         let door = null;
 
         function generateMap() {
@@ -450,6 +553,13 @@
 
             camera.x = player.x - camera.w / 2;
             camera.y = player.y - camera.h / 2;
+            
+            if (screenShakeTimer > 0) {
+                screenShakeTimer--;
+                camera.x += (Math.random() - 0.5) * screenShakeIntensity;
+                camera.y += (Math.random() - 0.5) * screenShakeIntensity;
+            }
+
             camera.x = Math.max(0, Math.min(camera.x, MAP_COLS*TILE_SIZE - camera.w));
             camera.y = Math.max(0, Math.min(camera.y, MAP_ROWS*TILE_SIZE - camera.h));
 
@@ -472,9 +582,9 @@
                         keyToAvisar = item;
                         document.getElementById('btnAvisar').style.display = 'flex';
                     } else if (item.id === 'ammo_jostin' && char.id === 'jostin') {
-                        char.ammo += 5; items.splice(i,1); createParticles(item.x, item.y, '#ff0000'); updateHUD();
+                        char.ammo += 5; items.splice(i,1); createParticles(item.x, item.y, '#ff0000'); addFloatingText("+5 Balas", item.x, item.y, '#ff0000'); playSound('pickup'); updateHUD();
                     } else if (item.id === 'ammo_tavito' && char.id === 'tavito') {
-                        char.ammo += 10; items.splice(i,1); createParticles(item.x, item.y, '#888'); updateHUD();
+                        char.ammo += 10; items.splice(i,1); createParticles(item.x, item.y, '#888'); addFloatingText("+10 Bombas", item.x, item.y, '#ccc'); playSound('pickup'); updateHUD();
                     }
                 }
             }
@@ -501,6 +611,7 @@
                         if(p.type === 'pistol') {
                             enemies.splice(j, 1);
                             createParticles(e.x, e.y, '#0f0');
+                            addFloatingText("-1 Glitch", e.x, e.y, '#4ade80');
                         } else if(p.type === 'bazooka') {
                             createExplosion(p.x, p.y);
                         }
@@ -517,6 +628,12 @@
                 let pt = particles[i];
                 pt.x += pt.dx; pt.y += pt.dy; pt.life--;
                 if(pt.life <= 0) particles.splice(i,1);
+            }
+
+            for(let i=floatingTexts.length-1; i>=0; i--) {
+                let ft = floatingTexts[i];
+                ft.y -= 0.8; ft.life--;
+                if(ft.life <= 0) floatingTexts.splice(i, 1);
             }
 
             let isInvisible = (char.id === 'pepe' && char.stealthActive);
@@ -546,14 +663,17 @@
             if (char.id === 'jostin' && char.ammo > 0) {
                 char.ammo--;
                 projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 10, dy: player.dirY * 10, r: 4, color: '#ffff00', life: 60, type: 'pistol' });
+                playSound('shoot');
                 updateHUD();
             } else if (char.id === 'tavito' && char.ammo > 0) {
                 char.ammo--;
                 projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 8, dy: player.dirY * 8, r: 8, color: '#ff5500', life: 80, type: 'bazooka' });
+                playSound('shoot');
                 updateHUD();
             } else if (char.id === 'pepe') {
                 if(char.stealthTime > 0) {
                     char.stealthActive = !char.stealthActive;
+                    playSound('click');
                     updateHUD();
                 } else {
                     char.stealthActive = false;
@@ -562,7 +682,11 @@
         }
 
         function createExplosion(ex, ey) {
-            createParticles(ex, ey, '#ff5500', 20);
+            createParticles(ex, ey, '#ff5500', 25);
+            playSound('explosion');
+            screenShakeTimer = 15;
+            screenShakeIntensity = 8;
+            addFloatingText("¡BOOM!", ex, ey, '#f59e0b');
             let killed = 0;
             for(let j=enemies.length-1; j>=0; j--) {
                 if(killed >= 5) break;
@@ -584,6 +708,10 @@
             }
         }
 
+        function addFloatingText(text, x, y, color) {
+            floatingTexts.push({ text: text, x: x, y: y, color: color, life: 50 });
+        }
+
         function avisarLlave() {
             if(keyToAvisar) {
                 globalKeysFound++;
@@ -595,6 +723,8 @@
                 document.getElementById('btnAvisar').style.display = 'none';
                 
                 createParticles(player.x, player.y, '#facc15', 30);
+                playSound('pickup');
+                addFloatingText("¡LLAVE ENCONTRADA!", player.x, player.y - 20, '#facc15');
 
                 if(globalKeysFound >= 3) {
                     spawnDoor();
@@ -718,7 +848,45 @@
                 ctx.fillRect(pt.x, pt.y, pt.size, pt.size);
             }
 
+            for(let ft of floatingTexts) {
+                ctx.fillStyle = ft.color;
+                ctx.font = '10px "Press Start 2P"';
+                ctx.fillText(ft.text, ft.x - 20, ft.y);
+            }
+
             ctx.restore();
+
+            drawMinimap();
+        }
+
+        function drawMinimap() {
+            minimapCtx.fillStyle = '#000';
+            minimapCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+
+            let scaleX = minimapCanvas.width / (MAP_COLS * TILE_SIZE);
+            let scaleY = minimapCanvas.height / (MAP_ROWS * TILE_SIZE);
+
+            for(let r=0; r<MAP_ROWS; r+=2) {
+                for(let c=0; c<MAP_COLS; c+=2) {
+                    if(map[r] && map[r][c] > 0) {
+                        minimapCtx.fillStyle = '#225522';
+                        minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
+                    }
+                }
+            }
+
+            for(let item of items) {
+                minimapCtx.fillStyle = item.color;
+                minimapCtx.fillRect(item.x * scaleX - 1, item.y * scaleY - 1, 2, 2);
+            }
+
+            if (door) {
+                minimapCtx.fillStyle = '#facc15';
+                minimapCtx.fillRect(door.x * scaleX - 2, door.y * scaleY - 2, 4, 4);
+            }
+
+            minimapCtx.fillStyle = '#3b82f6';
+            minimapCtx.fillRect(player.x * scaleX - 2, player.y * scaleY - 2, 4, 4);
         }
 
         function changeCharacter() {
@@ -726,6 +894,7 @@
             if(party[2].stealthActive && activeCharIndex !== 2) {
                 party[2].stealthActive = false;
             }
+            playSound('click');
             updateHUD();
             createParticles(player.x, player.y, '#fff', 15);
         }
@@ -747,7 +916,14 @@
             document.getElementById('hudName').style.color = (char.id === 'pepe' && char.stealthActive) ? '#55ff55' : varHighlight;
         }
 
+        function updateTimerDisplay() {
+            let mins = Math.floor(gameTime / 60).toString().padStart(2, '0');
+            let secs = (gameTime % 60).toString().padStart(2, '0');
+            document.getElementById('gameTimer').innerText = `${mins}:${secs}`;
+        }
+
         document.getElementById('btnStartGame').addEventListener('click', () => {
+            playSound('click');
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('dialogueScreen').classList.remove('hidden');
             currentState = STATES.CUTSCENE;
@@ -774,6 +950,7 @@
             let d = story[currentDialogue];
             document.getElementById('speakerAvatar').src = d.img;
             document.getElementById('speakerName').innerText = d.s;
+            playSound('click');
             
             let textEl = document.getElementById('dialogueText');
             textEl.innerText = '';
@@ -795,25 +972,71 @@
         }
 
         document.getElementById('btnPlayNow').addEventListener('click', () => {
+            playSound('click');
             document.getElementById('instructionsScreen').classList.add('hidden');
             document.getElementById('gameHUD').classList.remove('hidden');
             document.getElementById('controlsLayer').classList.remove('hidden');
+            document.getElementById('btnPause').classList.remove('hidden');
             generateMap();
             updateHUD();
             currentState = STATES.PLAYING;
+            
+            gameTime = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (currentState === STATES.PLAYING) {
+                    gameTime++;
+                    updateTimerDisplay();
+                }
+            }, 1000);
         });
+
+        function togglePause() {
+            if (currentState === STATES.PLAYING) {
+                currentState = STATES.PAUSED;
+                document.getElementById('pauseScreen').classList.remove('hidden');
+                document.getElementById('gameHUD').classList.add('hidden');
+                document.getElementById('controlsLayer').classList.add('hidden');
+                document.getElementById('btnPause').classList.add('hidden');
+            } else if (currentState === STATES.PAUSED) {
+                currentState = STATES.PLAYING;
+                document.getElementById('pauseScreen').classList.add('hidden');
+                document.getElementById('gameHUD').classList.remove('hidden');
+                document.getElementById('controlsLayer').classList.remove('hidden');
+                document.getElementById('btnPause').classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('btnPause').addEventListener('click', togglePause);
+        document.getElementById('btnResume').addEventListener('click', togglePause);
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            let text = soundEnabled ? "🔊 Sonido: ON" : "🔇 Sonido: OFF";
+            document.getElementById('btnToggleAudio').innerText = text;
+            document.getElementById('btnPauseAudio').innerText = text;
+            if (soundEnabled) playSound('click');
+        }
+        document.getElementById('btnToggleAudio').addEventListener('click', toggleAudio);
+        document.getElementById('btnPauseAudio').addEventListener('click', toggleAudio);
 
         function endGame(win) {
             currentState = win ? STATES.VICTORY : STATES.GAMEOVER;
+            if (timerInterval) clearInterval(timerInterval);
             document.getElementById('gameHUD').classList.add('hidden');
             document.getElementById('controlsLayer').classList.add('hidden');
+            document.getElementById('btnPause').classList.add('hidden');
             let endScreen = document.getElementById('endScreen');
             endScreen.classList.remove('hidden');
             
+            let mins = Math.floor(gameTime / 60).toString().padStart(2, '0');
+            let secs = (gameTime % 60).toString().padStart(2, '0');
+            document.getElementById('endStats').innerText = `Tiempo de escape: ${mins}:${secs}`;
+
             if(win) {
                 document.getElementById('endTitle').innerText = "¡VICTORIA!";
                 document.getElementById('endTitle').style.color = "#facc15";
-                document.getElementById('endDesc').innerText = "Han regresado a casa sanos y salvos.\nPollito Guía: '¡Completaste el juego!'";
+                document.getElementById('endDesc').innerText = "Han regresado a casa sanos y salvos.\nPollito Guía: '¡Completaste el juego con éxito!'";
             } else {
                 document.getElementById('endTitle').innerText = "BORRADOS";
                 document.getElementById('endTitle').style.color = "#ff0000";
@@ -822,6 +1045,10 @@
         }
 
         window.addEventListener('keydown', (e) => {
+            if (e.key === 'p' || e.key === 'P') {
+                if (currentState === STATES.PLAYING || currentState === STATES.PAUSED) togglePause();
+                return;
+            }
             if(currentState !== STATES.PLAYING) return;
             const key = e.key.toLowerCase();
             if(key === 'w' || e.key === 'ArrowUp') keys.w = true;
