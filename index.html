@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Escape City EMDCG</title>
+    <title>Escape City EMDCG Enhanced</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -48,7 +48,7 @@
         }
         .hidden { display: none !important; }
 
-        /* Menú Principal */
+        #preloaderScreen { background: #050a05; z-index: 100; pointer-events: auto; }
         #mainMenu { background: rgba(10, 20, 10, 0.96); pointer-events: auto; }
         .title { font-size: 7vw; color: #4ade80; text-shadow: 4px 4px 0 #000; text-align: center; margin-bottom: 1.5rem; line-height: 1.4; }
         .subtitle { font-size: 3vw; color: #a3e635; margin-bottom: 2.5rem; text-align: center; padding: 0 15px; }
@@ -62,7 +62,6 @@
         .btn:active { transform: translate(5px, 5px); box-shadow: none; }
         .btn-secondary { background: #3b82f6; color: #fff; }
 
-        /* Cinemática / Diálogos */
         #dialogueScreen { background: rgba(0, 0, 0, 0.92); pointer-events: auto; justify-content: flex-end; padding-bottom: 5%; }
         .dialogue-box {
             width: 92%; max-width: 800px; background: var(--ui-bg);
@@ -101,7 +100,6 @@
         .inst-content ul { list-style-type: square; margin-bottom: 12px; padding-left: 18px; }
         .inst-content li { margin-bottom: 6px; color: #fff; }
 
-        /* HUD del Juego */
         #gameHUD { justify-content: space-between; padding: 15px; box-sizing: border-box; }
         .top-hud { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; gap: 10px; }
         
@@ -168,7 +166,6 @@
         
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
-        /* Pantallas de Pausa y Final */
         #pauseScreen, #endScreen { background: rgba(0,0,0,0.94); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
         .menu-buttons { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px; }
         
@@ -184,11 +181,19 @@
 
     <canvas id="gameCanvas"></canvas>
     
-    <!-- Botón de Pausa flotante -->
     <button class="action-btn hidden" id="btnPause" style="border-color:#3b82f6; color:#60a5fa;">⏸</button>
 
-    <!-- UI Menú -->
-    <div id="mainMenu" class="ui-layer">
+    <!-- Pantalla de Carga (Preloader) -->
+    <div id="preloaderScreen" class="ui-layer">
+        <h1 class="title" style="font-size:5vw; color:#4ade80;">ESCAPE CITY EMDCG</h1>
+        <p id="loadingText" class="subtitle" style="font-size:11px; color:#fff; margin-bottom:20px;">Cargando recursos... 0%</p>
+        <div style="width:260px; height:22px; border:3px solid #fff; background:#111; border-radius:4px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.8);">
+            <div id="loadingBar" style="width:0%; height:100%; background:#22c55e; transition:width 0.15s ease-out;"></div>
+        </div>
+    </div>
+
+    <!-- Menú Principal -->
+    <div id="mainMenu" class="ui-layer hidden">
         <h1 class="title">ESCAPE CITY<br>EMDCG</h1>
         <p class="subtitle">Un fallo en la Matrix...</p>
         <div class="menu-buttons">
@@ -197,7 +202,7 @@
         </div>
     </div>
 
-    <!-- UI Cinemática -->
+    <!-- Cinemática / Diálogos -->
     <div id="dialogueScreen" class="ui-layer hidden">
         <div class="dialogue-box" id="dialogueBox">
             <div class="avatar-container">
@@ -211,13 +216,13 @@
         </div>
     </div>
 
-    <!-- UI Instrucciones -->
+    <!-- Instrucciones -->
     <div id="instructionsScreen" class="ui-layer hidden">
         <div class="inst-content">
             <h2>MISIÓN Y REGLAS</h2>
             <ul>
                 <li>Están atrapados. Encuentren <b>3 LLAVES</b> ocultas.</li>
-                <li><b>Llave 1:</b> En edificios destruidos.</li>
+                <li><b>Llave 1:</b> En edificios destruidos (interiores transitables).</li>
                 <li><b>Llave 2:</b> En zonas abiertas.</li>
                 <li><b>Llave 3:</b> En edificios intactos.</li>
                 <li><b>CUIDADO:</b> Las entidades te borrarán si te tocan.</li>
@@ -228,12 +233,12 @@
                 <li><b>Tavito (Cambio 2):</b> Bazuca. Daño en área. (20 bombas)</li>
                 <li><b>Pepe (Cambio 3):</b> Sigilo. Invisible 120s. No ataca.</li>
             </ul>
-            <p style="line-height:1.4;">Usa el Joystick para moverte.<br>Botón ACCIÓN para habilidad.<br>Pisa la llave y pulsa <b>AVISAR</b>.</p>
+            <p style="line-height:1.4;">Usa el Joystick para moverte.<br>Entra a los edificios para explorar.<br>Pisa la llave y pulsa <b>AVISAR</b>.</p>
         </div>
         <button class="btn" id="btnPlayNow" style="margin-bottom: 15px;">¡Entendido!</button>
     </div>
 
-    <!-- HUD Juego -->
+    <!-- HUD del Juego -->
     <div id="gameHUD" class="ui-layer hidden" style="pointer-events: none;">
         <div class="top-hud">
             <div class="char-info">
@@ -360,14 +365,44 @@
             tavito: new Image(),
             pepe: new Image()
         };
-        charImages.jostin.src = 'Jostin.PNG';
-        charImages.tavito.src = 'Tavito.PNG';
-        charImages.pepe.src = 'Pepe.PNG';
+
+        const assetList = [
+            { key: 'jostin', img: charImages.jostin, src: 'Jostin.PNG' },
+            { key: 'tavito', img: charImages.tavito, src: 'Tavito.PNG' },
+            { key: 'pepe', img: charImages.pepe, src: 'Pepe.PNG' }
+        ];
+
+        let loadedCount = 0;
+        const totalAssets = assetList.length;
+
+        function updatePreloader() {
+            loadedCount++;
+            let pct = Math.floor((loadedCount / totalAssets) * 100);
+            document.getElementById('loadingText').innerText = `Cargando recursos... ${pct}%`;
+            document.getElementById('loadingBar').style.width = `${pct}%`;
+
+            if (loadedCount >= totalAssets) {
+                setTimeout(() => {
+                    document.getElementById('preloaderScreen').classList.add('hidden');
+                    document.getElementById('mainMenu').classList.remove('hidden');
+                }, 400);
+            }
+        }
+
+        assetList.forEach(item => {
+            item.img.onload = updatePreloader;
+            item.img.onerror = () => {
+                // Fallback graceful handler if image path fails
+                console.warn(`Failed to load ${item.src}, using fallback color block.`);
+                updatePreloader();
+            };
+            item.img.src = item.src;
+        });
 
         const guideAvatarSVG = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="%23eab308"/><circle cx="12" cy="12" r="8" fill="%23fef08a"/><circle cx="10" cy="10" r="1" fill="%23000"/><circle cx="14" cy="10" r="1" fill="%23000"/><polygon points="11,12 13,12 12,14" fill="%23f97316"/></svg>';
 
-        const STATES = { MENU: 0, CUTSCENE: 1, INSTRUCTIONS: 2, PLAYING: 3, PAUSED: 4, GAMEOVER: 5, VICTORY: 6 };
-        let currentState = STATES.MENU;
+        const STATES = { PRELOAD: 0, MENU: 1, CUTSCENE: 2, INSTRUCTIONS: 3, PLAYING: 4, PAUSED: 5, GAMEOVER: 6, VICTORY: 7 };
+        let currentState = STATES.PRELOAD;
 
         const story = [
             { s: 'Jostin', imgRef: 'jostin', t: 'Estábamos tranquilos jugando y de repente... ¿qué pasó?' },
@@ -404,7 +439,7 @@
         let globalKeysFound = 0;
         let keyToAvisar = null;
 
-        let player = { x: TILE_SIZE * 2, y: TILE_SIZE * 2, w: 40, h: 40, dirX: 0, dirY: 1 };
+        let player = { x: TILE_SIZE * 2, y: TILE_SIZE * 2, w: 36, h: 36, dirX: 0, dirY: 1 };
         let map = [];
         let items = [];
         let enemies = [];
@@ -419,16 +454,17 @@
                 let row = [];
                 for(let c=0; c<MAP_COLS; c++) {
                     if(r===0 || r===MAP_ROWS-1 || c===0 || c===MAP_COLS-1) {
-                        row.push(1); continue;
+                        row.push(1); continue; // Muro sólido perimetral
                     }
                     let rand = Math.random();
-                    if(rand < 0.1) row.push(1);
-                    else if(rand < 0.25) row.push(2);
-                    else row.push(0);
+                    if(rand < 0.12) row.push(1);      // Muros / Obstáculos sólidos
+                    else if(rand < 0.32) row.push(2); // Edificios destruidos (Interiores / Zonas transitables)
+                    else row.push(0);                 // Calles abiertas
                 }
                 map.push(row);
             }
             
+            // Área de inicio despejada
             map[1][1] = 0; map[1][2] = 0; map[2][1] = 0; map[2][2] = 0;
             player.x = TILE_SIZE * 1.5; player.y = TILE_SIZE * 1.5;
 
@@ -439,58 +475,79 @@
             placeItemInZone(0, 'key2', '#facc15');
             placeItemNear(1, 'key3', '#facc15');
 
-            for(let i=0; i<5; i++) {
+            for(let i=0; i<4; i++) {
                 placeItemInZone(2, 'ammo_jostin', '#ff0000');
-                placeItemInZone(1, 'ammo_tavito', '#888');
+                placeItemInZone(0, 'ammo_tavito', '#888');
             }
 
-            for(let i=0; i<15; i++) {
+            // REDUCCIÓN DE SPAWNEO DE ENEMIGOS (Densidad táctica: 6 entidades en lugar de 15)
+            for(let i=0; i<6; i++) {
                 let ex, ey;
                 do {
-                    let c = Math.floor(Math.random() * MAP_COLS);
-                    let r = Math.floor(Math.random() * MAP_ROWS);
+                    let c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
+                    let r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
                     ex = c * TILE_SIZE + TILE_SIZE/2;
                     ey = r * TILE_SIZE + TILE_SIZE/2;
-                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] !== 0 || distance(player.x, player.y, ex, ey) < TILE_SIZE*5);
+                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*6);
                 
-                enemies.push({ x: ex, y: ey, w: 32, h: 32, speed: 1.5 + Math.random(), type: 'glitch' });
+                enemies.push({ 
+                    x: ex, 
+                    y: ey, 
+                    w: 32, 
+                    h: 32, 
+                    speed: 1.3 + Math.random() * 0.5, 
+                    state: 'PATROL', // PATROL o CHASE
+                    patrolTarget: { x: ex, y: ey },
+                    patrolTimer: 0,
+                    visionRange: 260
+                });
             }
         }
 
         function placeItemInZone(tileType, id, color) {
             let placed = false;
-            while(!placed) {
+            let attempts = 0;
+            while(!placed && attempts < 200) {
+                attempts++;
                 let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
                 let c = Math.floor(Math.random() * (MAP_COLS-2)) + 1;
                 if(map[r][c] === tileType) {
-                    if(tileType !== 0) {
-                        if(map[r][c+1] === 0) c++;
-                        else if(map[r][c-1] === 0) c--;
-                        else if(map[r+1][c] === 0) r++;
-                        else if(map[r-1][c] === 0) r--;
-                        else continue;
-                    }
-                    items.push({ x: c*TILE_SIZE + TILE_SIZE/2, y: r*TILE_SIZE + TILE_SIZE/2, id: id, color: color, radius: 15 });
+                    items.push({ x: c*TILE_SIZE + TILE_SIZE/2, y: r*TILE_SIZE + TILE_SIZE/2, id: id, color: color, radius: 14 });
                     placed = true;
                 }
+            }
+            if(!placed) {
+                items.push({ x: TILE_SIZE * 3, y: TILE_SIZE * 3, id: id, color: color, radius: 14 });
             }
         }
 
         function placeItemNear(tileType, id, color) {
             let placed = false;
-            while(!placed) {
+            let attempts = 0;
+            while(!placed && attempts < 200) {
+                attempts++;
                 let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
                 let c = Math.floor(Math.random() * (MAP_COLS-2)) + 1;
                 if(map[r][c] === 0) {
                     if(map[r][c+1]===tileType || map[r][c-1]===tileType || map[r+1][c]===tileType || map[r-1][c]===tileType) {
-                        items.push({ x: c*TILE_SIZE + TILE_SIZE/2, y: r*TILE_SIZE + TILE_SIZE/2, id: id, color: color, radius: 15 });
+                        items.push({ x: c*TILE_SIZE + TILE_SIZE/2, y: r*TILE_SIZE + TILE_SIZE/2, id: id, color: color, radius: 14 });
                         placed = true;
                     }
                 }
             }
+            if(!placed) {
+                items.push({ x: TILE_SIZE * 5, y: TILE_SIZE * 5, id: id, color: color, radius: 14 });
+            }
         }
 
         function distance(x1, y1, x2, y2) { return Math.hypot(x2-x1, y2-y1); }
+
+        function isSolid(tileX, tileY) {
+            if (tileX < 0 || tileX >= MAP_COLS || tileY < 0 || tileY >= MAP_ROWS) return true;
+            // Solo los bloques con valor 1 (muros sólidos perimetrales o de obstrucción) bloquean.
+            // Los bloques 0 (calles) y 2 (edificios destruidos / interiores) son transitables para el jugador.
+            return map[tileY][tileX] === 1;
+        }
 
         function update() {
             if (currentState !== STATES.PLAYING) return;
@@ -519,30 +576,32 @@
                 player.dirX = dx/mag; player.dirY = dy/mag;
             }
 
+            // Colisión deslizante por ejes para el jugador (permitiendo explorar interiores tipo 2)
             let newX = player.x + dx;
-            let newY = player.y + dy;
+            let pR = player.w / 2;
+            let topY = player.y - pR, botY = player.y + pR;
             
-            let rX = newX + player.w/2; let lX = newX - player.w/2;
-            let bY = newY + player.h/2; let tY = newY - player.h/2;
+            let leftX = newX - pR, rightX = newX + pR;
+            let cLeft = Math.floor(leftX / TILE_SIZE), cRight = Math.floor(rightX / TILE_SIZE);
+            let rTop = Math.floor(topY / TILE_SIZE), rBot = Math.floor(botY / TILE_SIZE);
 
-            let colLeft = Math.floor(lX / TILE_SIZE); let colRight = Math.floor(rX / TILE_SIZE);
-            let rowTop = Math.floor(tY / TILE_SIZE); let rowBottom = Math.floor(bY / TILE_SIZE);
-
-            let collide = false;
-            if (map[rowTop] && (map[rowTop][colLeft] > 0 || map[rowTop][colRight] > 0)) collide = true;
-            if (map[rowBottom] && (map[rowBottom][colLeft] > 0 || map[rowBottom][colRight] > 0)) collide = true;
-
-            if(!collide) {
-                player.x = newX;
-                player.y = newY;
-            } else {
-                let canMoveX = true; let canMoveY = true;
-                if(map[Math.floor(player.y/TILE_SIZE)][colLeft]>0 || map[Math.floor(player.y/TILE_SIZE)][colRight]>0) canMoveX = false;
-                if(map[rowTop][Math.floor(player.x/TILE_SIZE)]>0 || map[rowBottom][Math.floor(player.x/TILE_SIZE)]>0) canMoveY = false;
-                
-                if(canMoveX) player.x += dx;
-                if(canMoveY) player.y += dy;
+            let canMoveX = true;
+            if (isSolid(cLeft, rTop) || isSolid(cLeft, rBot) || isSolid(cRight, rTop) || isSolid(cRight, rBot)) {
+                canMoveX = false;
             }
+            if (canMoveX) player.x = newX;
+
+            let newY = player.y + dy;
+            leftX = player.x - pR; rightX = player.x + pR;
+            topY = newY - pR; botY = newY + pR;
+            cLeft = Math.floor(leftX / TILE_SIZE); cRight = Math.floor(rightX / TILE_SIZE);
+            rTop = Math.floor(topY / TILE_SIZE); rBot = Math.floor(botY / TILE_SIZE);
+
+            let canMoveY = true;
+            if (isSolid(cLeft, rTop) || isSolid(cLeft, rBot) || isSolid(cRight, rTop) || isSolid(cRight, rBot)) {
+                canMoveY = false;
+            }
+            if (canMoveY) player.y = newY;
 
             camera.x = player.x - camera.w / 2;
             camera.y = player.y - camera.h / 2;
@@ -591,7 +650,7 @@
                 p.x += p.dx; p.y += p.dy; p.life--;
                 
                 let prC = Math.floor(p.x/TILE_SIZE); let prR = Math.floor(p.y/TILE_SIZE);
-                if(p.life <= 0 || map[prR]===undefined || map[prR][prC]===undefined || map[prR][prC] === 1) {
+                if(p.life <= 0 || isSolid(prC, prR)) {
                     if(p.type==='bazooka') createExplosion(p.x, p.y);
                     projectiles.splice(i, 1);
                     continue;
@@ -634,16 +693,58 @@
                 let e = enemies[i];
                 let distToPlayer = distance(e.x, e.y, player.x, player.y);
 
-                if(!isInvisible && distToPlayer < 300) {
-                    let angle = Math.atan2(player.y - e.y, player.x - e.x);
-                    e.x += Math.cos(angle) * e.speed;
-                    e.y += Math.sin(angle) * e.speed;
-                } else {
-                    e.x += (Math.random() - 0.5) * 2;
-                    e.y += (Math.random() - 0.5) * 2;
+                // Determinar estado de IA (Patrulla vs Persecución con visión)
+                if (!isInvisible && distToPlayer < e.visionRange) {
+                    e.state = 'CHASE';
+                } else if (distToPlayer > e.visionRange * 1.3 || isInvisible) {
+                    if (e.state === 'CHASE') e.state = 'PATROL';
                 }
 
-                if(!isInvisible && distToPlayer < (e.w/2 + player.w/2 - 5)) {
+                let targetX = e.x, targetY = e.y;
+                if (e.state === 'CHASE') {
+                    targetX = player.x;
+                    targetY = player.y;
+                } else {
+                    // Comportamiento de Patrulla Autónoma
+                    e.patrolTimer--;
+                    if (e.patrolTimer <= 0 || distance(e.x, e.y, e.patrolTarget.x, e.patrolTarget.y) < 20) {
+                        let randC = Math.floor(Math.random() * (MAP_COLS - 2)) + 1;
+                        let randR = Math.floor(Math.random() * (MAP_ROWS - 2)) + 1;
+                        if (!isSolid(randC, randR)) {
+                            e.patrolTarget.x = randC * TILE_SIZE + TILE_SIZE/2;
+                            e.patrolTarget.y = randR * TILE_SIZE + TILE_SIZE/2;
+                        }
+                        e.patrolTimer = 180 + Math.random() * 120;
+                    }
+                    targetX = e.patrolTarget.x;
+                    targetY = e.patrolTarget.y;
+                }
+
+                let angle = Math.atan2(targetY - e.y, targetX - e.x);
+                let moveStep = e.state === 'CHASE' ? e.speed : e.speed * 0.6;
+                let nextX = e.x + Math.cos(angle) * moveStep;
+                let nextY = e.y + Math.sin(angle) * moveStep;
+
+                // Evasión de Obstáculos y Muros (Raycasting simple / Sliding contra tile 1)
+                let eR = e.w / 2;
+                let cE_X = Math.floor(nextX / TILE_SIZE);
+                let cE_Y = Math.floor(e.y / TILE_SIZE);
+                if (!isSolid(cE_X, Math.floor(e.y / TILE_SIZE))) {
+                    e.x = nextX;
+                } else {
+                    // Si choca con un muro en X, intenta rodearlo variando ángulo en patrulla
+                    if (e.state === 'PATROL') e.patrolTimer = 0;
+                }
+
+                let cE_X2 = Math.floor(e.x / TILE_SIZE);
+                let cE_Y2 = Math.floor(nextY / TILE_SIZE);
+                if (!isSolid(Math.floor(e.x / TILE_SIZE), cE_Y2)) {
+                    e.y = nextY;
+                } else {
+                    if (e.state === 'PATROL') e.patrolTimer = 0;
+                }
+
+                if (!isInvisible && distToPlayer < (e.w/2 + player.w/2 - 4)) {
                     endGame(false);
                 }
             }
@@ -682,8 +783,8 @@
             addFloatingText("¡BOOM!", ex, ey, '#f59e0b');
             let killed = 0;
             for(let j=enemies.length-1; j>=0; j--) {
-                if(killed >= 5) break;
-                if(distance(ex, ey, enemies[j].x, enemies[j].y) < 100) {
+                if(killed >= 4) break;
+                if(distance(ex, ey, enemies[j].x, enemies[j].y) < 110) {
                     createParticles(enemies[j].x, enemies[j].y, '#0f0');
                     enemies.splice(j, 1);
                     killed++;
@@ -754,18 +855,24 @@
                         let ty = r * TILE_SIZE;
                         
                         if(map[r][c] === 1) {
-                            ctx.fillStyle = '#223322';
+                            // Muro sólido (Impassable)
+                            ctx.fillStyle = '#1c281c';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = '#334433';
+                            ctx.strokeStyle = '#2d3d2d';
                             ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
                         } else if (map[r][c] === 2) {
-                            ctx.fillStyle = '#111a11';
+                            // Edificio destruido / Interior transitable
+                            ctx.fillStyle = '#111a13';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = '#334433';
-                            ctx.fillRect(tx+10, ty+10, 20, 20);
-                            ctx.fillRect(tx+40, ty+30, 15, 15);
+                            ctx.strokeStyle = 'rgba(74, 222, 128, 0.15)';
+                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
+                            // Detalles interiores de ruina
+                            ctx.fillStyle = '#223322';
+                            ctx.fillRect(tx+12, ty+12, 16, 16);
+                            ctx.fillRect(tx+36, ty+32, 12, 12);
                         } else {
-                            ctx.strokeStyle = 'rgba(0, 255, 0, 0.05)';
+                            // Calle abierta
+                            ctx.strokeStyle = 'rgba(0, 255, 0, 0.04)';
                             ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
                         }
                     }
@@ -797,11 +904,11 @@
             }
 
             for(let e of enemies) {
-                ctx.fillStyle = (Math.random()>0.8) ? '#fff' : '#0f0';
+                ctx.fillStyle = (e.state === 'CHASE') ? '#ef4444' : '#22c55e';
                 ctx.fillRect(e.x - e.w/2, e.y - e.h/2, e.w, e.h);
                 ctx.fillStyle = '#000';
-                ctx.fillRect(e.x - 8, e.y - 5, 4, 4);
-                ctx.fillRect(e.x + 4, e.y - 5, 4, 4);
+                ctx.fillRect(e.x - 7, e.y - 5, 4, 4);
+                ctx.fillRect(e.x + 3, e.y - 5, 4, 4);
             }
 
             const char = party[activeCharIndex];
@@ -810,12 +917,11 @@
             ctx.translate(player.x, player.y);
             
             if(char.id === 'pepe' && char.stealthActive) {
-                ctx.globalAlpha = 0.3;
+                ctx.globalAlpha = 0.35;
             }
 
             if(player.dirX < 0) ctx.scale(-1, 1);
 
-            // Verificación segura para imágenes PNG
             if(char.img && char.img.complete && char.img.naturalHeight !== 0) {
                 ctx.drawImage(char.img, -player.w/2, -player.h/2, player.w, player.h);
             } else {
@@ -825,8 +931,8 @@
             ctx.restore();
 
             if (char.id !== 'pepe') {
-                ctx.fillStyle = 'rgba(255,0,0,0.5)';
-                ctx.fillRect(player.x + player.dirX * 40 - 2, player.y + player.dirY * 40 - 2, 4, 4);
+                ctx.fillStyle = 'rgba(255,255,0,0.6)';
+                ctx.fillRect(player.x + player.dirX * 36 - 2, player.y + player.dirY * 36 - 2, 4, 4);
             }
 
             for(let p of projectiles) {
@@ -861,8 +967,11 @@
 
             for(let r=0; r<MAP_ROWS; r+=2) {
                 for(let c=0; c<MAP_COLS; c+=2) {
-                    if(map[r] && map[r][c] > 0) {
-                        minimapCtx.fillStyle = '#225522';
+                    if(map[r] && map[r][c] === 1) {
+                        minimapCtx.fillStyle = '#2d3d2d';
+                        minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
+                    } else if (map[r] && map[r][c] === 2) {
+                        minimapCtx.fillStyle = '#113311';
                         minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
                     }
                 }
@@ -889,7 +998,7 @@
             }
             playSound('click');
             updateHUD();
-            createParticles(player.x, player.y, '#fff', 15);
+            createParticles(player.x, player.y, '#fff', 12);
         }
 
         function updateHUD() {
@@ -1053,9 +1162,9 @@
             if(key === 's' || e.key === 'ArrowDown') keys.s = true;
             if(key === 'd' || e.key === 'ArrowRight') keys.d = true;
             
-            if(key === '1') { activeCharIndex=0; updateHUD(); createParticles(player.x, player.y, '#fff', 10); }
-            if(key === '2') { activeCharIndex=1; updateHUD(); createParticles(player.x, player.y, '#fff', 10); }
-            if(key === '3') { activeCharIndex=2; updateHUD(); createParticles(player.x, player.y, '#fff', 10); }
+            if(key === '1') { activeCharIndex=0; updateHUD(); createParticles(player.x, player.y, '#fff', 8); }
+            if(key === '2') { activeCharIndex=1; updateHUD(); createParticles(player.x, player.y, '#fff', 8); }
+            if(key === '3') { activeCharIndex=2; updateHUD(); createParticles(player.x, player.y, '#fff', 8); }
             
             if(key === ' ' && !keys.space) {
                 keys.space = true; triggerAction();
