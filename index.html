@@ -143,6 +143,13 @@
         .timer-badge { background: rgba(10, 15, 30, 0.88); border: 2px solid #38bdf8; padding: 8px 12px; color: #60a5fa; font-size: 10px; border-radius: 6px; }
         .keys-info { background: rgba(10, 15, 30, 0.88); border: 2px solid var(--highlight); padding: 10px 14px; color: var(--highlight); font-size: 11px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-radius: 6px; }
 
+        .minimap-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
         .minimap-container {
             width: 100px;
             height: 100px;
@@ -195,7 +202,7 @@
         .action-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
         #btnAvisar { border-color: var(--highlight); color: var(--highlight); animation: pulse 2s infinite; display: none; }
         #btnAction { width: 75px; height: 75px; font-size: 9px; background: rgba(16, 185, 129, 0.5); border-color: #10b981; }
-        #btnPause { width: 45px; height: 45px; position: fixed; top: 15px; right: 130px; pointer-events: auto; z-index: 20; font-size: 10px; border-radius: 8px; }
+        #btnPause { width: 100px; height: 32px; pointer-events: auto; z-index: 20; font-size: 9px; border-radius: 6px; border-color: #3b82f6; color: #60a5fa; }
         
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
@@ -224,8 +231,6 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    
-    <button class="action-btn hidden" id="btnPause" style="border-color:#3b82f6; color:#60a5fa;">⏸</button>
 
     <div class="currency-badge" id="currencyBadge">
         <span>🏆 Copas: <span id="cupCount">0</span></span>
@@ -305,8 +310,11 @@
                 <div class="keys-info">LLAVES: <span id="keyCount">0</span>/3</div>
                 <div class="timer-badge" id="gameTimer">00:00</div>
             </div>
-            <div class="minimap-container">
-                <canvas id="minimapCanvas" width="100" height="100"></canvas>
+            <div class="minimap-wrapper">
+                <div class="minimap-container">
+                    <canvas id="minimapCanvas" width="100" height="100"></canvas>
+                </div>
+                <button class="action-btn hidden" id="btnPause">⏸ PAUSA</button>
             </div>
         </div>
     </div>
@@ -460,13 +468,20 @@
         const STATES = { PRELOAD: 0, MENU: 1, CUTSCENE: 2, INSTRUCTIONS: 3, PLAYING: 4, PAUSED: 5, GAMEOVER: 6, VICTORY: 7 };
         let currentState = STATES.PRELOAD;
 
+        // SECUENCIA DE DIÁLOGOS EXACTA SOLICITADA (12 ítems con avatares correspondientes)
         const story = [
-            { s: 'Jostin', imgRef: 'jostin', t: 'Estábamos tranquilos jugando y de repente... ¿qué pasó con el terreno?' },
-            { s: 'Tavito', imgRef: 'tavito', t: 'El suelo se abrió y se expandió. Es un mega fallo nocturno en la Matrix.' },
-            { s: 'Pepe', imgRef: 'pepe', t: '*Tiembla* Pío pío... esta zona abandonada es enorme y muy oscura.' },
-            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: '¡Atención viajeros! Bienvenidos a la versión ampliada 128x128 de la Ciudad EMDCG.' },
-            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: 'Para escapar, deben encontrar 3 LLAVES ocultas en este vasto mapa y llegar a la puerta.' },
-            { s: 'Jostin', imgRef: 'jostin', t: 'Preparen sus armas y sigilo. ¡Vamos a explorar!' }
+            { s: 'Jostin', imgRef: 'jostin', t: 'Estábamos tranquilos, Pepe y yo jugando en la Play… y, de repente… ¿qué pasó?' },
+            { s: 'Tavito', imgRef: 'tavito', t: '¡¿Qué es esto?! ¡¿Dónde estamos?! ¡Yo solo estaba en mi celular! ¡¿Cómo terminamos aquí?!' },
+            { s: 'Pepe', imgRef: 'pepe', t: '¿Q-Qué…? ¡¿Dónde estamos?! Tengo… tengo miedo…' },
+            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: '¡ATENCIÓN, VIAJEROS! Por un error en la Matrix… ¡han sido transportados a La Ciudad EMCD! Para poder escapar, tendrán que encontrar 3 llaves.' },
+            { s: 'Jostin', imgRef: 'jostin', t: '¿3 llaves? Bah… suena fácil.' },
+            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: 'No será tan fácil… Tendrán que protegerse de las entidades que habitan por todo el mapa. Y si alguna de ellas logra matarlos…' },
+            { s: 'Tavito', imgRef: 'tavito', t: '¿Qué pasa si nos mata?' },
+            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: 'Simplemente… desaparecen.' },
+            { s: 'Tavito', imgRef: 'tavito', t: 'Bueno… entonces será mejor que prepare mi bazuca.' },
+            { s: 'Jostin', imgRef: 'jostin', t: 'Y yo ya estoy cargando mi pistola.' },
+            { s: 'Jostin', imgRef: 'jostin', t: 'Así que…' },
+            { s: 'Jostin', imgRef: 'jostin', t: '¡¡VAMOS ALLÁ!!' }
         ];
         let currentDialogue = 0;
         let isTyping = false;
@@ -514,16 +529,15 @@
                         row.push(1); continue;
                     }
                     let rand = Math.random();
-                    if(rand < 0.14) row.push(1); // Muro normal
-                    else if(rand < 0.20) row.push(4); // Zona Dinámica: Muro parpadeante
-                    else if(rand < 0.35) row.push(2); // Edificio en ruinas
-                    else if(rand < 0.50) row.push(3); // Zona Dinámica: Calle lúgubre
-                    else row.push(0); // Calle normal
+                    if(rand < 0.14) row.push(1);
+                    else if(rand < 0.20) row.push(4);
+                    else if(rand < 0.35) row.push(2);
+                    else if(rand < 0.50) row.push(3);
+                    else row.push(0);
                 }
                 map.push(row);
             }
             
-            // Clearing starting zone
             for(let r=1; r<=3; r++) {
                 for(let c=1; c<=3; c++) {
                     map[r][c] = 0;
@@ -531,7 +545,6 @@
             }
             player.x = TILE_SIZE * 2; player.y = TILE_SIZE * 2;
             
-            // Tamaño inicial según personaje activo
             player.w = party[activeCharIndex].id === 'pepe' ? 28 : 36;
             player.h = party[activeCharIndex].id === 'pepe' ? 28 : 36;
 
@@ -547,7 +560,6 @@
                 placeItemInZone(0, 'ammo_tavito', '#a855f7');
             }
 
-            // Generando enemigos con propiedad de vida y mayor número por el mapa grande
             for(let i=0; i<60; i++) {
                 let ex, ey;
                 do {
@@ -567,7 +579,7 @@
                     patrolTarget: { x: ex, y: ey },
                     patrolTimer: 0,
                     visionRange: 300,
-                    hp: 3 // Sistema de vida implementado
+                    hp: 3 
                 });
             }
         }
@@ -676,7 +688,6 @@
             camera.x = Math.max(0, Math.min(camera.x, MAP_COLS*TILE_SIZE - camera.w));
             camera.y = Math.max(0, Math.min(camera.y, MAP_ROWS*TILE_SIZE - camera.h));
 
-            // Aviso automático de límites de mapa 
             if (player.x < TILE_SIZE * 1.5 || player.x > (MAP_COLS - 1.5) * TILE_SIZE || 
                 player.y < TILE_SIZE * 1.5 || player.y > (MAP_ROWS - 1.5) * TILE_SIZE) {
                 if (Date.now() - lastBoundaryWarning > 3000) {
@@ -722,7 +733,6 @@
                 let prC = Math.floor(p.x/TILE_SIZE); let prR = Math.floor(p.y/TILE_SIZE);
                 if(p.life <= 0 || isSolid(prC, prR)) {
                     if (isSolid(prC, prR)) {
-                        // Creando grietas visuales sin romper la pared
                         cracks.push({
                             x: p.x, y: p.y, life: 250,
                             lines: [
@@ -743,7 +753,7 @@
                     let e = enemies[j];
                     if(distance(p.x, p.y, e.x, e.y) < e.w/2 + p.r) {
                         if(p.type === 'pistol') {
-                            e.hp -= 1; // Pistola requiere 3 hits (3 HP)
+                            e.hp -= 1;
                             if(e.hp <= 0) {
                                 enemies.splice(j, 1);
                                 createParticles(e.x, e.y, '#00ffcc');
@@ -753,7 +763,6 @@
                                 addFloatingText("-1 HP", e.x, e.y - 15, '#facc15');
                             }
                         } else if(p.type === 'bazooka') {
-                            // Bazooka impacta y causa explosión letal instantánea (quita todos los HP)
                             createExplosion(p.x, p.y); 
                         }
                         hit = true;
@@ -944,7 +953,7 @@
                         
                         if(tileType === 1 || tileType === 4) {
                             ctx.fillStyle = '#0f172a';
-                            if (tileType === 4) { // Zona Dinámica: Parpadeo de muro
+                            if (tileType === 4) {
                                 let blink = 0.5 + Math.abs(Math.sin(Date.now()/300)) * 0.5;
                                 ctx.fillStyle = `rgba(15, 23, 42, ${blink})`;
                             }
@@ -962,7 +971,6 @@
                             ctx.fillRect(tx+10, ty+10, 18, 18);
                             ctx.fillRect(tx+34, ty+34, 14, 14);
                         } else if (tileType === 3) {
-                            // Zona Dinámica: Zona Lúgubre (oscura)
                             ctx.fillStyle = '#010203'; 
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
                             ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
@@ -1010,7 +1018,6 @@
                 ctx.fillRect(e.x - 7, e.y - 5, 4, 4);
                 ctx.fillRect(e.x + 3, e.y - 5, 4, 4);
 
-                // Barras de Vida sobre Enemigos Heridos (3 HP máximo)
                 if (e.hp < 3) {
                     ctx.fillStyle = '#ef4444';
                     ctx.fillRect(e.x - 12, e.y - 24, 24, 4);
@@ -1022,7 +1029,6 @@
                 }
             }
 
-            // Renderizado Visual de Grietas contra los muros
             ctx.strokeStyle = `rgba(16, 185, 129, 0.8)`;
             ctx.lineWidth = 1.5;
             for(let crack of cracks) {
@@ -1060,7 +1066,6 @@
             }
             ctx.restore();
 
-            // Dibujar silueta vectorial de armas según personaje
             if (char.id !== 'pepe') {
                 let aimAngle = Math.atan2(player.dirY, player.dirX);
                 ctx.save();
@@ -1142,7 +1147,6 @@
                 party[2].stealthActive = false;
             }
             
-            // Ajuste estricto de Hitbox de tamaño para que Pepe sea notablemente menor
             if (party[activeCharIndex].id === 'pepe') {
                 player.w = 28; player.h = 28;
             } else {
