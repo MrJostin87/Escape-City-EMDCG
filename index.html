@@ -202,7 +202,6 @@
         #pauseScreen, #endScreen, #storeModal { background: rgba(3, 5, 10, 0.96); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
         .menu-buttons { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 15px; }
 
-        /* Modal personalizado de Tienda */
         #storeModal { z-index: 150; }
         .store-box {
             background: rgba(15, 23, 42, 0.95);
@@ -229,7 +228,7 @@
     
     <button class="action-btn hidden" id="btnPause" style="border-color:#3b82f6; color:#60a5fa;">⏸</button>
 
-    <!-- Badge de Moneda / Copas Global -->
+    <!-- Badge de Moneda / Copas Global. Visible por defecto en el menú. Se ocultará en partida. -->
     <div class="currency-badge" id="currencyBadge">
         <span>🏆 Copas: <span id="cupCount">0</span></span>
     </div>
@@ -245,7 +244,6 @@
 
     <!-- Menú Principal -->
     <div id="mainMenu" class="ui-layer hidden">
-        <!-- Logo de imagen solicitado -->
         <img src="Escape_City_EMDCG.PNG" alt="Escape City EMDCG" class="menu-logo-img" id="menuLogoImg" onerror="this.style.display='none'; document.getElementById('fallbackTitle').style.display='block';">
         <h1 id="fallbackTitle" class="title" style="display:none;">ESCAPE CITY<br>EMDCG</h1>
         <p class="subtitle">Un fallo en la Matrix urbana...</p>
@@ -284,7 +282,8 @@
         <div class="inst-content">
             <h2>MISIÓN Y REGLAS</h2>
             <ul>
-                <li>Están atrapados en un mapa urbano ampliado (42x42). Encuentren <b>3 LLAVES</b> ocultas.</li>
+                <!-- Actualizado al nuevo tamaño masivo -->
+                <li>Están atrapados en un mapa urbano masivo (64x64). Encuentren <b>3 LLAVES</b> ocultas.</li>
                 <li><b>Llave 1:</b> En edificios destruidos (interiores transitables).</li>
                 <li><b>Llave 2:</b> En zonas abiertas y calles oscuras.</li>
                 <li><b>Llave 3:</b> En bloques urbanos intactos.</li>
@@ -369,7 +368,6 @@
         let audioCtx = null;
         let soundEnabled = true;
 
-        // Sistema de Economía persistente (Copas)
         let playerCups = parseInt(localStorage.getItem('emdcg_cups') || '0', 10);
         function updateCupDisplay() {
             document.getElementById('cupCount').innerText = playerCups;
@@ -478,7 +476,7 @@
             { s: 'Jostin', imgRef: 'jostin', t: 'Estábamos tranquilos jugando y de repente... ¿qué pasó con el terreno?' },
             { s: 'Tavito', imgRef: 'tavito', t: 'El suelo se abrió y se expandió. Es un mega fallo nocturno en la Matrix.' },
             { s: 'Pepe', imgRef: 'pepe', t: '*Tiembla* Pío pío... esta zona abandonada es enorme y muy oscura.' },
-            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: '¡Atención viajeros! Bienvenidos a la versión ampliada de la Ciudad EMDCG.' },
+            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: '¡Atención viajeros! Bienvenidos a la versión ampliada 64x64 de la Ciudad EMDCG.' },
             { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: 'Para escapar, deben encontrar 3 LLAVES ocultas en este vasto mapa y llegar a la puerta.' },
             { s: 'Jostin', imgRef: 'jostin', t: 'Preparen sus armas y sigilo. ¡Vamos a explorar!' }
         ];
@@ -486,10 +484,10 @@
         let isTyping = false;
         let typingTimeout = null;
 
-        // 1. Ampliación del Mapa a 42x42
+        // EXPANSION DEL MAPA: Elevado a 64x64
         const TILE_SIZE = 64;
-        const MAP_COLS = 42;
-        const MAP_ROWS = 42;
+        const MAP_COLS = 64;
+        const MAP_ROWS = 64;
         let camera = { x: 0, y: 0, w: canvas.width, h: canvas.height };
         let screenShakeTimer = 0;
         let screenShakeIntensity = 0;
@@ -517,24 +515,22 @@
         let floatingTexts = [];
         let door = null;
 
-        // 2. Generación procedural del mapa ampliado con estilo visual nocturno/urbano protagonista
         function generateMap() {
             map = [];
             for(let r=0; r<MAP_ROWS; r++) {
                 let row = [];
                 for(let c=0; c<MAP_COLS; c++) {
                     if(r===0 || r===MAP_ROWS-1 || c===0 || c===MAP_COLS-1) {
-                        row.push(1); continue; // Muro perimetral sólido
+                        row.push(1); continue;
                     }
                     let rand = Math.random();
-                    if(rand < 0.14) row.push(1);      // Bloques de edificios urbanos sólidos / neón
-                    else if(rand < 0.35) row.push(2); // Edificios destruidos / interiores transitables
-                    else row.push(0);                 // Calles y avenidas abiertas
+                    if(rand < 0.14) row.push(1);
+                    else if(rand < 0.35) row.push(2);
+                    else row.push(0);
                 }
                 map.push(row);
             }
             
-            // Área de inicio despejada
             for(let r=1; r<=3; r++) {
                 for(let c=1; c<=3; c++) {
                     map[r][c] = 0;
@@ -549,20 +545,21 @@
             placeItemInZone(0, 'key2', '#facc15');
             placeItemNear(1, 'key3', '#facc15');
 
-            for(let i=0; i<6; i++) {
+            // Más munición debido a la expansión del mapa
+            for(let i=0; i<12; i++) {
                 placeItemInZone(2, 'ammo_jostin', '#ff3333');
                 placeItemInZone(0, 'ammo_tavito', '#a855f7');
             }
 
-            // Entidades enemigas adaptadas al mapa 42x42 (12 entidades patrullando)
-            for(let i=0; i<12; i++) {
+            // Más entidades para abarcar el tamaño 64x64
+            for(let i=0; i<24; i++) {
                 let ex, ey;
                 do {
                     let c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
                     let r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
                     ex = c * TILE_SIZE + TILE_SIZE/2;
                     ey = r * TILE_SIZE + TILE_SIZE/2;
-                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*7);
+                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*8);
                 
                 enemies.push({ 
                     x: ex, 
@@ -573,7 +570,7 @@
                     state: 'PATROL',
                     patrolTarget: { x: ex, y: ey },
                     patrolTimer: 0,
-                    visionRange: 280
+                    visionRange: 300
                 });
             }
         }
@@ -581,7 +578,7 @@
         function placeItemInZone(tileType, id, color) {
             let placed = false;
             let attempts = 0;
-            while(!placed && attempts < 300) {
+            while(!placed && attempts < 400) {
                 attempts++;
                 let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
                 let c = Math.floor(Math.random() * (MAP_COLS-2)) + 1;
@@ -598,7 +595,7 @@
         function placeItemNear(tileType, id, color) {
             let placed = false;
             let attempts = 0;
-            while(!placed && attempts < 300) {
+            while(!placed && attempts < 400) {
                 attempts++;
                 let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
                 let c = Math.floor(Math.random() * (MAP_COLS-2)) + 1;
@@ -896,7 +893,6 @@
             door.y = Math.max(TILE_SIZE, Math.min(door.y, (MAP_ROWS-1)*TILE_SIZE));
         }
 
-        // 2. Renderizado con estilo visual nocturno y ciberpunk urbano para el mapa
         function draw() {
             if (currentState !== STATES.PLAYING) return;
 
@@ -920,16 +916,13 @@
                         let ty = r * TILE_SIZE;
                         
                         if(map[r][c] === 1) {
-                            // Muro sólido con estilo bloque urbano nocturno
                             ctx.fillStyle = '#0f172a';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
                             ctx.strokeStyle = '#1e293b';
                             ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            // Detalle de neón en esquinas
                             ctx.fillStyle = '#10b981';
                             ctx.fillRect(tx + 4, ty + 4, 3, 3);
                         } else if (map[r][c] === 2) {
-                            // Edificio destruido / interior transitable con textura de ruina cyberpunk
                             ctx.fillStyle = '#090d16';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
                             ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
@@ -938,7 +931,6 @@
                             ctx.fillRect(tx+10, ty+10, 18, 18);
                             ctx.fillRect(tx+34, ty+34, 14, 14);
                         } else {
-                            // Calle abierta pavimentada con cuadrícula sutil
                             ctx.fillStyle = '#05080e';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
                             ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
@@ -991,7 +983,9 @@
                 ctx.globalAlpha = 0.4;
             }
 
-            if(player.dirX < 0) ctx.scale(-1, 1);
+            let facingFlip = player.dirX < 0 ? -1 : 1;
+            ctx.save();
+            if(facingFlip < 0) ctx.scale(-1, 1);
 
             if(char.img && char.img.complete && char.img.naturalHeight !== 0) {
                 ctx.drawImage(char.img, -player.w/2, -player.h/2, player.w, player.h);
@@ -1001,10 +995,36 @@
             }
             ctx.restore();
 
+            // REQUERIMIENTO 3: Siluetas vectoriales pixeladas de armas para Jostin y Tavito
             if (char.id !== 'pepe') {
-                ctx.fillStyle = 'rgba(0, 255, 204, 0.7)';
-                ctx.fillRect(player.x + player.dirX * 36 - 2, player.y + player.dirY * 36 - 2, 4, 4);
+                let aimAngle = Math.atan2(player.dirY, player.dirX);
+                ctx.save();
+                ctx.rotate(aimAngle);
+                
+                if (char.id === 'jostin') {
+                    // Silueta clara de Pistola Clásica
+                    ctx.fillStyle = '#94a3b8'; // Cañón gris claro
+                    ctx.fillRect(12, -2, 12, 4); 
+                    ctx.fillStyle = '#334155'; // Empuñadura oscura
+                    ctx.fillRect(12, 2, 4, 6);  
+                    ctx.fillStyle = '#00ffcc'; // Mira de neón brillante
+                    ctx.fillRect(22, -3, 2, 2); 
+                } else if (char.id === 'tavito') {
+                    // Silueta robusta de Bazuca
+                    ctx.fillStyle = '#475569'; // Tubo principal grueso
+                    ctx.fillRect(10, -5, 22, 10); 
+                    ctx.fillStyle = '#1e293b'; // Asas y soportes
+                    ctx.fillRect(14, 5, 4, 6);
+                    ctx.fillRect(24, 5, 4, 6);
+                    ctx.fillStyle = '#a855f7'; // Punta ancha / Salida de cohete (Morado de la bomba)
+                    ctx.fillRect(32, -6, 6, 12);  
+                    ctx.fillStyle = '#ef4444'; // Mira óptica superior
+                    ctx.fillRect(20, -8, 6, 3);
+                }
+                ctx.restore();
             }
+
+            ctx.restore();
 
             for(let p of projectiles) {
                 ctx.beginPath();
@@ -1098,12 +1118,14 @@
         document.getElementById('btnStartGame').addEventListener('click', () => {
             playSound('click');
             document.getElementById('mainMenu').classList.add('hidden');
+            // REQUERIMIENTO 1: Se oculta explícitamente el contador de copas al iniciar el juego
+            document.getElementById('currencyBadge').classList.add('hidden');
+            
             document.getElementById('dialogueScreen').classList.remove('hidden');
             currentState = STATES.CUTSCENE;
             showNextDialogue();
         });
 
-        // 5. Configuración de Tienda en el Menú Principal
         document.getElementById('btnStore').addEventListener('click', () => {
             playSound('click');
             document.getElementById('storeModal').classList.remove('hidden');
@@ -1164,6 +1186,10 @@
             document.getElementById('gameHUD').classList.remove('hidden');
             document.getElementById('controlsLayer').classList.remove('hidden');
             document.getElementById('btnPause').classList.remove('hidden');
+            
+            // REQUERIMIENTO 1: Aseguramos que durante la partida esté absolutamente oculto
+            document.getElementById('currencyBadge').classList.add('hidden');
+            
             generateMap();
             updateHUD();
             currentState = STATES.PLAYING;
@@ -1207,13 +1233,17 @@
         document.getElementById('btnToggleAudio').addEventListener('click', toggleAudio);
         document.getElementById('btnPauseAudio').addEventListener('click', toggleAudio);
 
-        // 4. Sistema de Economía: Otorgar 1 Copa al ganar la partida
         function endGame(win) {
             currentState = win ? STATES.VICTORY : STATES.GAMEOVER;
             if (timerInterval) clearInterval(timerInterval);
             document.getElementById('gameHUD').classList.add('hidden');
             document.getElementById('controlsLayer').classList.add('hidden');
             document.getElementById('btnPause').classList.add('hidden');
+            
+            // REQUERIMIENTO 1: Mostrar el contador de copas únicamente al finalizar para ver recompensas
+            updateCupDisplay();
+            document.getElementById('currencyBadge').classList.remove('hidden');
+
             let endScreen = document.getElementById('endScreen');
             endScreen.classList.remove('hidden');
             
@@ -1228,7 +1258,7 @@
 
                 document.getElementById('endTitle').innerText = "¡VICTORIA!";
                 document.getElementById('endTitle').style.color = "#facc15";
-                document.getElementById('endDesc').innerText = "Han escapado con éxito de la ciudad ampliada EMDCG.";
+                document.getElementById('endDesc').innerText = "Han escapado con éxito de la ciudad masiva EMDCG.";
                 document.getElementById('rewardNotice').innerText = "🏆 ¡Has ganado +1 Copa!";
             } else {
                 document.getElementById('endTitle').innerText = "BORRADOS";
