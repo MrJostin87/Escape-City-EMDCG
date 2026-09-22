@@ -223,17 +223,14 @@
     </style>
 </head>
 <body>
-
     <canvas id="gameCanvas"></canvas>
     
     <button class="action-btn hidden" id="btnPause" style="border-color:#3b82f6; color:#60a5fa;">⏸</button>
 
-    <!-- Badge de Moneda / Copas Global. Visible por defecto en el menú. Se ocultará en partida. -->
     <div class="currency-badge" id="currencyBadge">
         <span>🏆 Copas: <span id="cupCount">0</span></span>
     </div>
 
-    <!-- Pantalla de Carga (Preloader) -->
     <div id="preloaderScreen" class="ui-layer">
         <h1 class="title" style="font-size:4vw; color:#10b981;">ESCAPE CITY EMDCG</h1>
         <p id="loadingText" class="subtitle" style="font-size:11px; color:#fff; margin-bottom:20px;">Cargando recursos... 0%</p>
@@ -242,7 +239,6 @@
         </div>
     </div>
 
-    <!-- Menú Principal -->
     <div id="mainMenu" class="ui-layer hidden">
         <img src="Escape_City_EMDCG.PNG" alt="Escape City EMDCG" class="menu-logo-img" id="menuLogoImg" onerror="this.style.display='none'; document.getElementById('fallbackTitle').style.display='block';">
         <h1 id="fallbackTitle" class="title" style="display:none;">ESCAPE CITY<br>EMDCG</h1>
@@ -254,7 +250,6 @@
         </div>
     </div>
 
-    <!-- Modal de Tienda -->
     <div id="storeModal" class="ui-layer hidden">
         <div class="store-box">
             <h2 style="color:var(--highlight); margin-bottom: 20px; font-size: 16px;">TIENDA EMDCG</h2>
@@ -263,7 +258,6 @@
         </div>
     </div>
 
-    <!-- Cinemática / Diálogos -->
     <div id="dialogueScreen" class="ui-layer hidden">
         <div class="dialogue-box" id="dialogueBox">
             <div class="avatar-container">
@@ -277,15 +271,13 @@
         </div>
     </div>
 
-    <!-- Instrucciones -->
     <div id="instructionsScreen" class="ui-layer hidden">
         <div class="inst-content">
             <h2>MISIÓN Y REGLAS</h2>
             <ul>
-                <!-- Actualizado al nuevo tamaño masivo -->
-                <li>Están atrapados en un mapa urbano masivo (64x64). Encuentren <b>3 LLAVES</b> ocultas.</li>
+                <li>Están atrapados en un mapa urbano masivo (128x128). Encuentren <b>3 LLAVES</b> ocultas.</li>
                 <li><b>Llave 1:</b> En edificios destruidos (interiores transitables).</li>
-                <li><b>Llave 2:</b> En zonas abiertas y calles oscuras.</li>
+                <li><b>Llave 2:</b> En zonas abiertas y calles lúgubres.</li>
                 <li><b>Llave 3:</b> En bloques urbanos intactos.</li>
                 <li><b>CUIDADO:</b> Las entidades cibernéticas te borrarán si te tocan.</li>
             </ul>
@@ -293,14 +285,13 @@
             <ul>
                 <li><b>Jostin (Cambio 1):</b> Pistola. Disparo recto. (12 balas)</li>
                 <li><b>Tavito (Cambio 2):</b> Bazuca. Daño en área. (20 bombas)</li>
-                <li><b>Pepe (Cambio 3):</b> Sigilo. Invisible 120s. No ataca.</li>
+                <li><b>Pepe (Cambio 3):</b> Sigilo. Invisible 120s. No ataca. (Más pequeño)</li>
             </ul>
-            <p style="line-height:1.5;">Usa el Joystick para moverte.<br>Explora los edificios y esquiva enemigos.<br>Pisa la llave y pulsa <b>AVISAR</b>.</p>
+            <p style="line-height:1.5;">Usa el Joystick para moverte.<br>Explora los edificios y esquiva enemigos.<br>Dispara a las paredes para ver grietas.<br>Pisa la llave y pulsa <b>AVISAR</b>.</p>
         </div>
         <button class="btn" id="btnPlayNow" style="margin-bottom: 15px;">¡Entendido!</button>
     </div>
 
-    <!-- HUD del Juego -->
     <div id="gameHUD" class="ui-layer hidden" style="pointer-events: none;">
         <div class="top-hud">
             <div class="char-info">
@@ -320,7 +311,6 @@
         </div>
     </div>
 
-    <!-- Controles en Pantalla -->
     <div id="controlsLayer" class="controls-area hidden">
         <div id="joystickZone">
             <div id="joystickKnob"></div>
@@ -332,7 +322,6 @@
         </div>
     </div>
 
-    <!-- Pantalla de Pausa -->
     <div id="pauseScreen" class="ui-layer hidden">
         <h1 class="title" style="font-size: 5vw; color: #60a5fa;">JUEGO PAUSADO</h1>
         <div class="menu-buttons">
@@ -342,7 +331,6 @@
         </div>
     </div>
 
-    <!-- Pantalla Final -->
     <div id="endScreen" class="ui-layer hidden">
         <h1 id="endTitle" class="title"></h1>
         <p id="endDesc" class="subtitle" style="font-size: 12px; line-height: 1.6;"></p>
@@ -367,8 +355,8 @@
 
         let audioCtx = null;
         let soundEnabled = true;
-
         let playerCups = parseInt(localStorage.getItem('emdcg_cups') || '0', 10);
+        
         function updateCupDisplay() {
             document.getElementById('cupCount').innerText = playerCups;
         }
@@ -476,7 +464,7 @@
             { s: 'Jostin', imgRef: 'jostin', t: 'Estábamos tranquilos jugando y de repente... ¿qué pasó con el terreno?' },
             { s: 'Tavito', imgRef: 'tavito', t: 'El suelo se abrió y se expandió. Es un mega fallo nocturno en la Matrix.' },
             { s: 'Pepe', imgRef: 'pepe', t: '*Tiembla* Pío pío... esta zona abandonada es enorme y muy oscura.' },
-            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: '¡Atención viajeros! Bienvenidos a la versión ampliada 64x64 de la Ciudad EMDCG.' },
+            { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: '¡Atención viajeros! Bienvenidos a la versión ampliada 128x128 de la Ciudad EMDCG.' },
             { s: 'Pollito Guía', imgSVG: guideAvatarSVG, t: 'Para escapar, deben encontrar 3 LLAVES ocultas en este vasto mapa y llegar a la puerta.' },
             { s: 'Jostin', imgRef: 'jostin', t: 'Preparen sus armas y sigilo. ¡Vamos a explorar!' }
         ];
@@ -484,15 +472,16 @@
         let isTyping = false;
         let typingTimeout = null;
 
-        // EXPANSION DEL MAPA: Elevado a 64x64
+        // AMPLIACIÓN MASIVA DEL MAPA a 128x128
         const TILE_SIZE = 64;
-        const MAP_COLS = 64;
-        const MAP_ROWS = 64;
+        const MAP_COLS = 128;
+        const MAP_ROWS = 128;
         let camera = { x: 0, y: 0, w: canvas.width, h: canvas.height };
         let screenShakeTimer = 0;
         let screenShakeIntensity = 0;
         let gameTime = 0;
         let timerInterval = null;
+        let lastBoundaryWarning = 0; 
         
         const keys = { w: false, a: false, s: false, d: false, space: false };
         let joystick = { active: false, dx: 0, dy: 0 };
@@ -513,6 +502,7 @@
         let projectiles = [];
         let particles = [];
         let floatingTexts = [];
+        let cracks = []; 
         let door = null;
 
         function generateMap() {
@@ -524,19 +514,26 @@
                         row.push(1); continue;
                     }
                     let rand = Math.random();
-                    if(rand < 0.14) row.push(1);
-                    else if(rand < 0.35) row.push(2);
-                    else row.push(0);
+                    if(rand < 0.14) row.push(1); // Muro normal
+                    else if(rand < 0.20) row.push(4); // Zona Dinámica: Muro parpadeante
+                    else if(rand < 0.35) row.push(2); // Edificio en ruinas
+                    else if(rand < 0.50) row.push(3); // Zona Dinámica: Calle lúgubre
+                    else row.push(0); // Calle normal
                 }
                 map.push(row);
             }
             
+            // Clearing starting zone
             for(let r=1; r<=3; r++) {
                 for(let c=1; c<=3; c++) {
                     map[r][c] = 0;
                 }
             }
             player.x = TILE_SIZE * 2; player.y = TILE_SIZE * 2;
+            
+            // Tamaño inicial según personaje activo
+            player.w = party[activeCharIndex].id === 'pepe' ? 28 : 36;
+            player.h = party[activeCharIndex].id === 'pepe' ? 28 : 36;
 
             items = [];
             enemies = [];
@@ -545,21 +542,20 @@
             placeItemInZone(0, 'key2', '#facc15');
             placeItemNear(1, 'key3', '#facc15');
 
-            // Más munición debido a la expansión del mapa
             for(let i=0; i<12; i++) {
                 placeItemInZone(2, 'ammo_jostin', '#ff3333');
                 placeItemInZone(0, 'ammo_tavito', '#a855f7');
             }
 
-            // Más entidades para abarcar el tamaño 64x64
-            for(let i=0; i<24; i++) {
+            // Generando enemigos con propiedad de vida y mayor número por el mapa grande
+            for(let i=0; i<60; i++) {
                 let ex, ey;
                 do {
                     let c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
                     let r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
                     ex = c * TILE_SIZE + TILE_SIZE/2;
                     ey = r * TILE_SIZE + TILE_SIZE/2;
-                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*8);
+                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 4 || distance(player.x, player.y, ex, ey) < TILE_SIZE*8);
                 
                 enemies.push({ 
                     x: ex, 
@@ -570,7 +566,8 @@
                     state: 'PATROL',
                     patrolTarget: { x: ex, y: ey },
                     patrolTimer: 0,
-                    visionRange: 300
+                    visionRange: 300,
+                    hp: 3 // Sistema de vida implementado
                 });
             }
         }
@@ -587,9 +584,7 @@
                     placed = true;
                 }
             }
-            if(!placed) {
-                items.push({ x: TILE_SIZE * 4, y: TILE_SIZE * 4, id: id, color: color, radius: 14 });
-            }
+            if(!placed) items.push({ x: TILE_SIZE * 4, y: TILE_SIZE * 4, id: id, color: color, radius: 14 });
         }
 
         function placeItemNear(tileType, id, color) {
@@ -606,16 +601,14 @@
                     }
                 }
             }
-            if(!placed) {
-                items.push({ x: TILE_SIZE * 6, y: TILE_SIZE * 6, id: id, color: color, radius: 14 });
-            }
+            if(!placed) items.push({ x: TILE_SIZE * 6, y: TILE_SIZE * 6, id: id, color: color, radius: 14 });
         }
 
         function distance(x1, y1, x2, y2) { return Math.hypot(x2-x1, y2-y1); }
 
         function isSolid(tileX, tileY) {
             if (tileX < 0 || tileX >= MAP_COLS || tileY < 0 || tileY >= MAP_ROWS) return true;
-            return map[tileY][tileX] === 1;
+            return map[tileY][tileX] === 1 || map[tileY][tileX] === 4;
         }
 
         function update() {
@@ -683,6 +676,15 @@
             camera.x = Math.max(0, Math.min(camera.x, MAP_COLS*TILE_SIZE - camera.w));
             camera.y = Math.max(0, Math.min(camera.y, MAP_ROWS*TILE_SIZE - camera.h));
 
+            // Aviso automático de límites de mapa 
+            if (player.x < TILE_SIZE * 1.5 || player.x > (MAP_COLS - 1.5) * TILE_SIZE || 
+                player.y < TILE_SIZE * 1.5 || player.y > (MAP_ROWS - 1.5) * TILE_SIZE) {
+                if (Date.now() - lastBoundaryWarning > 3000) {
+                    addFloatingText("¡LÍMITE DE LA MATRIX!", player.x, player.y - 30, '#ef4444');
+                    lastBoundaryWarning = Date.now();
+                }
+            }
+
             if (char.id === 'pepe' && char.stealthActive) {
                 char.stealthTime -= 1/60;
                 if (char.stealthTime <= 0) {
@@ -719,6 +721,18 @@
                 
                 let prC = Math.floor(p.x/TILE_SIZE); let prR = Math.floor(p.y/TILE_SIZE);
                 if(p.life <= 0 || isSolid(prC, prR)) {
+                    if (isSolid(prC, prR)) {
+                        // Creando grietas visuales sin romper la pared
+                        cracks.push({
+                            x: p.x, y: p.y, life: 250,
+                            lines: [
+                                {x1: 0, y1: 0, x2: -6-Math.random()*6, y2: -6-Math.random()*6},
+                                {x1: 0, y1: 0, x2: 6+Math.random()*6, y2: -6-Math.random()*6},
+                                {x1: 0, y1: 0, x2: -4+Math.random()*8, y2: 6+Math.random()*8}
+                            ]
+                        });
+                        createParticles(p.x, p.y, '#94a3b8', 6);
+                    }
                     if(p.type==='bazooka') createExplosion(p.x, p.y);
                     projectiles.splice(i, 1);
                     continue;
@@ -729,11 +743,18 @@
                     let e = enemies[j];
                     if(distance(p.x, p.y, e.x, e.y) < e.w/2 + p.r) {
                         if(p.type === 'pistol') {
-                            enemies.splice(j, 1);
-                            createParticles(e.x, e.y, '#00ffcc');
-                            addFloatingText("-1 Glitch", e.x, e.y, '#38bdf8');
+                            e.hp -= 1; // Pistola requiere 3 hits (3 HP)
+                            if(e.hp <= 0) {
+                                enemies.splice(j, 1);
+                                createParticles(e.x, e.y, '#00ffcc');
+                                addFloatingText("-1 Glitch", e.x, e.y, '#38bdf8');
+                            } else {
+                                createParticles(e.x, e.y, '#facc15', 4);
+                                addFloatingText("-1 HP", e.x, e.y - 15, '#facc15');
+                            }
                         } else if(p.type === 'bazooka') {
-                            createExplosion(p.x, p.y);
+                            // Bazooka impacta y causa explosión letal instantánea (quita todos los HP)
+                            createExplosion(p.x, p.y); 
                         }
                         hit = true;
                         break;
@@ -754,6 +775,11 @@
                 let ft = floatingTexts[i];
                 ft.y -= 0.8; ft.life--;
                 if(ft.life <= 0) floatingTexts.splice(i, 1);
+            }
+
+            for(let i=cracks.length-1; i>=0; i--) {
+                cracks[i].life--;
+                if(cracks[i].life <= 0) cracks.splice(i, 1);
             }
 
             let isInvisible = (char.id === 'pepe' && char.stealthActive);
@@ -914,15 +940,20 @@
                     if(map[r] !== undefined && map[r][c] !== undefined) {
                         let tx = c * TILE_SIZE;
                         let ty = r * TILE_SIZE;
+                        let tileType = map[r][c];
                         
-                        if(map[r][c] === 1) {
+                        if(tileType === 1 || tileType === 4) {
                             ctx.fillStyle = '#0f172a';
+                            if (tileType === 4) { // Zona Dinámica: Parpadeo de muro
+                                let blink = 0.5 + Math.abs(Math.sin(Date.now()/300)) * 0.5;
+                                ctx.fillStyle = `rgba(15, 23, 42, ${blink})`;
+                            }
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = '#1e293b';
+                            ctx.strokeStyle = tileType === 4 ? `rgba(56, 189, 248, ${0.4 + Math.abs(Math.sin(Date.now()/300)) * 0.6})` : '#1e293b';
                             ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = '#10b981';
+                            ctx.fillStyle = tileType === 4 ? `rgba(16, 185, 129, ${0.4 + Math.abs(Math.sin(Date.now()/300)) * 0.6})` : '#10b981';
                             ctx.fillRect(tx + 4, ty + 4, 3, 3);
-                        } else if (map[r][c] === 2) {
+                        } else if (tileType === 2) {
                             ctx.fillStyle = '#090d16';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
                             ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
@@ -930,6 +961,12 @@
                             ctx.fillStyle = '#1e1b4b';
                             ctx.fillRect(tx+10, ty+10, 18, 18);
                             ctx.fillRect(tx+34, ty+34, 14, 14);
+                        } else if (tileType === 3) {
+                            // Zona Dinámica: Zona Lúgubre (oscura)
+                            ctx.fillStyle = '#010203'; 
+                            ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
                         } else {
                             ctx.fillStyle = '#05080e';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
@@ -972,7 +1009,35 @@
                 ctx.fillStyle = '#fff';
                 ctx.fillRect(e.x - 7, e.y - 5, 4, 4);
                 ctx.fillRect(e.x + 3, e.y - 5, 4, 4);
+
+                // Barras de Vida sobre Enemigos Heridos (3 HP máximo)
+                if (e.hp < 3) {
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(e.x - 12, e.y - 24, 24, 4);
+                    ctx.fillStyle = '#10b981';
+                    ctx.fillRect(e.x - 12, e.y - 24, (24/3) * e.hp, 4);
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(e.x - 12, e.y - 24, 24, 4);
+                }
             }
+
+            // Renderizado Visual de Grietas contra los muros
+            ctx.strokeStyle = `rgba(16, 185, 129, 0.8)`;
+            ctx.lineWidth = 1.5;
+            for(let crack of cracks) {
+                ctx.globalAlpha = crack.life / 250;
+                ctx.save();
+                ctx.translate(crack.x, crack.y);
+                ctx.beginPath();
+                for(let l of crack.lines) {
+                    ctx.moveTo(l.x1, l.y1);
+                    ctx.lineTo(l.x2, l.y2);
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+            ctx.globalAlpha = 1.0;
 
             const char = party[activeCharIndex];
             
@@ -995,31 +1060,21 @@
             }
             ctx.restore();
 
-            // REQUERIMIENTO 3: Siluetas vectoriales pixeladas de armas para Jostin y Tavito
+            // Dibujar silueta vectorial de armas según personaje
             if (char.id !== 'pepe') {
                 let aimAngle = Math.atan2(player.dirY, player.dirX);
                 ctx.save();
                 ctx.rotate(aimAngle);
                 
                 if (char.id === 'jostin') {
-                    // Silueta clara de Pistola Clásica
-                    ctx.fillStyle = '#94a3b8'; // Cañón gris claro
-                    ctx.fillRect(12, -2, 12, 4); 
-                    ctx.fillStyle = '#334155'; // Empuñadura oscura
-                    ctx.fillRect(12, 2, 4, 6);  
-                    ctx.fillStyle = '#00ffcc'; // Mira de neón brillante
-                    ctx.fillRect(22, -3, 2, 2); 
+                    ctx.fillStyle = '#94a3b8'; ctx.fillRect(12, -2, 12, 4); 
+                    ctx.fillStyle = '#334155'; ctx.fillRect(12, 2, 4, 6);  
+                    ctx.fillStyle = '#00ffcc'; ctx.fillRect(22, -3, 2, 2); 
                 } else if (char.id === 'tavito') {
-                    // Silueta robusta de Bazuca
-                    ctx.fillStyle = '#475569'; // Tubo principal grueso
-                    ctx.fillRect(10, -5, 22, 10); 
-                    ctx.fillStyle = '#1e293b'; // Asas y soportes
-                    ctx.fillRect(14, 5, 4, 6);
-                    ctx.fillRect(24, 5, 4, 6);
-                    ctx.fillStyle = '#a855f7'; // Punta ancha / Salida de cohete (Morado de la bomba)
-                    ctx.fillRect(32, -6, 6, 12);  
-                    ctx.fillStyle = '#ef4444'; // Mira óptica superior
-                    ctx.fillRect(20, -8, 6, 3);
+                    ctx.fillStyle = '#475569'; ctx.fillRect(10, -5, 22, 10); 
+                    ctx.fillStyle = '#1e293b'; ctx.fillRect(14, 5, 4, 6); ctx.fillRect(24, 5, 4, 6);
+                    ctx.fillStyle = '#a855f7'; ctx.fillRect(32, -6, 6, 12);  
+                    ctx.fillStyle = '#ef4444'; ctx.fillRect(20, -8, 6, 3);
                 }
                 ctx.restore();
             }
@@ -1045,7 +1100,6 @@
             }
 
             ctx.restore();
-
             drawMinimap();
         }
 
@@ -1058,7 +1112,7 @@
 
             for(let r=0; r<MAP_ROWS; r+=2) {
                 for(let c=0; c<MAP_COLS; c+=2) {
-                    if(map[r] && map[r][c] === 1) {
+                    if(map[r] && (map[r][c] === 1 || map[r][c] === 4)) {
                         minimapCtx.fillStyle = '#1e293b';
                         minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
                     } else if (map[r] && map[r][c] === 2) {
@@ -1087,6 +1141,14 @@
             if(party[2].stealthActive && activeCharIndex !== 2) {
                 party[2].stealthActive = false;
             }
+            
+            // Ajuste estricto de Hitbox de tamaño para que Pepe sea notablemente menor
+            if (party[activeCharIndex].id === 'pepe') {
+                player.w = 28; player.h = 28;
+            } else {
+                player.w = 36; player.h = 36;
+            }
+
             playSound('click');
             updateHUD();
             createParticles(player.x, player.y, '#fff', 12);
@@ -1118,9 +1180,7 @@
         document.getElementById('btnStartGame').addEventListener('click', () => {
             playSound('click');
             document.getElementById('mainMenu').classList.add('hidden');
-            // REQUERIMIENTO 1: Se oculta explícitamente el contador de copas al iniciar el juego
             document.getElementById('currencyBadge').classList.add('hidden');
-            
             document.getElementById('dialogueScreen').classList.remove('hidden');
             currentState = STATES.CUTSCENE;
             showNextDialogue();
@@ -1186,8 +1246,6 @@
             document.getElementById('gameHUD').classList.remove('hidden');
             document.getElementById('controlsLayer').classList.remove('hidden');
             document.getElementById('btnPause').classList.remove('hidden');
-            
-            // REQUERIMIENTO 1: Aseguramos que durante la partida esté absolutamente oculto
             document.getElementById('currencyBadge').classList.add('hidden');
             
             generateMap();
@@ -1240,7 +1298,6 @@
             document.getElementById('controlsLayer').classList.add('hidden');
             document.getElementById('btnPause').classList.add('hidden');
             
-            // REQUERIMIENTO 1: Mostrar el contador de copas únicamente al finalizar para ver recompensas
             updateCupDisplay();
             document.getElementById('currencyBadge').classList.remove('hidden');
 
@@ -1280,9 +1337,9 @@
             if(key === 's' || e.key === 'ArrowDown') keys.s = true;
             if(key === 'd' || e.key === 'ArrowRight') keys.d = true;
             
-            if(key === '1') { activeCharIndex=0; updateHUD(); createParticles(player.x, player.y, '#fff', 8); }
-            if(key === '2') { activeCharIndex=1; updateHUD(); createParticles(player.x, player.y, '#fff', 8); }
-            if(key === '3') { activeCharIndex=2; updateHUD(); createParticles(player.x, player.y, '#fff', 8); }
+            if(key === '1') { activeCharIndex=0; changeCharacter(); }
+            if(key === '2') { activeCharIndex=1; changeCharacter(); }
+            if(key === '3') { activeCharIndex=2; changeCharacter(); }
             
             if(key === ' ' && !keys.space) {
                 keys.space = true; triggerAction();
@@ -1332,7 +1389,6 @@
             }
             
             joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-            
             joystick.dx = dx / maxR;
             joystick.dy = dy / maxR;
         }
@@ -1352,7 +1408,6 @@
         }
 
         gameLoop();
-
     </script>
 </body>
 </html>
