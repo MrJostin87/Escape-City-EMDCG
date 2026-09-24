@@ -281,7 +281,6 @@
             text-align: center;
         }
 
-        /* Estilo para los sliders de configuración de audio */
         input[type=range] {
             accent-color: #38bdf8;
             height: 6px;
@@ -313,12 +312,10 @@
         <div style="width:280px; height:22px; border:3px solid #fff; background:#111; border-radius:4px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.8); margin-bottom: 12px;">
             <div id="loadingBar" style="width:0%; height:100%; background:#10b981; transition:width 0.15s ease-out;"></div>
         </div>
-        <!-- Nuevo texto de carga dinámica -->
         <p id="loadingSubtext" style="font-size:9px; color:#38bdf8; margin:0; font-family:inherit; min-height:16px;">Iniciando carga de archivos...</p>
     </div>
 
     <div id="mainMenu" class="ui-layer hidden">
-        <!-- Nuevo botón de configuración -->
         <button class="settings-icon-btn" id="btnSettings" title="Configuración">⚙️</button>
         <img src="Escape_City_EMDCG.PNG" alt="Escape City EMDCG" class="menu-logo-img" id="menuLogoImg" onerror="this.style.display='none'; document.getElementById('fallbackTitle').style.display='block';">
         <h1 id="fallbackTitle" class="title" style="display:none;">ESCAPE CITY<br>EMDCG</h1>
@@ -338,12 +335,10 @@
         </div>
     </div>
 
-    <!-- Ventana modal de Configuración Modificada -->
     <div id="settingsModal" class="ui-layer hidden">
         <div class="store-box" style="border-color: #38bdf8;">
             <h2 style="color: #38bdf8; margin-bottom: 20px; font-size: 16px;">CONFIGURACIÓN ⚙️</h2>
             
-            <!-- Controles de Audio -->
             <div style="text-align: left; margin-bottom: 20px;">
                 <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;">Música de Fondo (Menú)</label>
                 <input type="range" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="width: 100%; cursor: pointer;">
@@ -359,7 +354,6 @@
     </div>
 
     <div id="dialogueScreen" class="ui-layer hidden">
-        <!-- Nuevo botón de saltar -->
         <button class="skip-dialogue-btn" id="btnSkipDialogue">SALTAR ⏭</button>
         <div class="scene-container">
             <img id="sceneImage" class="scene-img" src="" alt="Escena 16:9">
@@ -375,7 +369,6 @@
         <div class="inst-content">
             <h2>MISIÓN Y REGLAS</h2>
             <ul>
-                <!-- Línea de edificios agrietados eliminada, solo texto original -->
                 <li>Están atrapados en una Ciudad Abandonada masiva. Encuentren <b>3 LLAVES</b> ocultas.</li>
                 <li><b>Llave 1:</b> En edificios destruidos.</li>
                 <li><b>Llave 2:</b> En zonas abiertas y calles lúgubres.</li>
@@ -459,14 +452,14 @@
 
         let audioCtx = null;
         let soundEnabled = true;
-        let sfxVolume = 0.5; // Estado para volumen de efectos
-        let bgmVolume = 0.5; // Estado para volumen de música
+        let sfxVolume = 0.5; 
+        let bgmVolume = 0.5; 
         
         const bgMusic = document.getElementById('bgMusic');
-        bgMusic.volume = bgmVolume; // Aplicar volumen inicial
+        bgMusic.volume = bgmVolume;
         
         let playerCups = parseInt(localStorage.getItem('emdcg_cups') || '0', 10);
-        let typingTimeout = null; // Definido globalmente para el salto de diálogo
+        let typingTimeout = null; 
         
         function updateCupDisplay() {
             document.getElementById('cupCount').innerText = playerCups;
@@ -496,7 +489,7 @@
                     osc.type = 'square';
                     osc.frequency.setValueAtTime(600, now);
                     osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-                    gain.gain.setValueAtTime(0.15 * sfxVolume, now); // Multiplicador de volumen UI
+                    gain.gain.setValueAtTime(0.15 * sfxVolume, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
                     osc.start(now);
                     osc.stop(now + 0.1);
@@ -504,7 +497,7 @@
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(120, now);
                     osc.frequency.linearRampToValueAtTime(30, now + 0.3);
-                    gain.gain.setValueAtTime(0.3 * sfxVolume, now); // Multiplicador de volumen UI
+                    gain.gain.setValueAtTime(0.3 * sfxVolume, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
                     osc.start(now);
                     osc.stop(now + 0.3);
@@ -512,7 +505,7 @@
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(400, now);
                     osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
-                    gain.gain.setValueAtTime(0.35 * sfxVolume, now); // Multiplicador de volumen UI
+                    gain.gain.setValueAtTime(0.35 * sfxVolume, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
                     osc.start(now);
                     osc.stop(now + 0.15);
@@ -520,7 +513,7 @@
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(500, now);
                     osc.frequency.setValueAtTime(300, now + 0.05);
-                    gain.gain.setValueAtTime(0.25 * sfxVolume, now); // Multiplicador de volumen UI
+                    gain.gain.setValueAtTime(0.25 * sfxVolume, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
                     osc.start(now);
                     osc.stop(now + 0.08);
@@ -546,11 +539,11 @@
             { key: 'Pepe.PNG', img: charImages.pepe, src: 'Pepe.PNG' }
         ];
         
-        // Unificar todos los assets para iterarlos juntos
         const allAssets = assetList.concat(sceneImages);
 
+        // Añadir obligatoriamente la música de fondo al preloader (Matriz de precarga sincronizada)
         let loadedCount = 0;
-        const totalAssets = allAssets.length;
+        const totalAssets = allAssets.length + 1; // Se incluye bgMusic explícitamente
 
         function updatePreloader(assetName) {
             loadedCount++;
@@ -558,7 +551,6 @@
             document.getElementById('loadingText').innerText = `Cargando recursos... ${pct}%`;
             document.getElementById('loadingBar').style.width = `${pct}%`;
             
-            // Actualización dinámica del subtexto
             if(assetName) {
                 document.getElementById('loadingSubtext').innerText = `[${loadedCount}/${totalAssets}] Cargado: ${assetName}`;
             }
@@ -569,10 +561,8 @@
                     document.getElementById('mainMenu').classList.remove('hidden');
                     currentState = STATES.MENU;
                     
-                    // Iniciar música en bucle automáticamente en el menú
                     if(soundEnabled) {
                         bgMusic.play().catch(e => {
-                            // Workaround: Políticas de autoplay previenen audio hasta que el usuario interactúe
                             const startMusicOnInteract = () => {
                                 if (currentState === STATES.MENU && soundEnabled) {
                                     bgMusic.play();
@@ -588,11 +578,32 @@
             }
         }
 
+        // Carga de imágenes
         allAssets.forEach(item => {
             item.img.onload = () => updatePreloader(item.key);
             item.img.onerror = () => updatePreloader(item.key);
             item.img.src = item.src;
         });
+
+        // Carga sincronizada y obligatoria del objeto de audio bgMusic en el preloader
+        if (bgMusic.readyState >= 3) {
+            updatePreloader("Escape_City_EMDCG_Music_1.mp3 (Ya listo)");
+        } else {
+            bgMusic.addEventListener('canplaythrough', () => {
+                // Prevenir múltiples llamadas de canplaythrough
+                if (!bgMusic._preloadedReported) {
+                    bgMusic._preloadedReported = true;
+                    updatePreloader("Escape_City_EMDCG_Music_1.mp3");
+                }
+            }, { once: true });
+            bgMusic.addEventListener('error', () => {
+                if (!bgMusic._preloadedReported) {
+                    bgMusic._preloadedReported = true;
+                    updatePreloader("Escape_City_EMDCG_Music_1.mp3 (Omitido)");
+                }
+            }, { once: true });
+            bgMusic.load();
+        }
 
         const STATES = { PRELOAD: 0, MENU: 1, CUTSCENE: 2, INSTRUCTIONS: 3, PLAYING: 4, PAUSED: 5, GAMEOVER: 6, VICTORY: 7 };
         let currentState = STATES.PRELOAD;
@@ -654,7 +665,6 @@
                         row.push(1); continue;
                     }
                     let rand = Math.random();
-                    // Lógica original: Solo tiles 1 (Intacto), 2 (Destruido), 3 (Calles), 0 (Vacío)
                     if(rand < 0.10) row.push(1);
                     else if(rand < 0.45) row.push(2);
                     else if(rand < 0.65) row.push(3);
@@ -762,7 +772,6 @@
 
         function isSolid(tileX, tileY) {
             if (tileX < 0 || tileX >= MAP_COLS || tileY < 0 || tileY >= MAP_ROWS) return true;
-            // Solo los edificios intactos son sólidos y no destructibles
             return map[tileY][tileX] === 1;
         }
 
@@ -1081,7 +1090,6 @@
                         let ty = r * TILE_SIZE;
                         let tileType = map[r][c];
                         
-                        // Renderizado de las 3 zonas bases
                         if(tileType === 1) {
                             ctx.fillStyle = '#0f172a';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
@@ -1294,7 +1302,6 @@
 
         document.getElementById('btnStartGame').addEventListener('click', () => {
             playSound('click');
-            // CORTAR LA MÚSICA ABRUPTAMENTE
             bgMusic.pause();
             bgMusic.currentTime = 0;
             
@@ -1315,7 +1322,6 @@
             document.getElementById('storeModal').classList.add('hidden');
         });
 
-        // Eventos para la Ventana Modal de Configuración (Audio/UI)
         document.getElementById('btnSettings').addEventListener('click', () => {
             playSound('click');
             document.getElementById('settingsModal').classList.remove('hidden');
@@ -1326,21 +1332,20 @@
             document.getElementById('settingsModal').classList.add('hidden');
         });
         
-        // Controladores para los Sliders de Volumen
+        // Control reactivo en tiempo real para el slider de volumen de BGM (0.0 a 1.0)
         document.getElementById('bgmVolumeSlider').addEventListener('input', (e) => {
             bgmVolume = parseFloat(e.target.value);
-            bgMusic.volume = bgmVolume;
+            // Aplicación directa e instantánea al objeto de audio de fondo, sincronizándose con la escala 0.0 a 1.0
+            bgMusic.volume = Math.max(0, Math.min(1, bgmVolume));
         });
 
         document.getElementById('sfxVolumeSlider').addEventListener('input', (e) => {
             sfxVolume = parseFloat(e.target.value);
         });
-        // Feedback auditivo al soltar el slider de efectos
         document.getElementById('sfxVolumeSlider').addEventListener('change', () => {
             if(soundEnabled) playSound('click');
         });
 
-        // Funcionalidad del botón de saltar diálogo
         document.getElementById('btnSkipDialogue').addEventListener('click', () => {
             playSound('click');
             if (typingTimeout) clearTimeout(typingTimeout);
@@ -1368,7 +1373,6 @@
             }
             
             let d = story[currentDialogue];
-            // Si las imágenes precargadas de la escena existen, la asignamos visualmente.
             document.getElementById('sceneImage').src = `Escena_${currentDialogue + 1}.PNG`;
             document.getElementById('speakerName').innerText = d.s;
             playSound('click');
@@ -1439,11 +1443,10 @@
             document.getElementById('btnToggleAudio').innerText = text;
             document.getElementById('btnPauseAudio').innerText = text;
             
-            bgMusic.muted = !soundEnabled; // Mutea/Desmutea la BGM Globalmente
+            bgMusic.muted = !soundEnabled; 
 
             if (soundEnabled) {
                 playSound('click');
-                // Si estamos en el menú, intentar reanudar la música
                 if(currentState === STATES.MENU) bgMusic.play().catch(e=>{});
             } else {
                 bgMusic.pause();
