@@ -280,6 +280,14 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             text-align: center;
         }
+
+        /* Estilo para los sliders de configuración de audio */
+        input[type=range] {
+            accent-color: #38bdf8;
+            height: 6px;
+            border-radius: 4px;
+            outline: none;
+        }
         
         @media (min-width: 1024px) {
             #joystickZone { opacity: 0.5; }
@@ -291,6 +299,9 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
+
+    <!-- Reproductor de Música de Fondo -->
+    <audio id="bgMusic" src="Escape_City_EMDCG_Music_1.mp3" loop preload="auto"></audio>
 
     <div class="currency-badge" id="currencyBadge">
         <span>🏆 Copas: <span id="cupCount">0</span></span>
@@ -327,11 +338,22 @@
         </div>
     </div>
 
-    <!-- Nueva ventana modal de Configuración -->
+    <!-- Ventana modal de Configuración Modificada -->
     <div id="settingsModal" class="ui-layer hidden">
         <div class="store-box" style="border-color: #38bdf8;">
             <h2 style="color: #38bdf8; margin-bottom: 20px; font-size: 16px;">CONFIGURACIÓN ⚙️</h2>
-            <p style="font-size: 13px; color:#fff; margin-bottom: 25px; line-height: 1.6;">Próximamente :D</p>
+            
+            <!-- Controles de Audio -->
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;">Música de Fondo (Menú)</label>
+                <input type="range" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="width: 100%; cursor: pointer;">
+            </div>
+            
+            <div style="text-align: left; margin-bottom: 30px;">
+                <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;">Efectos de Sonido (Juego)</label>
+                <input type="range" id="sfxVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="width: 100%; cursor: pointer;">
+            </div>
+
             <button class="btn" id="btnCloseSettings">Cerrar</button>
         </div>
     </div>
@@ -437,6 +459,12 @@
 
         let audioCtx = null;
         let soundEnabled = true;
+        let sfxVolume = 0.5; // Estado para volumen de efectos
+        let bgmVolume = 0.5; // Estado para volumen de música
+        
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = bgmVolume; // Aplicar volumen inicial
+        
         let playerCups = parseInt(localStorage.getItem('emdcg_cups') || '0', 10);
         let typingTimeout = null; // Definido globalmente para el salto de diálogo
         
@@ -468,7 +496,7 @@
                     osc.type = 'square';
                     osc.frequency.setValueAtTime(600, now);
                     osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.setValueAtTime(0.15 * sfxVolume, now); // Multiplicador de volumen UI
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
                     osc.start(now);
                     osc.stop(now + 0.1);
@@ -476,7 +504,7 @@
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(120, now);
                     osc.frequency.linearRampToValueAtTime(30, now + 0.3);
-                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.setValueAtTime(0.3 * sfxVolume, now); // Multiplicador de volumen UI
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
                     osc.start(now);
                     osc.stop(now + 0.3);
@@ -484,7 +512,7 @@
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(400, now);
                     osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
-                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.setValueAtTime(0.35 * sfxVolume, now); // Multiplicador de volumen UI
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
                     osc.start(now);
                     osc.stop(now + 0.15);
@@ -492,7 +520,7 @@
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(500, now);
                     osc.frequency.setValueAtTime(300, now + 0.05);
-                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.setValueAtTime(0.25 * sfxVolume, now); // Multiplicador de volumen UI
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
                     osc.start(now);
                     osc.stop(now + 0.08);
@@ -539,6 +567,23 @@
                 setTimeout(() => {
                     document.getElementById('preloaderScreen').classList.add('hidden');
                     document.getElementById('mainMenu').classList.remove('hidden');
+                    currentState = STATES.MENU;
+                    
+                    // Iniciar música en bucle automáticamente en el menú
+                    if(soundEnabled) {
+                        bgMusic.play().catch(e => {
+                            // Workaround: Políticas de autoplay previenen audio hasta que el usuario interactúe
+                            const startMusicOnInteract = () => {
+                                if (currentState === STATES.MENU && soundEnabled) {
+                                    bgMusic.play();
+                                }
+                                document.removeEventListener('click', startMusicOnInteract);
+                                document.removeEventListener('touchstart', startMusicOnInteract);
+                            };
+                            document.addEventListener('click', startMusicOnInteract);
+                            document.addEventListener('touchstart', startMusicOnInteract);
+                        });
+                    }
                 }, 400);
             }
         }
@@ -562,7 +607,7 @@
             { s: 'Tavito', t: '¿Qué pasa si nos mata?' },
             { s: 'Pollito Guía', t: 'Simplemente… desaparecen.' },
             { s: 'Tavito', t: 'Bueno… entonces será mejor que prepare mi bazuca.' },
-            { s: 'Jostin', t: 'Y yo ya tengo mi pistola cargada.' },
+            { s: 'Jostin', t: 'Y io ya estoy cargando mi pistola.' },
             { s: 'Jostin', t: 'Así que…' },
             { s: 'Jostin', t: '¡¡VAMOS ALLÁ!!' }
         ];
@@ -1249,6 +1294,10 @@
 
         document.getElementById('btnStartGame').addEventListener('click', () => {
             playSound('click');
+            // CORTAR LA MÚSICA ABRUPTAMENTE
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+            
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('currencyBadge').classList.add('hidden');
             document.getElementById('dialogueScreen').classList.remove('hidden');
@@ -1266,14 +1315,29 @@
             document.getElementById('storeModal').classList.add('hidden');
         });
 
-        // Listeners para la nueva ventana de Configuración (engranaje)
+        // Eventos para la Ventana Modal de Configuración (Audio/UI)
         document.getElementById('btnSettings').addEventListener('click', () => {
             playSound('click');
             document.getElementById('settingsModal').classList.remove('hidden');
         });
+        
         document.getElementById('btnCloseSettings').addEventListener('click', () => {
             playSound('click');
             document.getElementById('settingsModal').classList.add('hidden');
+        });
+        
+        // Controladores para los Sliders de Volumen
+        document.getElementById('bgmVolumeSlider').addEventListener('input', (e) => {
+            bgmVolume = parseFloat(e.target.value);
+            bgMusic.volume = bgmVolume;
+        });
+
+        document.getElementById('sfxVolumeSlider').addEventListener('input', (e) => {
+            sfxVolume = parseFloat(e.target.value);
+        });
+        // Feedback auditivo al soltar el slider de efectos
+        document.getElementById('sfxVolumeSlider').addEventListener('change', () => {
+            if(soundEnabled) playSound('click');
         });
 
         // Funcionalidad del botón de saltar diálogo
@@ -1374,7 +1438,16 @@
             let text = soundEnabled ? "🔊 Sonido: ON" : "🔇 Sonido: OFF";
             document.getElementById('btnToggleAudio').innerText = text;
             document.getElementById('btnPauseAudio').innerText = text;
-            if (soundEnabled) playSound('click');
+            
+            bgMusic.muted = !soundEnabled; // Mutea/Desmutea la BGM Globalmente
+
+            if (soundEnabled) {
+                playSound('click');
+                // Si estamos en el menú, intentar reanudar la música
+                if(currentState === STATES.MENU) bgMusic.play().catch(e=>{});
+            } else {
+                bgMusic.pause();
+            }
         }
         document.getElementById('btnToggleAudio').addEventListener('click', toggleAudio);
         document.getElementById('btnPauseAudio').addEventListener('click', toggleAudio);
@@ -1403,7 +1476,7 @@
 
                 document.getElementById('endTitle').innerText = "¡VICTORIA!";
                 document.getElementById('endTitle').style.color = "#facc15";
-                document.getElementById('endDesc').innerText = "Han escapado con éxito de La Ciudad EMCD.";
+                document.getElementById('endDesc').innerText = "Han escapado con éxito de la ciudad masiva EMDCG.";
                 document.getElementById('rewardNotice').innerText = "🏆 ¡Has ganado +1 Copa!";
             } else {
                 document.getElementById('endTitle').innerText = "BORRADOS";
