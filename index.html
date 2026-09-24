@@ -27,6 +27,7 @@
             touch-action: none;
             color: var(--text-color);
         }
+        
         #gameCanvas {
             display: block;
             width: 100%;
@@ -75,6 +76,53 @@
         .btn-secondary { background: #3b82f6; color: #fff; }
         .btn-accent { background: #8b5cf6; color: #fff; }
 
+        .settings-icon-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid #38bdf8;
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            pointer-events: auto;
+            z-index: 30;
+            transition: transform 0.2s ease, border-color 0.2s;
+        }
+        .settings-icon-btn:hover {
+            transform: rotate(45deg);
+            border-color: var(--highlight);
+        }
+
+        .skip-dialogue-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.85);
+            border: 2px solid #38bdf8;
+            color: #38bdf8;
+            padding: 8px 14px;
+            font-size: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            pointer-events: auto;
+            transition: background 0.2s, color 0.2s;
+        }
+        .skip-dialogue-btn:hover {
+            background: #38bdf8;
+            color: #000;
+        }
+
         .currency-badge {
             position: absolute;
             top: 20px;
@@ -118,6 +166,7 @@
             object-fit: contain;
             image-rendering: pixelated;
         }
+        
         .dialogue-overlay-box {
             position: relative;
             z-index: 2;
@@ -172,12 +221,7 @@
         .timer-badge { background: rgba(10, 15, 30, 0.88); border: 2px solid #38bdf8; padding: 8px 12px; color: #60a5fa; font-size: 10px; border-radius: 6px; }
         .keys-info { background: rgba(10, 15, 30, 0.88); border: 2px solid var(--highlight); padding: 10px 14px; color: var(--highlight); font-size: 11px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-radius: 6px; }
 
-        .minimap-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 6px;
-        }
+        .minimap-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 
         .minimap-container {
             width: 100px;
@@ -193,31 +237,18 @@
 
         .controls-area { 
             position: fixed; 
-            bottom: 0;
-            left: 0;
-            width: 100%; 
-            pointer-events: none; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-end; 
-            padding: 20px; 
-            box-sizing: border-box; 
-            z-index: 15;
+            bottom: 0; left: 0; width: 100%; 
+            pointer-events: none; display: flex; 
+            justify-content: space-between; align-items: flex-end; 
+            padding: 20px; box-sizing: border-box; z-index: 15;
             padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
         
         #joystickZone { 
-            width: 130px; 
-            height: 130px; 
-            background: rgba(255,255,255,0.08); 
-            border-radius: 50%; 
-            border: 2px solid rgba(56, 189, 248, 0.3); 
-            position: relative; 
-            pointer-events: auto; 
-            touch-action: none; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
+            width: 130px; height: 130px; background: rgba(255,255,255,0.08); 
+            border-radius: 50%; border: 2px solid rgba(56, 189, 248, 0.3); 
+            position: relative; pointer-events: auto; touch-action: none; 
+            display: flex; justify-content: center; align-items: center;
         }
         #joystickKnob { width: 50px; height: 50px; background: rgba(56, 189, 248, 0.5); border-radius: 50%; position: absolute; pointer-events: none; box-shadow: 0 0 10px rgba(56,189,248,0.5); }
 
@@ -235,10 +266,10 @@
         
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
-        #pauseScreen, #endScreen, #storeModal { background: rgba(3, 5, 10, 0.96); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
+        #pauseScreen, #endScreen, #storeModal, #settingsModal { background: rgba(3, 5, 10, 0.96); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
         .menu-buttons { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 15px; }
 
-        #storeModal { z-index: 150; }
+        #storeModal, #settingsModal { z-index: 150; }
         .store-box {
             background: rgba(15, 23, 42, 0.95);
             border: 3px solid #38bdf8;
@@ -267,13 +298,17 @@
 
     <div id="preloaderScreen" class="ui-layer">
         <h1 class="title" style="font-size:4vw; color:#10b981;">ESCAPE CITY EMDCG</h1>
-        <p id="loadingText" class="subtitle" style="font-size:11px; color:#fff; margin-bottom:20px;">Cargando recursos... 0%</p>
-        <div style="width:260px; height:22px; border:3px solid #fff; background:#111; border-radius:4px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.8);">
+        <p id="loadingText" class="subtitle" style="font-size:11px; color:#fff; margin-bottom:10px;">Cargando recursos... 0%</p>
+        <div style="width:280px; height:22px; border:3px solid #fff; background:#111; border-radius:4px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.8); margin-bottom: 12px;">
             <div id="loadingBar" style="width:0%; height:100%; background:#10b981; transition:width 0.15s ease-out;"></div>
         </div>
+        <!-- Nuevo texto de carga dinámica -->
+        <p id="loadingSubtext" style="font-size:9px; color:#38bdf8; margin:0; font-family:inherit; min-height:16px;">Iniciando carga de archivos...</p>
     </div>
 
     <div id="mainMenu" class="ui-layer hidden">
+        <!-- Nuevo botón de configuración -->
+        <button class="settings-icon-btn" id="btnSettings" title="Configuración">⚙️</button>
         <img src="Escape_City_EMDCG.PNG" alt="Escape City EMDCG" class="menu-logo-img" id="menuLogoImg" onerror="this.style.display='none'; document.getElementById('fallbackTitle').style.display='block';">
         <h1 id="fallbackTitle" class="title" style="display:none;">ESCAPE CITY<br>EMDCG</h1>
         <p class="subtitle">Un fallo en la Matrix...</p>
@@ -292,7 +327,18 @@
         </div>
     </div>
 
+    <!-- Nueva ventana modal de Configuración -->
+    <div id="settingsModal" class="ui-layer hidden">
+        <div class="store-box" style="border-color: #38bdf8;">
+            <h2 style="color: #38bdf8; margin-bottom: 20px; font-size: 16px;">CONFIGURACIÓN ⚙️</h2>
+            <p style="font-size: 13px; color:#fff; margin-bottom: 25px; line-height: 1.6;">Próximamente :D</p>
+            <button class="btn" id="btnCloseSettings">Cerrar</button>
+        </div>
+    </div>
+
     <div id="dialogueScreen" class="ui-layer hidden">
+        <!-- Nuevo botón de saltar -->
+        <button class="skip-dialogue-btn" id="btnSkipDialogue">SALTAR ⏭</button>
         <div class="scene-container">
             <img id="sceneImage" class="scene-img" src="" alt="Escena 16:9">
         </div>
@@ -307,12 +353,12 @@
         <div class="inst-content">
             <h2>MISIÓN Y REGLAS</h2>
             <ul>
+                <!-- Línea de edificios agrietados eliminada, solo texto original -->
                 <li>Están atrapados en una Ciudad Abandonada masiva. Encuentren <b>3 LLAVES</b> ocultas.</li>
                 <li><b>Llave 1:</b> En edificios destruidos.</li>
                 <li><b>Llave 2:</b> En zonas abiertas y calles lúgubres.</li>
                 <li><b>Llave 3:</b> En los raros edificios intactos remanentes.</li>
                 <li><b>CUIDADO:</b> Las entidades cibernéticas te borrarán si te tocan.</li>
-                <li><b>NUEVO:</b> Dispara con la bazuca a los edificios agrietados para demolerlos de forma interactiva.</li>
             </ul>
             <p style="color:var(--highlight); margin-bottom:5px;"><b>HABILIDADES:</b></p>
             <ul>
@@ -392,6 +438,7 @@
         let audioCtx = null;
         let soundEnabled = true;
         let playerCups = parseInt(localStorage.getItem('emdcg_cups') || '0', 10);
+        let typingTimeout = null; // Definido globalmente para el salto de diálogo
         
         function updateCupDisplay() {
             document.getElementById('cupCount').innerText = playerCups;
@@ -434,7 +481,6 @@
                     osc.start(now);
                     osc.stop(now + 0.3);
                 } else if (type === 'pickup') {
-                    // Increased volume/gain for pickup / feedback pup
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(400, now);
                     osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
@@ -443,7 +489,6 @@
                     osc.start(now);
                     osc.stop(now + 0.15);
                 } else if (type === 'click') {
-                    // Increased volume/gain for click feedback
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(500, now);
                     osc.frequency.setValueAtTime(300, now + 0.05);
@@ -464,24 +509,31 @@
         const sceneImages = [];
         for (let s = 1; s <= 12; s++) {
             let img = new Image();
-            img.src = `Escena_${s}.PNG`;
-            sceneImages.push(img);
+            sceneImages.push({ key: `Escena_${s}.PNG`, img: img, src: `Escena_${s}.PNG` });
         }
 
         const assetList = [
-            { key: 'jostin', img: charImages.jostin, src: 'Jostin.PNG' },
-            { key: 'tavito', img: charImages.tavito, src: 'Tavito.PNG' },
-            { key: 'pepe', img: charImages.pepe, src: 'Pepe.PNG' }
+            { key: 'Jostin.PNG', img: charImages.jostin, src: 'Jostin.PNG' },
+            { key: 'Tavito.PNG', img: charImages.tavito, src: 'Tavito.PNG' },
+            { key: 'Pepe.PNG', img: charImages.pepe, src: 'Pepe.PNG' }
         ];
+        
+        // Unificar todos los assets para iterarlos juntos
+        const allAssets = assetList.concat(sceneImages);
 
         let loadedCount = 0;
-        const totalAssets = assetList.length + sceneImages.length;
+        const totalAssets = allAssets.length;
 
-        function updatePreloader() {
+        function updatePreloader(assetName) {
             loadedCount++;
             let pct = Math.floor((loadedCount / totalAssets) * 100);
             document.getElementById('loadingText').innerText = `Cargando recursos... ${pct}%`;
             document.getElementById('loadingBar').style.width = `${pct}%`;
+            
+            // Actualización dinámica del subtexto
+            if(assetName) {
+                document.getElementById('loadingSubtext').innerText = `[${loadedCount}/${totalAssets}] Cargado: ${assetName}`;
+            }
 
             if (loadedCount >= totalAssets) {
                 setTimeout(() => {
@@ -491,15 +543,10 @@
             }
         }
 
-        assetList.forEach(item => {
-            item.img.onload = updatePreloader;
-            item.img.onerror = () => updatePreloader();
+        allAssets.forEach(item => {
+            item.img.onload = () => updatePreloader(item.key);
+            item.img.onerror = () => updatePreloader(item.key);
             item.img.src = item.src;
-        });
-
-        sceneImages.forEach(img => {
-            img.onload = updatePreloader;
-            img.onerror = () => updatePreloader();
         });
 
         const STATES = { PRELOAD: 0, MENU: 1, CUTSCENE: 2, INSTRUCTIONS: 3, PLAYING: 4, PAUSED: 5, GAMEOVER: 6, VICTORY: 7 };
@@ -521,7 +568,6 @@
         ];
         let currentDialogue = 0;
         let isTyping = false;
-        let typingTimeout = null;
 
         const TILE_SIZE = 64;
         const MAP_COLS = 128;
@@ -552,7 +598,6 @@
         let projectiles = [];
         let particles = [];
         let floatingTexts = [];
-        let cracks = []; 
         let door = null;
 
         function generateMap() {
@@ -564,34 +609,27 @@
                         row.push(1); continue;
                     }
                     let rand = Math.random();
-                    // Tile 1: Intact buildings (minority now, ~6%)
-                    // Tile 2: Destroyed buildings / interiors (dominant, ~30%)
-                    // Tile 5: New cracked destructible buildings (~20%)
-                    // Tile 3: Open streets/rubble (~15%)
-                    // Tile 0: Empty walkable space (~29%)
-                    if(rand < 0.06) row.push(1);
-                    else if(rand < 0.36) row.push(2);
-                    else if(rand < 0.56) row.push(5); // Cracked destructible building
-                    else if(rand < 0.71) row.push(3);
+                    // Lógica original: Solo tiles 1 (Intacto), 2 (Destruido), 3 (Calles), 0 (Vacío)
+                    if(rand < 0.10) row.push(1);
+                    else if(rand < 0.45) row.push(2);
+                    else if(rand < 0.65) row.push(3);
                     else row.push(0);
                 }
                 map.push(row);
             }
             
-            // Distribute large zone clusters in the map corners (without being gigantic)
             const cornerZones = [
-                { rMin: 4, rMax: 18, cMin: 4, cMax: 18 },       // Top-Left corner
-                { rMin: 4, rMax: 18, cMin: MAP_COLS-19, cMax: MAP_COLS-5 }, // Top-Right corner
-                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: 4, cMax: 18 }, // Bottom-Left corner
-                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: MAP_COLS-19, cMax: MAP_COLS-5 } // Bottom-Right corner
+                { rMin: 4, rMax: 18, cMin: 4, cMax: 18 },       
+                { rMin: 4, rMax: 18, cMin: MAP_COLS-19, cMax: MAP_COLS-5 }, 
+                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: 4, cMax: 18 }, 
+                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: MAP_COLS-19, cMax: MAP_COLS-5 } 
             ];
 
             cornerZones.forEach(zone => {
                 for(let r = zone.rMin; r <= zone.rMax; r++) {
                     for(let c = zone.cMin; c <= zone.cMax; c++) {
                         let subRand = Math.random();
-                        if (subRand < 0.65) map[r][c] = 2; // Destroyed zones in corners
-                        else if (subRand < 0.90) map[r][c] = 5; // Cracked destructible buildings
+                        if (subRand < 0.70) map[r][c] = 2;
                         else map[r][c] = 0;
                     }
                 }
@@ -626,7 +664,7 @@
                     let r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
                     ex = c * TILE_SIZE + TILE_SIZE/2;
                     ey = r * TILE_SIZE + TILE_SIZE/2;
-                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 4 || map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 5 || distance(player.x, player.y, ex, ey) < TILE_SIZE*8);
+                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*8);
                 
                 enemies.push({ 
                     x: ex, 
@@ -679,7 +717,8 @@
 
         function isSolid(tileX, tileY) {
             if (tileX < 0 || tileX >= MAP_COLS || tileY < 0 || tileY >= MAP_ROWS) return true;
-            return map[tileY][tileX] === 1 || map[tileY][tileX] === 4 || map[tileY][tileX] === 5;
+            // Solo los edificios intactos son sólidos y no destructibles
+            return map[tileY][tileX] === 1;
         }
 
         function update() {
@@ -792,22 +831,7 @@
                 let prC = Math.floor(p.x/TILE_SIZE); let prR = Math.floor(p.y/TILE_SIZE);
                 if(p.life <= 0 || isSolid(prC, prR)) {
                     if (isSolid(prC, prR)) {
-                        // Check if it hit a new cracked destructible building (Tile 5) with a bazooka
-                        if (p.type === 'bazooka' && prC >= 0 && prC < MAP_COLS && prR >= 0 && prR < MAP_ROWS && map[prR][prC] === 5) {
-                            map[prR][prC] = 2; // Demolish into normal destroyed interior
-                            createParticles(p.x, p.y, '#f59e0b', 25);
-                            addFloatingText("¡EDIFICIO DEMOLIDO!", p.x, p.y - 15, '#f59e0b');
-                        } else {
-                            cracks.push({
-                                x: p.x, y: p.y, life: 250,
-                                lines: [
-                                    {x1: 0, y1: 0, x2: -6-Math.random()*6, y2: -6-Math.random()*6},
-                                    {x1: 0, y1: 0, x2: 6+Math.random()*6, y2: -6-Math.random()*6},
-                                    {x1: 0, y1: 0, x2: -4+Math.random()*8, y2: 6+Math.random()*8}
-                                ]
-                            });
-                            createParticles(p.x, p.y, '#94a3b8', 6);
-                        }
+                        createParticles(p.x, p.y, '#94a3b8', 6);
                     }
                     if(p.type==='bazooka') createExplosion(p.x, p.y);
                     projectiles.splice(i, 1);
@@ -850,11 +874,6 @@
                 let ft = floatingTexts[i];
                 ft.y -= 0.8; ft.life--;
                 if(ft.life <= 0) floatingTexts.splice(i, 1);
-            }
-
-            for(let i=cracks.length-1; i>=0; i--) {
-                cracks[i].life--;
-                if(cracks[i].life <= 0) cracks.splice(i, 1);
             }
 
             let isInvisible = (char.id === 'pepe' && char.stealthActive);
@@ -1017,31 +1036,14 @@
                         let ty = r * TILE_SIZE;
                         let tileType = map[r][c];
                         
-                        if(tileType === 1 || tileType === 4) {
+                        // Renderizado de las 3 zonas bases
+                        if(tileType === 1) {
                             ctx.fillStyle = '#0f172a';
-                            if (tileType === 4) {
-                                let blink = 0.5 + Math.abs(Math.sin(Date.now()/300)) * 0.5;
-                                ctx.fillStyle = `rgba(15, 23, 42, ${blink})`;
-                            }
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = tileType === 4 ? `rgba(56, 189, 248, ${0.4 + Math.abs(Math.sin(Date.now()/300)) * 0.6})` : '#1e293b';
+                            ctx.strokeStyle = '#1e293b';
                             ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = tileType === 4 ? `rgba(16, 185, 129, ${0.4 + Math.abs(Math.sin(Date.now()/300)) * 0.6})` : '#10b981';
+                            ctx.fillStyle = '#10b981';
                             ctx.fillRect(tx + 4, ty + 4, 3, 3);
-                        } else if (tileType === 5) {
-                            // New heavily cracked destructible building tile
-                            ctx.fillStyle = '#1e1b4b';
-                            ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = '#f59e0b';
-                            ctx.lineWidth = 2;
-                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            // Draw cracks on the building tile
-                            ctx.beginPath();
-                            ctx.strokeStyle = '#fbbf24';
-                            ctx.moveTo(tx + 8, ty + 8); ctx.lineTo(tx + 32, ty + 24); ctx.lineTo(tx + 54, ty + 12);
-                            ctx.moveTo(tx + 32, ty + 24); ctx.lineTo(tx + 20, ty + 56);
-                            ctx.moveTo(tx + 40, ty + 30); ctx.lineTo(tx + 56, ty + 50);
-                            ctx.stroke();
                         } else if (tileType === 2) {
                             ctx.fillStyle = '#090d16';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
@@ -1108,22 +1110,6 @@
                     ctx.strokeRect(e.x - 12, e.y - 24, 24, 4);
                 }
             }
-
-            ctx.strokeStyle = `rgba(16, 185, 129, 0.8)`;
-            ctx.lineWidth = 1.5;
-            for(let crack of cracks) {
-                ctx.globalAlpha = crack.life / 250;
-                ctx.save();
-                ctx.translate(crack.x, crack.y);
-                ctx.beginPath();
-                for(let l of crack.lines) {
-                    ctx.moveTo(l.x1, l.y1);
-                    ctx.lineTo(l.x2, l.y2);
-                }
-                ctx.stroke();
-                ctx.restore();
-            }
-            ctx.globalAlpha = 1.0;
 
             const char = party[activeCharIndex];
             
@@ -1197,10 +1183,10 @@
 
             for(let r=0; r<MAP_ROWS; r+=2) {
                 for(let c=0; c<MAP_COLS; c+=2) {
-                    if(map[r] && (map[r][c] === 1 || map[r][c] === 4)) {
+                    if(map[r] && map[r][c] === 1) {
                         minimapCtx.fillStyle = '#1e293b';
                         minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
-                    } else if (map[r] && (map[r][c] === 2 || map[r][c] === 5)) {
+                    } else if (map[r] && map[r][c] === 2) {
                         minimapCtx.fillStyle = '#0f172a';
                         minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
                     }
@@ -1280,6 +1266,26 @@
             document.getElementById('storeModal').classList.add('hidden');
         });
 
+        // Listeners para la nueva ventana de Configuración (engranaje)
+        document.getElementById('btnSettings').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('settingsModal').classList.remove('hidden');
+        });
+        document.getElementById('btnCloseSettings').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('settingsModal').classList.add('hidden');
+        });
+
+        // Funcionalidad del botón de saltar diálogo
+        document.getElementById('btnSkipDialogue').addEventListener('click', () => {
+            playSound('click');
+            if (typingTimeout) clearTimeout(typingTimeout);
+            isTyping = false;
+            document.getElementById('dialogueScreen').classList.add('hidden');
+            document.getElementById('instructionsScreen').classList.remove('hidden');
+            currentState = STATES.INSTRUCTIONS;
+        });
+
         document.getElementById('dialogueBox').addEventListener('click', showNextDialogue);
 
         function showNextDialogue() {
@@ -1298,7 +1304,7 @@
             }
             
             let d = story[currentDialogue];
-            // Update 16:9 background scene image corresponding to Escena_1.PNG through Escena_12.PNG
+            // Si las imágenes precargadas de la escena existen, la asignamos visualmente.
             document.getElementById('sceneImage').src = `Escena_${currentDialogue + 1}.PNG`;
             document.getElementById('speakerName').innerText = d.s;
             playSound('click');
