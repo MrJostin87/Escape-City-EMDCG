@@ -288,6 +288,25 @@
             outline: none;
         }
         
+        /* Estilo para la notificación Toast de alertas */
+        @keyframes slideDownAlert {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        #toastAlertContainer {
+            animation: slideDownAlert 0.3s ease-out;
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #ef4444;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 10px;
+            line-height: 1.6;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            max-width: 80%;
+        }
+
         @media (min-width: 1024px) {
             #joystickZone { opacity: 0.5; }
             .inst-content { font-size: 11px; }
@@ -304,6 +323,14 @@
 
     <div class="currency-badge" id="currencyBadge">
         <span>🏆 Copas: <span id="cupCount">0</span></span>
+    </div>
+
+    <!-- Contenedor para Notificaciones Flotantes / Toast (Ej. Sigilo agotado) -->
+    <div id="toastAlert" class="ui-layer hidden" style="justify-content: flex-start; padding-top: 80px; z-index: 200;">
+        <div id="toastAlertContainer">
+            <span id="toastMsgText" style="display: block; color: #ef4444; font-weight: bold; margin-bottom: 5px;">¡ALERTA!</span>
+            <span id="toastSubText">Mensaje secundario</span>
+        </div>
     </div>
 
     <div id="preloaderScreen" class="ui-layer">
@@ -464,6 +491,26 @@
         let playerCups = parseInt(localStorage.getItem('emdcg_cups') || '0', 10);
         let typingTimeout = null; 
         
+        // Sistema de Alerta Toast Flotante
+        let toastTimeoutId = null;
+        function showGameToast(title, message, color) {
+            const toastEl = document.getElementById('toastAlert');
+            const container = document.getElementById('toastAlertContainer');
+            document.getElementById('toastMsgText').innerText = title;
+            document.getElementById('toastMsgText').style.color = color;
+            document.getElementById('toastSubText').innerText = message;
+            
+            container.style.borderColor = color;
+            container.style.boxShadow = `0 0 20px ${color}99`; // Color con opacidad
+            
+            toastEl.classList.remove('hidden');
+            
+            if(toastTimeoutId) clearTimeout(toastTimeoutId);
+            toastTimeoutId = setTimeout(() => {
+                toastEl.classList.add('hidden');
+            }, 4500);
+        }
+
         function updateCupDisplay() {
             document.getElementById('cupCount').innerText = playerCups;
         }
@@ -520,6 +567,15 @@
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
                     osc.start(now);
                     osc.stop(now + 0.08);
+                } else if (type === 'alert') {
+                    // Sonido de alerta para sigilo agotado
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.setValueAtTime(100, now + 0.15);
+                    gain.gain.setValueAtTime(0.3 * sfxVolume, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
                 }
             } catch(e) {}
         }
@@ -725,8 +781,8 @@
                 enemies.push({ 
                     x: ex, 
                     y: ey, 
-                    w: 32, 
-                    h: 32, 
+                    w: 40, // Aumentado un poco para el nuevo diseño
+                    h: 40, 
                     speed: 1.4 + Math.random() * 0.6, 
                     state: 'PATROL',
                     patrolTarget: { x: ex, y: ey },
@@ -849,11 +905,23 @@
                 }
             }
 
+            // --- Lógica Actualizada del Sigilo de Pepe ---
             if (char.id === 'pepe' && char.stealthActive) {
                 char.stealthTime -= 1/60;
+                
+                // Si el sigilo llega exactamente a 0 o menos, desactivar y notificar
                 if (char.stealthTime <= 0) {
                     char.stealthTime = 0;
                     char.stealthActive = false;
+                    
+                    // Alertas visuales y sonoras directas en el personaje
+                    createParticles(player.x, player.y, '#ef4444', 25);
+                    addFloatingText("¡SIGILO AGOTADO!", player.x, player.y - 45, '#ef4444');
+                    addFloatingText("Busca cargadores", player.x, player.y - 25, '#38bdf8');
+                    playSound('alert');
+                    
+                    // Alerta Toast global en pantalla
+                    showGameToast("¡SIGILO DE PEPE AGOTADO!", "Debes conseguir cargadores azules por el mapa para volver a usarlo.", "#ef4444");
                 }
                 updateHUD();
             }
@@ -1016,6 +1084,7 @@
                     updateHUD();
                 } else {
                     char.stealthActive = false;
+                    showGameToast("¡NO TIENES SIGILO!", "Debes conseguir cargadores azules.", "#ef4444");
                 }
             }
         }
@@ -1192,21 +1261,73 @@
                 }
             }
 
+            // --- Nuevo Renderizado de Entidades Enemigas ---
             for(let e of enemies) {
-                ctx.fillStyle = (e.state === 'CHASE') ? '#f43f5e' : '#10b981';
-                ctx.fillRect(e.x - e.w/2, e.y - e.h/2, e.w, e.h);
+                ctx.save();
+                ctx.translate(e.x, e.y);
+                
+                let isChase = (e.state === 'CHASE');
+                let mainColor = isChase ? '#f43f5e' : '#10b981';
+                let glowColor = isChase ? '#ff003c' : '#00ffcc';
+                
+                // Efecto de pulso en base al tiempo
+                let pulse = Math.abs(Math.sin(Date.now() / (isChase ? 150 : 300)));
+                
+                // Resplandor exterior cybernético
+                ctx.shadowColor = glowColor;
+                ctx.shadowBlur = 10 + (pulse * 15);
+                
+                // Caparazón exterior geométrico (Octágono / Cuadrado cortado)
+                ctx.beginPath();
+                let s = (e.w/2) - 2; 
+                ctx.moveTo(-s, -s/2);
+                ctx.lineTo(-s/2, -s);
+                ctx.lineTo(s/2, -s);
+                ctx.lineTo(s, -s/2);
+                ctx.lineTo(s, s/2);
+                ctx.lineTo(s/2, s);
+                ctx.lineTo(-s/2, s);
+                ctx.lineTo(-s, s/2);
+                ctx.closePath();
+                
+                ctx.fillStyle = '#05080e'; // Cuerpo oscuro Matrix
+                ctx.fill();
+                
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = mainColor;
+                ctx.stroke();
+                
+                // Apagar resplandor de sombra para los detalles internos
+                ctx.shadowBlur = 0;
+                
+                // Núcleo interno brillante
+                ctx.fillStyle = mainColor;
+                ctx.globalAlpha = 0.2 + (pulse * 0.4);
+                ctx.beginPath();
+                ctx.arc(0, 0, s*0.5, 0, Math.PI*2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+                
+                // Detalles frontales (ojos digitales o circuitos)
                 ctx.fillStyle = '#fff';
-                ctx.fillRect(e.x - 7, e.y - 5, 4, 4);
-                ctx.fillRect(e.x + 3, e.y - 5, 4, 4);
+                ctx.fillRect(-6, -4, 4, 8); // Ojo izquierdo
+                ctx.fillRect(2, -4, 4, 8);  // Ojo derecho
+                
+                // Punto de energía central
+                ctx.fillStyle = glowColor;
+                ctx.fillRect(-2, -2, 4, 4);
 
+                ctx.restore();
+
+                // Barra de Vida
                 if (e.hp < 3) {
                     ctx.fillStyle = '#ef4444';
-                    ctx.fillRect(e.x - 12, e.y - 24, 24, 4);
+                    ctx.fillRect(e.x - 12, e.y - 28, 24, 4); // Subido un poco por el nuevo tamaño
                     ctx.fillStyle = '#10b981';
-                    ctx.fillRect(e.x - 12, e.y - 24, (24/3) * e.hp, 4);
+                    ctx.fillRect(e.x - 12, e.y - 28, (24/3) * e.hp, 4);
                     ctx.strokeStyle = '#000';
                     ctx.lineWidth = 1;
-                    ctx.strokeRect(e.x - 12, e.y - 24, 24, 4);
+                    ctx.strokeRect(e.x - 12, e.y - 28, 24, 4);
                 }
             }
 
