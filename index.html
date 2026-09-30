@@ -51,7 +51,7 @@
         .hidden { display: none !important; }
 
         #preloaderScreen { background: #03050a; z-index: 100; pointer-events: auto; }
-        #mainMenu { background: rgba(3, 5, 10, 0.95); pointer-events: auto; position: relative; }
+        #mainMenu { background: rgba(3, 5, 10, 0.95); pointer-events: auto; }
         
         .menu-logo-img {
             max-width: 92vw;
@@ -65,6 +65,19 @@
         .title { font-size: 6vw; color: #10b981; text-shadow: 3px 3px 0 #000, 0 0 15px rgba(16,185,129,0.5); text-align: center; margin-bottom: 1.5rem; line-height: 1.4; }
         .subtitle { font-size: 2.5vw; color: #38bdf8; margin-bottom: 2rem; text-align: center; padding: 0 15px; text-shadow: 0 0 8px rgba(56,189,248,0.4); }
         
+        /* Etiqueta de versión en el menú principal */
+        .version-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: rgba(148, 163, 184, 0.8);
+            pointer-events: none;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        
         .btn {
             background: var(--primary); border: 3px solid #fff; color: #000;
             padding: 14px 28px; font-size: 13px; font-family: inherit;
@@ -75,20 +88,6 @@
         .btn:active { transform: translate(4px, 4px); box-shadow: none; }
         .btn-secondary { background: #3b82f6; color: #fff; }
         .btn-accent { background: #8b5cf6; color: #fff; }
-
-        /* Indicador de versión estilizado en el menú principal */
-        .version-tag {
-            position: absolute;
-            bottom: 15px;
-            font-size: 9px;
-            color: #64748b;
-            letter-spacing: 1px;
-            pointer-events: none;
-            user-select: none;
-            opacity: 0.85;
-            text-shadow: 0 0 5px rgba(0,0,0,0.8);
-            font-family: 'Press Start 2P', cursive;
-        }
 
         .settings-icon-btn {
             position: absolute;
@@ -302,7 +301,6 @@
             outline: none;
         }
         
-        /* Estilo para la notificación Toast de alertas */
         @keyframes slideDownAlert {
             0% { transform: translateY(-20px); opacity: 0; }
             100% { transform: translateY(0); opacity: 1; }
@@ -366,8 +364,9 @@
             <button class="btn btn-accent" id="btnStore">Tienda</button>
             <button class="btn btn-secondary" id="btnToggleAudio" style="font-size: 10px; padding: 12px 20px;">🔊 Sonido: ON</button>
         </div>
-        <!-- Texto de versión exclusivamente dentro de #mainMenu -->
-        <div class="version-tag">v0.1.0-Beta</div>
+        
+        <!-- Nuevo texto de versión fijo en la parte inferior del menú -->
+        <div class="version-label">v0.1.0-Beta</div>
     </div>
 
     <div id="storeModal" class="ui-layer hidden">
@@ -495,62 +494,49 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
+        let playerCups = parseInt(localStorage.getItem('emdcg_cups') || '0', 10);
+        let typingTimeout = null; 
+
         let audioCtx = null;
         let soundEnabled = true;
         let sfxVolume = 0.5; 
         let bgmVolume = 0.5; 
+        let bgMusicStarted = false;
         
         const bgMusic = document.getElementById('bgMusic');
         bgMusic.volume = bgmVolume;
 
-        // Gestión optimizada para la reproducción de BGM superando restricciones de autoplay
-        function playBGM() {
-            if (!soundEnabled || currentState !== STATES.MENU) return;
+        // Intentar reproducir música atrapando errores de Autoplay policy
+        function attemptPlayBGM() {
+            if (!soundEnabled) return;
             bgMusic.volume = bgmVolume;
             const playPromise = bgMusic.play();
             if (playPromise !== undefined) {
-                playPromise.catch(() => {
-                    // Si el navegador requiere interacción previa, añadimos listener de desbloqueo único
-                    const unlockAudio = () => {
-                        if (soundEnabled && currentState === STATES.MENU && bgMusic.paused) {
-                            bgMusic.play().catch(e => console.log("BGM unlock error:", e));
-                        }
-                    };
-                    window.addEventListener('pointerdown', unlockAudio, { once: true });
-                    window.addEventListener('touchstart', unlockAudio, { once: true });
-                    window.addEventListener('click', unlockAudio, { once: true });
-                    window.addEventListener('keydown', unlockAudio, { once: true });
+                playPromise.then(() => {
+                    bgMusicStarted = true;
+                }).catch(error => {
+                    // Silenciar advertencias en consola de reproducción automática bloqueada
+                    bgMusicStarted = false;
                 });
             }
         }
-        
-        let playerCups = parseInt(localStorage.getItem('emdcg_cups') || '0', 10);
-        let typingTimeout = null; 
-        
-        // Sistema de Alerta Toast Flotante
-        let toastTimeoutId = null;
-        function showGameToast(title, message, color) {
-            const toastEl = document.getElementById('toastAlert');
-            const container = document.getElementById('toastAlertContainer');
-            document.getElementById('toastMsgText').innerText = title;
-            document.getElementById('toastMsgText').style.color = color;
-            document.getElementById('toastSubText').innerText = message;
-            
-            container.style.borderColor = color;
-            container.style.boxShadow = `0 0 20px ${color}99`;
-            
-            toastEl.classList.remove('hidden');
-            
-            if(toastTimeoutId) clearTimeout(toastTimeoutId);
-            toastTimeoutId = setTimeout(() => {
-                toastEl.classList.add('hidden');
-            }, 4500);
+
+        // Desbloquear audio en la primera interacción del usuario
+        function unlockAudioContext() {
+            initAudio(); // Inicializa o resume el AudioContext
+            if (!bgMusicStarted && soundEnabled && (currentState === STATES.MENU || currentState === STATES.PRELOAD)) {
+                attemptPlayBGM();
+            }
+            // Eliminar listeners después de interactuar
+            document.removeEventListener('click', unlockAudioContext);
+            document.removeEventListener('touchstart', unlockAudioContext);
+            document.removeEventListener('keydown', unlockAudioContext);
         }
 
-        function updateCupDisplay() {
-            document.getElementById('cupCount').innerText = playerCups;
-        }
-        updateCupDisplay();
+        // Escuchar eventos globales para garantizar el arranque de la música
+        document.addEventListener('click', unlockAudioContext);
+        document.addEventListener('touchstart', unlockAudioContext);
+        document.addEventListener('keydown', unlockAudioContext);
 
         function initAudio() {
             if (!audioCtx) {
@@ -615,6 +601,30 @@
             } catch(e) {}
         }
 
+        let toastTimeoutId = null;
+        function showGameToast(title, message, color) {
+            const toastEl = document.getElementById('toastAlert');
+            const container = document.getElementById('toastAlertContainer');
+            document.getElementById('toastMsgText').innerText = title;
+            document.getElementById('toastMsgText').style.color = color;
+            document.getElementById('toastSubText').innerText = message;
+            
+            container.style.borderColor = color;
+            container.style.boxShadow = `0 0 20px ${color}99`;
+            
+            toastEl.classList.remove('hidden');
+            
+            if(toastTimeoutId) clearTimeout(toastTimeoutId);
+            toastTimeoutId = setTimeout(() => {
+                toastEl.classList.add('hidden');
+            }, 4500);
+        }
+
+        function updateCupDisplay() {
+            document.getElementById('cupCount').innerText = playerCups;
+        }
+        updateCupDisplay();
+
         const charImages = {
             jostin: new Image(),
             tavito: new Image(),
@@ -654,8 +664,9 @@
                     document.getElementById('mainMenu').classList.remove('hidden');
                     currentState = STATES.MENU;
                     
-                    // Iniciar reproducción segura de la música de fondo al llegar al menú
-                    playBGM();
+                    // Iniciar la música de fondo utilizando la lógica mejorada al entrar al menú
+                    attemptPlayBGM();
+                    
                 }, 400);
             }
         }
@@ -697,7 +708,7 @@
             { s: 'Tavito', t: '¿Qué pasa si nos mata?' },
             { s: 'Pollito Guía', t: 'Simplemente… desaparecen.' },
             { s: 'Tavito', t: 'Bueno… entonces será mejor que prepare mi bazuca.' },
-            { s: 'Jostin', t: 'Y io ya estoy cargando mi pistola.' },
+            { s: 'Jostin', t: 'Y yo ya tengo mi pistola cargada.' },
             { s: 'Jostin', t: 'Así que…' },
             { s: 'Jostin', t: '¡¡VAMOS ALLÁ!!' }
         ];
@@ -804,7 +815,7 @@
                 enemies.push({ 
                     x: ex, 
                     y: ey, 
-                    w: 40, 
+                    w: 40,
                     h: 40, 
                     speed: 1.4 + Math.random() * 0.6, 
                     state: 'PATROL',
@@ -1515,9 +1526,7 @@
 
         document.getElementById('btnStartGame').addEventListener('click', () => {
             playSound('click');
-            // Detener música del menú al pasar al modo de juego
             bgMusic.pause();
-            bgMusic.currentTime = 0;
             
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('currencyBadge').classList.add('hidden');
@@ -1546,12 +1555,12 @@
             document.getElementById('settingsModal').classList.add('hidden');
         });
         
-        // Control de volumen fluido para la música de fondo
+        // Volumen dinámico de la música para no requerir pausas ni reinicios
         document.getElementById('bgmVolumeSlider').addEventListener('input', (e) => {
             bgmVolume = parseFloat(e.target.value);
-            bgMusic.volume = bgmVolume;
-            if (bgmVolume > 0 && soundEnabled && currentState === STATES.MENU && bgMusic.paused) {
-                playBGM();
+            bgMusic.volume = Math.max(0, Math.min(1, bgmVolume));
+            if (bgmVolume > 0 && soundEnabled && bgMusic.paused) {
+                attemptPlayBGM();
             }
         });
 
@@ -1653,6 +1662,7 @@
         document.getElementById('btnPause').addEventListener('click', togglePause);
         document.getElementById('btnResume').addEventListener('click', togglePause);
 
+        // Control dinámico de Sonido Robusto
         function toggleAudio() {
             soundEnabled = !soundEnabled;
             let text = soundEnabled ? "🔊 Sonido: ON" : "🔇 Sonido: OFF";
@@ -1663,26 +1673,17 @@
 
             if (soundEnabled) {
                 playSound('click');
-                if(currentState === STATES.MENU) {
-                    playBGM();
+                // Intentar recuperar la música de fondo solo si estamos en los menús apropiados
+                if(currentState === STATES.MENU || currentState === STATES.PRELOAD) {
+                    attemptPlayBGM();
                 }
             } else {
                 bgMusic.pause();
+                bgMusicStarted = false;
             }
         }
         document.getElementById('btnToggleAudio').addEventListener('click', toggleAudio);
         document.getElementById('btnPauseAudio').addEventListener('click', toggleAudio);
-
-        // Desbloqueo global de audio mediante primera interacción
-        const globalAudioUnlock = () => {
-            initAudio();
-            if (currentState === STATES.MENU && soundEnabled && bgMusic.paused) {
-                playBGM();
-            }
-        };
-        document.addEventListener('pointerdown', globalAudioUnlock, { once: true });
-        document.addEventListener('touchstart', globalAudioUnlock, { once: true });
-        document.addEventListener('click', globalAudioUnlock, { once: true });
 
         function endGame(win) {
             currentState = win ? STATES.VICTORY : STATES.GAMEOVER;
@@ -1708,7 +1709,7 @@
 
                 document.getElementById('endTitle').innerText = "¡VICTORIA!";
                 document.getElementById('endTitle').style.color = "#facc15";
-                document.getElementById('endDesc').innerText = "Han escapado con éxito de la ciudad masiva EMDCG.";
+                document.getElementById('endDesc').innerText = "Han escapado con éxito de La Ciudad EMCD.";
                 document.getElementById('rewardNotice').innerText = "🏆 ¡Has ganado +1 Copa!";
             } else {
                 document.getElementById('endTitle').innerText = "BORRADOS";
