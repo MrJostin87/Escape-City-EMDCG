@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Escape City EMDCG</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    
     <style>
         :root {
             --ui-bg: rgba(5, 8, 15, 0.92);
@@ -14,7 +13,6 @@
             --highlight: #facc15;
             --primary: #10b981;
             --accent: #6366f1;
-            --cloud: #38bdf8;
         }
         body, html {
             margin: 0;
@@ -77,21 +75,6 @@
             pointer-events: none;
             letter-spacing: 1px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .cloud-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 8px;
-            background: rgba(56, 189, 248, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            border-radius: 4px;
-            color: #38bdf8;
-            font-size: 7px;
         }
 
         .btn {
@@ -373,6 +356,7 @@
         .add-account-panel { margin-top: 10px; padding: 12px; border: 1px dashed #334155; background:rgba(2,6,23,.5); border-radius:8px; display:none; }
         .add-account-panel.open { display:block; }
         .profile-small-line { color:#94a3b8; font-size:7px; line-height:1.6; margin-top:8px; }
+        .settings-account-grid { display:grid; grid-template-columns: 1fr; gap:10px; }
 
         @keyframes slideDownAlert { 0% { transform: translateY(-20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
         #toastAlertContainer {
@@ -412,7 +396,6 @@
 
     <div class="currency-badge hidden" id="currencyBadge">
         <span>🏆 Copas: <span id="cupCount">0</span></span>
-        <span class="cloud-badge" id="cloudSyncStatus">☁️ OK</span>
     </div>
 
     <div id="toastAlert" class="ui-layer hidden" style="justify-content: flex-start; padding-top: 80px; z-index: 400;">
@@ -428,14 +411,14 @@
         <div style="width:280px; height:22px; border:3px solid #fff; background:#111; border-radius:4px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.8); margin-bottom: 12px;">
             <div id="loadingBar" style="width:0%; height:100%; background:#10b981; transition:width 0.15s ease-out;"></div>
         </div>
-        <p id="loadingSubtext" style="font-size:9px; color:#38bdf8; margin:0; font-family:inherit; min-height:16px;">Conectando con Backend Cloud...</p>
+        <p id="loadingSubtext" style="font-size:9px; color:#38bdf8; margin:0; font-family:inherit; min-height:16px;">Iniciando carga de archivos...</p>
     </div>
 
     <!-- Flujo inicial / creación de cuentas -->
     <div id="accountSetupScreen" class="ui-layer hidden">
         <div class="store-box" style="border-color:#10b981; max-width:460px;">
             <h2 id="accountWizardTitle" style="color:#10b981; margin-bottom:10px; font-size:16px;">CREAR CUENTA</h2>
-            <p id="accountWizardIntro" style="font-size:9px; color:#cbd5e1; line-height:1.6; margin-bottom:18px;">Crea tu cuenta de Escape City EMDCG con sincronización en la nube.</p>
+            <p id="accountWizardIntro" style="font-size:9px; color:#cbd5e1; line-height:1.6; margin-bottom:18px;">Crea tu cuenta local de Escape City EMDCG para continuar.</p>
 
             <div class="wizard-progress" aria-hidden="true">
                 <div class="wizard-dot active" id="wizardDot1"></div>
@@ -445,7 +428,7 @@
             <div class="wizard-step active" id="accountStep1">
                 <label for="accountUsername" style="display:block; text-align:left; font-size:10px; color:#fff; margin-bottom:8px;">Paso 1 · Nombre de usuario</label>
                 <input id="accountUsername" type="text" maxlength="18" placeholder="Escribe tu nombre" autocomplete="nickname" spellcheck="false">
-                <p class="wizard-note">Usa entre 2 y 18 caracteres. Se respaldará en la nube automáticamente.</p>
+                <p class="wizard-note">Usa entre 2 y 18 caracteres. El nombre se guardará en este dispositivo.</p>
                 <button class="btn" id="btnAccountContinue">CONTINUAR</button>
             </div>
 
@@ -478,52 +461,49 @@
             <button class="btn btn-accent" id="btnStore">Tienda</button>
             <button class="btn btn-secondary" id="btnToggleAudio" style="font-size: 10px; padding: 12px 20px;">🔊 Sonido: ON</button>
         </div>
-        <div class="version-label">
-            <span>v0.1.0</span>
-            <span class="cloud-badge">☁️ Firebase Sync Active</span>
-        </div>
+        <div class="version-label">v0.1.0-Beta</div>
     </div>
 
     <div id="profileModal" class="ui-layer hidden">
         <div class="store-box" style="border-color:#facc15; max-width:480px;">
-            <h2 style="color:#facc15; margin-bottom:16px; font-size:16px;">PERFIL & CUENTAS CLOUD</h2>
+            <h2 style="color:#facc15; margin-bottom:16px; font-size:16px;">PERFIL & CUENTAS</h2>
 
             <div class="account-info-card" style="margin-bottom:16px;">
                 <img id="profileAvatarPreview" src="" alt="Avatar actual">
                 <div class="account-meta">
                     <div class="account-name" id="profileUsernameDisplay">Usuario</div>
                     <div class="account-id" id="profileAbgIdDisplay">--------</div>
-                    <div class="profile-small-line">☁️ Sincronizado en la Nube</div>
+                    <div class="profile-small-line">Cuenta activa</div>
                 </div>
             </div>
 
             <div class="account-section-title">PERSONALIZAR FOTO DE PERFIL</div>
             <div class="avatar-tools">
-                <button class="avatar-preset" id="presetAvatar1" title="Jostin"><img src="Jostin.PNG" alt="Jostin" onerror="this.src=createInitialAvatarDataURL('Jostin')"></button>
-                <button class="avatar-preset" id="presetAvatar2" title="Tavito"><img src="Tavito.PNG" alt="Tavito" onerror="this.src=createInitialAvatarDataURL('Tavito')"></button>
-                <button class="avatar-preset" id="presetAvatar3" title="Pepe"><img src="Pepe.PNG" alt="Pepe" onerror="this.src=createInitialAvatarDataURL('Pepe')"></button>
+                <button class="avatar-preset" id="presetAvatar1" title="Jostin"><img src="Jostin.PNG" alt="Jostin"></button>
+                <button class="avatar-preset" id="presetAvatar2" title="Tavito"><img src="Tavito.PNG" alt="Tavito"></button>
+                <button class="avatar-preset" id="presetAvatar3" title="Pepe"><img src="Pepe.PNG" alt="Pepe"></button>
             </div>
             <label class="btn btn-small" for="profileImageInput" style="display:inline-flex; align-items:center; justify-content:center; margin-bottom:10px;">Subir una foto</label>
             <input id="profileImageInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
 
             <div style="height:1px; background:#334155; margin:12px 0 16px;"></div>
 
-            <div class="account-section-title">VINCULAR ABG ID DESDE CUALQUIER DISPOSITIVO</div>
-            <button class="plus-btn" id="btnOpenAddAccount" title="Vincular cuenta con ABG ID">+</button>
+            <div class="account-section-title">AGREGAR OTRA CUENTA</div>
+            <button class="plus-btn" id="btnOpenAddAccount" title="Agregar una cuenta existente">+</button>
             <div class="add-account-panel" id="addAccountPanel">
-                <label for="existingAbgIdInput" style="display:block; text-align:left; font-size:8px; color:#cbd5e1; margin-bottom:8px;">Ingresa la ABG ID de 8 caracteres</label>
+                <label for="existingAbgIdInput" style="display:block; text-align:left; font-size:8px; color:#cbd5e1; margin-bottom:8px;">Ingresa únicamente la ABG ID</label>
                 <input id="existingAbgIdInput" type="text" maxlength="8" placeholder="AB12CD34" autocomplete="off" spellcheck="false" style="text-transform:uppercase;">
-                <p class="profile-small-line">El sistema buscará tu cuenta en el Backend Cloud y la descargará inmediatamente.</p>
+                <p class="profile-small-line">En esta versión, la cuenta existente debe estar guardada previamente en este mismo dispositivo/navegador.</p>
                 <div style="display:flex; gap:8px; justify-content:center; margin-top:10px;">
-                    <button class="btn btn-small" id="btnAddExistingAccount">Buscar en Cloud & Usar</button>
+                    <button class="btn btn-small" id="btnAddExistingAccount">Agregar y usar</button>
                     <button class="btn btn-small" id="btnCancelAddAccount" style="background:#334155; color:#fff; border-color:#94a3b8;">Cancelar</button>
                 </div>
             </div>
 
-            <button class="btn btn-accent btn-small" id="btnCreateAnotherAccount" style="margin-top:14px;">Crear Nueva Cuenta</button>
+            <button class="btn btn-accent btn-small" id="btnCreateAnotherAccount" style="margin-top:14px;">Crear una Nueva</button>
 
             <div style="height:1px; background:#334155; margin:18px 0 14px;"></div>
-            <div class="account-section-title">CUENTAS GUARDADAS (LOCAL & NUBE)</div>
+            <div class="account-section-title">CUENTAS GUARDADAS</div>
             <div class="account-list" id="accountList"></div>
 
             <button class="btn" id="btnCloseProfile">Cerrar</button>
@@ -550,10 +530,11 @@
                 <input type="range" id="sfxVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="width: 100%; cursor: pointer;">
             </div>
 
+            <!-- Información de cuenta exactamente debajo de Efectos de Sonido (Juego) -->
             <div class="account-info-card" style="border-color:rgba(16,185,129,.55); margin-bottom:20px;">
                 <img id="settingsAccountAvatar" src="" alt="Avatar">
                 <div class="account-meta">
-                    <div style="font-size:8px; color:#94a3b8; margin-bottom:7px;">CUENTA ACTIVA (NUBE OK)</div>
+                    <div style="font-size:8px; color:#94a3b8; margin-bottom:7px;">CUENTA ACTIVA</div>
                     <div class="account-name" id="settingsAccountName">Usuario</div>
                     <div class="account-id" id="settingsAccountId">--------</div>
                 </div>
@@ -647,109 +628,6 @@
         <button class="btn" onclick="location.reload()" style="margin-top: 10px;">Menú Principal</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global environment bindings or fallback configuration
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'escape-city-emdcG';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyDemoPlaceholderKeyForEscapeCity",
-            authDomain: "escape-city-emdcg.firebaseapp.com",
-            projectId: "escape-city-emdcg",
-            storageBucket: "escape-city-emdcg.appspot.com",
-            messagingSenderId: "100000000000",
-            appId: "1:100000000000:web:escapeCityEmdcg"
-        };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let app, auth, db;
-        let currentUser = null;
-
-        async function initBackend() {
-            try {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                if (initialAuthToken) {
-                    const userCred = await signInWithCustomToken(auth, initialAuthToken);
-                    currentUser = userCred.user;
-                } else {
-                    const userCred = await signInAnonymously(auth);
-                    currentUser = userCred.user;
-                }
-                console.log("☁️ Backend Firebase Firestore conectado:", currentUser.uid);
-                if (window.onCloudReady) window.onCloudReady();
-            } catch (err) {
-                console.warn("⚠️️ Firebase operando en modo offline/simulado local:", err);
-            }
-        }
-
-        // Global Cloud Sync API
-        window.CloudSync = {
-            async saveAccount(account) {
-                if (!account || !account.abgId) return false;
-                try {
-                    if (!currentUser && auth) {
-                        const res = await signInAnonymously(auth);
-                        currentUser = res.user;
-                    }
-                    if (!currentUser || !db) return false;
-
-                    const accountRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', account.abgId);
-                    const cloudPayload = {
-                        abgId: account.abgId,
-                        username: account.username,
-                        avatar: account.avatar || '',
-                        cups: Number(account.cups) || 0,
-                        updatedAt: new Date().toISOString(),
-                        lastOwnerUid: currentUser.uid
-                    };
-
-                    await setDoc(accountRef, cloudPayload, { merge: true });
-                    console.log(`☁️ Cuenta ${account.abgId} guardada en la Nube Firestore.`);
-                    return true;
-                } catch (e) {
-                    console.error("Error guardando cuenta en Firestore:", e);
-                    return false;
-                }
-            },
-
-            async fetchAccount(abgId) {
-                if (!abgId) return null;
-                try {
-                    if (!currentUser && auth) {
-                        const res = await signInAnonymously(auth);
-                        currentUser = res.user;
-                    }
-                    if (!currentUser || !db) return null;
-
-                    const accountRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', abgId.toUpperCase());
-                    const snap = await getDoc(accountRef);
-
-                    if (snap.exists()) {
-                        return snap.data();
-                    }
-                    return null;
-                } catch (e) {
-                    console.error("Error leyendo cuenta de Firestore:", e);
-                    return null;
-                }
-            },
-
-            async syncAllLocalAccounts(localAccountsList) {
-                if (!Array.isArray(localAccountsList)) return;
-                for (const acc of localAccountsList) {
-                    await this.saveAccount(acc);
-                }
-            }
-        };
-
-        initBackend();
-    </script>
-
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -789,7 +667,10 @@
         let currentState = STATES.PRELOAD;
 
         /* =========================================================
-           SISTEMA DE CUENTAS EMDCG + BACKEND CLOUD
+           SISTEMA DE CUENTAS EMDCG
+           - Persistencia local por navegador/dispositivo.
+           - ABG ID de 8 caracteres A-Z / 0-9.
+           - Una cuenta activa + múltiples cuentas guardadas.
            ========================================================= */
         const ACCOUNT_STORAGE_KEY = 'emdcg_accounts_v2';
         const ACTIVE_ACCOUNT_KEY = 'emdcg_active_account_v2';
@@ -799,7 +680,6 @@
         let accountWizardMode = 'first'; // first | additional
         let accountWizardStep = 1;
         let generatedAbgId = '';
-        let playerCups = 0;
 
         function normalizeAbgId(value) {
             return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
@@ -818,13 +698,9 @@
         function saveAccounts() {
             try {
                 localStorage.setItem(ACCOUNT_STORAGE_KEY, JSON.stringify(accounts));
-                // Disparar sincronización con la nube en segundo plano
-                if (window.CloudSync && activeAccount) {
-                    window.CloudSync.saveAccount(activeAccount);
-                }
                 return true;
             } catch (e) {
-                showGameToast('NO SE PUDO GUARDAR', 'El almacenamiento del navegador está lleno.', '#ef4444');
+                showGameToast('NO SE PUDO GUARDAR', 'El almacenamiento local del navegador está lleno.', '#ef4444');
                 return false;
             }
         }
@@ -891,10 +767,6 @@
             localStorage.setItem('emdcg_cups', String(playerCups));
         }
 
-        function updateCupDisplay() {
-            document.getElementById('cupCount').innerText = playerCups;
-        }
-
         function updateAccountUI() {
             if (!activeAccount) return;
             const avatar = activeAccount.avatar || createInitialAvatarDataURL(activeAccount.username);
@@ -939,23 +811,6 @@
             }
         }
 
-        function showGameToast(title, msg, color = '#ef4444') {
-            const toast = document.getElementById('toastAlert');
-            const container = document.getElementById('toastAlertContainer');
-            const titleEl = document.getElementById('toastMsgText');
-            const subEl = document.getElementById('toastSubText');
-
-            titleEl.innerText = title;
-            subEl.innerText = msg;
-            container.style.borderColor = color;
-            titleEl.style.color = color;
-
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
-
         function openAccountWizard(mode = 'first') {
             accountWizardMode = mode;
             accountWizardStep = 1;
@@ -963,8 +818,8 @@
 
             document.getElementById('accountWizardTitle').innerText = mode === 'first' ? 'CREAR CUENTA' : 'CREAR OTRA CUENTA';
             document.getElementById('accountWizardIntro').innerText = mode === 'first'
-                ? 'Crea tu cuenta de Escape City EMDCG para continuar.'
-                : 'Registra una cuenta adicional y quedará sincronizada con la Nube.';
+                ? 'Crea tu cuenta local de Escape City EMDCG para continuar.'
+                : 'Registra una cuenta adicional y quedará guardada junto a tus otras cuentas.';
 
             document.getElementById('accountUsername').value = '';
             document.getElementById('accountAbgId').value = '';
@@ -999,7 +854,7 @@
             return true;
         }
 
-        async function finishAccountCreation() {
+        function finishAccountCreation() {
             const username = String(document.getElementById('accountUsername').value || '').trim();
             const abgId = normalizeAbgId(document.getElementById('accountAbgId').value);
 
@@ -1032,11 +887,6 @@
             syncLegacyCupStorage();
             updateAccountUI();
 
-            // Guardar en la Nube
-            if (window.CloudSync) {
-                await window.CloudSync.saveAccount(newAccount);
-            }
-
             document.getElementById('accountSetupScreen').classList.add('hidden');
             document.getElementById('mainMenu').classList.remove('hidden');
             document.getElementById('currencyBadge').classList.remove('hidden');
@@ -1044,7 +894,7 @@
             document.getElementById('addAccountPanel').classList.remove('open');
             currentState = STATES.MENU;
             attemptPlayBGM();
-            showGameToast('CUENTA CREADA & NUBE OK', `${username} · ${abgId}`, '#10b981');
+            showGameToast('CUENTA CREADA', `${username} · ${abgId}`, '#10b981');
         }
 
         function renderAccountList() {
@@ -1062,7 +912,7 @@
 
             accounts.forEach(acc => {
                 const row = document.createElement('div');
-                row.className = `account-row ${activeAccount && activeAccount.abgId === acc.abgId ? 'active' : ''}`;
+                row.className = `account-row ${activeAccount && acc.abgId === activeAccount.abgId ? 'active' : ''}`;
 
                 const img = document.createElement('img');
                 img.src = acc.avatar || createInitialAvatarDataURL(acc.username);
@@ -1070,904 +920,1069 @@
 
                 const info = document.createElement('div');
                 info.className = 'account-row-info';
-                info.innerHTML = `
-                    <div class="account-row-name">${acc.username}</div>
-                    <div class="account-row-id">${acc.abgId} · 🏆 ${acc.cups || 0}</div>
-                `;
+                const name = document.createElement('div');
+                name.className = 'account-row-name';
+                name.innerText = acc.username;
+                const id = document.createElement('div');
+                id.className = 'account-row-id';
+                id.innerText = acc.abgId;
+                info.append(name, id);
 
                 const actions = document.createElement('div');
                 actions.className = 'account-row-actions';
 
-                if (!activeAccount || activeAccount.abgId !== acc.abgId) {
-                    const useBtn = document.createElement('button');
-                    useBtn.className = 'mini-btn use';
-                    useBtn.innerText = 'Usar';
-                    useBtn.onclick = () => setActiveAccount(acc.abgId);
-                    actions.appendChild(useBtn);
-                }
+                const useBtn = document.createElement('button');
+                useBtn.className = 'mini-btn use';
+                useBtn.innerText = acc.abgId === (activeAccount && activeAccount.abgId) ? 'ACTIVA' : 'USAR';
+                useBtn.disabled = acc.abgId === (activeAccount && activeAccount.abgId);
+                useBtn.addEventListener('click', () => {
+                    if (setActiveAccount(acc.abgId)) renderAccountList();
+                });
 
-                if (accounts.length > 1) {
-                    const delBtn = document.createElement('button');
-                    delBtn.className = 'mini-btn delete';
-                    delBtn.innerText = 'Borrar';
-                    delBtn.onclick = () => {
-                        accounts = accounts.filter(a => a.abgId !== acc.abgId);
-                        saveAccounts();
-                        if (activeAccount && activeAccount.abgId === acc.abgId) {
-                            activeAccount = accounts[0] || null;
-                            if (activeAccount) {
-                                localStorage.setItem(ACTIVE_ACCOUNT_KEY, activeAccount.abgId);
-                            }
-                        }
-                        syncLegacyCupStorage();
-                        updateAccountUI();
-                    };
-                    actions.appendChild(delBtn);
-                }
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'mini-btn delete';
+                deleteBtn.innerText = 'BORRAR';
+                deleteBtn.addEventListener('click', () => removeAccount(acc.abgId));
 
-                row.appendChild(img);
-                row.appendChild(info);
-                row.appendChild(actions);
+                actions.append(useBtn, deleteBtn);
+                row.append(img, info, actions);
                 list.appendChild(row);
             });
         }
 
-        function initAudioEngine() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function removeAccount(abgId) {
+            const target = getAccountById(abgId);
+            if (!target) return;
+            if (!confirm(`¿Borrar la cuenta ${target.username} (${target.abgId}) de este dispositivo?`)) return;
+
+            accounts = accounts.filter(acc => acc.abgId !== target.abgId);
+            if (!accounts.length) {
+                activeAccount = null;
+                saveAccounts();
+                localStorage.removeItem(ACTIVE_ACCOUNT_KEY);
+                document.getElementById('profileModal').classList.add('hidden');
+                document.getElementById('currencyBadge').classList.add('hidden');
+                openAccountWizard('first');
+                return;
             }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+
+            if (!activeAccount || activeAccount.abgId === target.abgId) {
+                activeAccount = accounts[0];
+                localStorage.setItem(ACTIVE_ACCOUNT_KEY, activeAccount.abgId);
+            }
+            saveAccounts();
+            syncLegacyCupStorage();
+            updateAccountUI();
+            showGameToast('CUENTA ELIMINADA', `${target.username} ya no está guardada en este dispositivo.`, '#f43f5e');
+        }
+
+        function persistActiveAccount() {
+            if (!activeAccount) return;
+            const idx = accounts.findIndex(acc => acc.abgId === activeAccount.abgId);
+            if (idx < 0) return;
+            accounts[idx] = activeAccount;
+            saveAccounts();
+        }
+
+        function setActiveAccountAvatar(dataUrl) {
+            if (!activeAccount) return;
+            activeAccount.avatar = dataUrl;
+            persistActiveAccount();
+            updateAccountUI();
+        }
+
+        function cropAndSaveImage(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                showGameToast('ARCHIVO INVÁLIDO', 'Selecciona una imagen válida.', '#ef4444');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    const size = 256;
+                    const c = document.createElement('canvas');
+                    c.width = size; c.height = size;
+                    const x = c.getContext('2d');
+                    x.imageSmoothingEnabled = false;
+                    const ratio = Math.max(size / img.width, size / img.height);
+                    const sw = size / ratio;
+                    const sh = size / ratio;
+                    const sx = (img.width - sw) / 2;
+                    const sy = (img.height - sh) / 2;
+                    x.fillStyle = '#020617';
+                    x.fillRect(0,0,size,size);
+                    x.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
+                    const dataUrl = c.toDataURL('image/webp', 0.78);
+                    setActiveAccountAvatar(dataUrl);
+                    showGameToast('PERFIL ACTUALIZADO', 'Tu foto de perfil fue guardada.', '#10b981');
+                };
+                img.onerror = () => showGameToast('ERROR DE IMAGEN', 'No se pudo leer la foto.', '#ef4444');
+                img.src = e.target.result;
+            };
+            reader.onerror = () => showGameToast('ERROR DE ARCHIVO', 'No se pudo leer el archivo seleccionado.', '#ef4444');
+            reader.readAsDataURL(file);
+        }
+
+        function finishPreloader() {
+            document.getElementById('preloaderScreen').classList.add('hidden');
+            initializeAccounts();
+            if (!activeAccount) {
+                document.getElementById('mainMenu').classList.add('hidden');
+                document.getElementById('currencyBadge').classList.add('hidden');
+                openAccountWizard('first');
+            } else {
+                document.getElementById('mainMenu').classList.remove('hidden');
+                document.getElementById('currencyBadge').classList.remove('hidden');
+                currentState = STATES.MENU;
+                updateAccountUI();
+                attemptPlayBGM();
             }
         }
 
-        function playSynthSound(freq, type = 'sine', duration = 0.15, gainVal = 0.3) {
+        // Música de fondo / audio
+        function attemptPlayBGM() {
             if (!soundEnabled) return;
-            initAudioEngine();
+            bgMusic.volume = bgmVolume;
+            const playPromise = bgMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => { bgMusicStarted = true; }).catch(() => { bgMusicStarted = false; });
+            }
+        }
+
+        function unlockAudioContext() {
+            initAudio();
+            if (!bgMusicStarted && soundEnabled && (currentState === STATES.MENU || currentState === STATES.PRELOAD)) {
+                attemptPlayBGM();
+            }
+            document.removeEventListener('click', unlockAudioContext);
+            document.removeEventListener('touchstart', unlockAudioContext);
+            document.removeEventListener('keydown', unlockAudioContext);
+        }
+
+        document.addEventListener('click', unlockAudioContext);
+        document.addEventListener('touchstart', unlockAudioContext, {passive:true});
+        document.addEventListener('keydown', unlockAudioContext);
+
+        function initAudio() {
             try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(gainVal * sfxVolume, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
             } catch (e) {}
         }
 
-        function attemptPlayBGM() {
-            if (soundEnabled && !bgMusicStarted) {
-                bgMusic.play().then(() => {
-                    bgMusicStarted = true;
-                }).catch(() => {});
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'shoot') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                    gain.gain.setValueAtTime(0.15 * sfxVolume, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
+                } else if (type === 'explosion') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.linearRampToValueAtTime(30, now + 0.3);
+                    gain.gain.setValueAtTime(0.3 * sfxVolume, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                } else if (type === 'pickup') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+                    gain.gain.setValueAtTime(0.35 * sfxVolume, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(500, now);
+                    osc.frequency.setValueAtTime(300, now + 0.05);
+                    gain.gain.setValueAtTime(0.25 * sfxVolume, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now); osc.stop(now + 0.08);
+                } else if (type === 'alert') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.setValueAtTime(100, now + 0.15);
+                    gain.gain.setValueAtTime(0.3 * sfxVolume, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                }
+            } catch(e) {}
+        }
+
+        let toastTimeoutId = null;
+        function showGameToast(title, message, color) {
+            const toastEl = document.getElementById('toastAlert');
+            const container = document.getElementById('toastAlertContainer');
+            document.getElementById('toastMsgText').innerText = title;
+            document.getElementById('toastMsgText').style.color = color;
+            document.getElementById('toastSubText').innerText = message;
+            container.style.borderColor = color;
+            container.style.boxShadow = `0 0 20px ${color}99`;
+            toastEl.classList.remove('hidden');
+            if(toastTimeoutId) clearTimeout(toastTimeoutId);
+            toastTimeoutId = setTimeout(() => toastEl.classList.add('hidden'), 4500);
+        }
+
+        let playerCups = 0;
+        function updateCupDisplay() { document.getElementById('cupCount').innerText = playerCups; }
+
+        const charImages = {
+            jostin: new Image(),
+            tavito: new Image(),
+            pepe: new Image()
+        };
+
+        const sceneImages = [];
+        for (let s = 1; s <= 12; s++) {
+            let img = new Image();
+            sceneImages.push({ key: `Escena_${s}.PNG`, img: img, src: `Escena_${s}.PNG` });
+        }
+
+        const assetList = [
+            { key: 'Jostin.PNG', img: charImages.jostin, src: 'Jostin.PNG' },
+            { key: 'Tavito.PNG', img: charImages.tavito, src: 'Tavito.PNG' },
+            { key: 'Pepe.PNG', img: charImages.pepe, src: 'Pepe.PNG' }
+        ];
+        const allAssets = assetList.concat(sceneImages);
+        let loadedCount = 0;
+        const totalAssets = allAssets.length + 1;
+
+        function updatePreloader(assetName) {
+            loadedCount++;
+            let pct = Math.floor((loadedCount / totalAssets) * 100);
+            document.getElementById('loadingText').innerText = `Cargando recursos... ${pct}%`;
+            document.getElementById('loadingBar').style.width = `${pct}%`;
+            if(assetName) document.getElementById('loadingSubtext').innerText = `[${loadedCount}/${totalAssets}] Cargado: ${assetName}`;
+            if (loadedCount >= totalAssets) {
+                setTimeout(finishPreloader, 400);
             }
         }
 
-        const CUTSCENE_DIALOGUES = [
-            { speaker: "Jostin", text: "¿Dónde... dónde estamos? Todo se ve distorsionado y derruido.", scene: "Escape_City_EMDCG.PNG" },
-            { speaker: "Tavito", text: "Parece que la Matrix de la Ciudad colapsó. La infraestructura se está desintegrando.", scene: "Escape_City_EMDCG.PNG" },
-            { speaker: "Pepe", text: "Detecto firmas cibernéticas enemigas. Si nos detectan, borrarán nuestra existencia.", scene: "Escape_City_EMDCG.PNG" },
-            { speaker: "Jostin", text: "Necesitamos encontrar las 3 Llaves Maestras para abrir la Puerta de Escape.", scene: "Escape_City_EMDCG.PNG" }
-        ];
-        let currentDialogueIdx = 0;
+        allAssets.forEach(item => {
+            item.img.onload = () => updatePreloader(item.key);
+            item.img.onerror = () => updatePreloader(item.key);
+            item.img.src = item.src;
+        });
 
-        function showDialogueStep(idx) {
-            if (idx >= CUTSCENE_DIALOGUES.length) {
+        if (bgMusic.readyState >= 3) {
+            updatePreloader("Escape_City_EMDCG_Music_1.mp3 (Ya listo)");
+        } else {
+            bgMusic.addEventListener('canplaythrough', () => {
+                if (!bgMusic._preloadedReported) {
+                    bgMusic._preloadedReported = true;
+                    updatePreloader("Escape_City_EMDCG_Music_1.mp3");
+                }
+            }, { once: true });
+            bgMusic.addEventListener('error', () => {
+                if (!bgMusic._preloadedReported) {
+                    bgMusic._preloadedReported = true;
+                    updatePreloader("Escape_City_EMDCG_Music_1.mp3 (Omitido)");
+                }
+            }, { once: true });
+            bgMusic.load();
+        }
+
+        const story = [
+            { s: 'Jostin', t: 'Estábamos tranquilos, Pepe y yo jugando en la Play… y, de repente… ¿qué pasó?' },
+            { s: 'Tavito', t: '¡¿Qué es esto?! ¡¿Dónde estamos?! ¡Yo solo estaba en mi celular! ¡¿Cómo terminamos aquí?!' },
+            { s: 'Pepe', t: '¿Q-Qué…? ¡¿Dónde estamos?! Tengo… tengo miedo…' },
+            { s: 'Pollito Guía', t: '¡ATENCIÓN, VIAJEROS! Por un error en la Matrix… ¡han sido transportados a La Ciudad EMCD! Para poder escapar, tendrán que encontrar 3 llaves.' },
+            { s: 'Jostin', t: '¿3 llaves? Bah… suena fácil.' },
+            { s: 'Pollito Guía', t: 'No será tan fácil… Tendrán que protegerse de las entidades que habitan por todo el mapa. Y si alguna de ellas logra matarlos…' },
+            { s: 'Tavito', t: '¿Qué pasa si nos mata?' },
+            { s: 'Pollito Guía', t: 'Simplemente… desaparecen.' },
+            { s: 'Tavito', t: 'Bueno… entonces será mejor que prepare mi bazuca.' },
+            { s: 'Jostin', t: 'Y yo ya tengo mi pistola cargada.' },
+            { s: 'Jostin', t: 'Así que…' },
+            { s: 'Jostin', t: '¡¡VAMOS ALLÁ!!' }
+        ];
+        let currentDialogue = 0;
+        let isTyping = false;
+
+        const TILE_SIZE = 64;
+        const MAP_COLS = 128;
+        const MAP_ROWS = 128;
+        let camera = { x: 0, y: 0, w: canvas.width, h: canvas.height };
+        let screenShakeTimer = 0;
+        let screenShakeIntensity = 0;
+        let gameTime = 0;
+        let timerInterval = null;
+        let lastBoundaryWarning = 0;
+        const keys = { w: false, a: false, s: false, d: false, space: false };
+        let joystick = { active: false, dx: 0, dy: 0 };
+
+        const party = [
+            { id: 'jostin', name: 'Jostin', color: '#ff0000', speed: 4, ammo: 12, maxAmmo: 12, ability: 'Pistola', img: charImages.jostin },
+            { id: 'tavito', name: 'Tavito', color: '#888888', speed: 3.5, ammo: 20, maxAmmo: 20, ability: 'Bazuca', img: charImages.tavito },
+            { id: 'pepe', name: 'Pepe', color: '#ffff00', speed: 5, stealthTime: 120, maxStealth: 120, stealthActive: false, ability: 'Sigilo', img: charImages.pepe }
+        ];
+        let activeCharIndex = 0;
+        let globalKeysFound = 0;
+        let keyToAvisar = null;
+        let player = { x: TILE_SIZE * 2, y: TILE_SIZE * 2, w: 36, h: 36, dirX: 0, dirY: 1 };
+        let map = [];
+        let items = [];
+        let enemies = [];
+        let projectiles = [];
+        let particles = [];
+        let floatingTexts = [];
+        let door = null;
+
+        function generateMap() {
+            map = [];
+            for(let r=0; r<MAP_ROWS; r++) {
+                let row = [];
+                for(let c=0; c<MAP_COLS; c++) {
+                    if(r===0 || r===MAP_ROWS-1 || c===0 || c===MAP_COLS-1) { row.push(1); continue; }
+                    let rand = Math.random();
+                    if(rand < 0.10) row.push(1);
+                    else if(rand < 0.45) row.push(2);
+                    else if(rand < 0.65) row.push(3);
+                    else row.push(0);
+                }
+                map.push(row);
+            }
+            const cornerZones = [
+                { rMin: 4, rMax: 18, cMin: 4, cMax: 18 },
+                { rMin: 4, rMax: 18, cMin: MAP_COLS-19, cMax: MAP_COLS-5 },
+                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: 4, cMax: 18 },
+                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: MAP_COLS-19, cMax: MAP_COLS-5 }
+            ];
+            cornerZones.forEach(zone => {
+                for(let r = zone.rMin; r <= zone.rMax; r++) {
+                    for(let c = zone.cMin; c <= zone.cMax; c++) {
+                        let subRand = Math.random();
+                        if (subRand < 0.70) map[r][c] = 2;
+                        else map[r][c] = 0;
+                    }
+                }
+            });
+            for(let r=1; r<=3; r++) for(let c=1; c<=3; c++) map[r][c] = 0;
+            player.x = TILE_SIZE * 2; player.y = TILE_SIZE * 2;
+            player.w = party[activeCharIndex].id === 'pepe' ? 28 : 36;
+            player.h = party[activeCharIndex].id === 'pepe' ? 28 : 36;
+            items = [];
+            enemies = [];
+            placeItemInZone(2, 'key1', '#facc15');
+            placeItemInZone(0, 'key2', '#facc15');
+            placeItemNear(1, 'key3', '#facc15');
+            for(let i=0; i<12; i++) {
+                placeItemInZone(2, 'ammo_jostin', '#ff3333');
+                placeItemInZone(0, 'ammo_tavito', '#a855f7');
+                placeItemInZone(2, 'stealth_pepe', '#38bdf8');
+            }
+            for(let i=0; i<60; i++) {
+                let ex, ey;
+                do {
+                    let c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
+                    let r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
+                    ex = c * TILE_SIZE + TILE_SIZE/2;
+                    ey = r * TILE_SIZE + TILE_SIZE/2;
+                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*8);
+                enemies.push({ x: ex, y: ey, w: 40, h: 40, speed: 1.4 + Math.random() * 0.6, state: 'PATROL', patrolTarget: { x: ex, y: ey }, patrolTimer: 0, visionRange: 300, hp: 3 });
+            }
+        }
+
+        function placeItemInZone(tileType, id, color) {
+            let placed = false, attempts = 0;
+            while(!placed && attempts < 400) {
+                attempts++;
+                let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
+                let c = Math.floor(Math.random() * (MAP_COLS-2)) + 1;
+                if(map[r][c] === tileType) {
+                    items.push({ x: c*TILE_SIZE + TILE_SIZE/2, y: r*TILE_SIZE + TILE_SIZE/2, id: id, color: color, radius: 14 });
+                    placed = true;
+                }
+            }
+            if(!placed) items.push({ x: TILE_SIZE * 4, y: TILE_SIZE * 4, id: id, color: color, radius: 14 });
+        }
+
+        function placeItemNear(tileType, id, color) {
+            let placed = false, attempts = 0;
+            while(!placed && attempts < 400) {
+                attempts++;
+                let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
+                let c = Math.floor(Math.random() * (MAP_COLS-2)) + 1;
+                if(map[r][c] === 0) {
+                    if(map[r][c+1]===tileType || map[r][c-1]===tileType || map[r+1][c]===tileType || map[r-1][c]===tileType) {
+                        items.push({ x: c*TILE_SIZE + TILE_SIZE/2, y: r*TILE_SIZE + TILE_SIZE/2, id: id, color: color, radius: 14 });
+                        placed = true;
+                    }
+                }
+            }
+            if(!placed) items.push({ x: TILE_SIZE * 6, y: TILE_SIZE * 6, id: id, color: color, radius: 14 });
+        }
+
+        function distance(x1, y1, x2, y2) { return Math.hypot(x2-x1, y2-y1); }
+        function isSolid(tileX, tileY) {
+            if (tileX < 0 || tileX >= MAP_COLS || tileY < 0 || tileY >= MAP_ROWS) return true;
+            return map[tileY][tileX] === 1;
+        }
+
+        function update() {
+            if (currentState !== STATES.PLAYING) return;
+            const char = party[activeCharIndex];
+            let dx = 0, dy = 0;
+            if (joystick.active) { dx = joystick.dx * char.speed; dy = joystick.dy * char.speed; }
+            else {
+                if (keys.w) dy -= char.speed;
+                if (keys.s) dy += char.speed;
+                if (keys.a) dx -= char.speed;
+                if (keys.d) dx += char.speed;
+            }
+            if(!joystick.active && dx !== 0 && dy !== 0) {
+                const length = Math.sqrt(dx*dx + dy*dy);
+                dx = (dx/length) * char.speed;
+                dy = (dy/length) * char.speed;
+            }
+            if(dx !== 0 || dy !== 0) { let mag = Math.hypot(dx, dy); player.dirX = dx/mag; player.dirY = dy/mag; }
+
+            let newX = player.x + dx;
+            let pR = player.w / 2;
+            let topY = player.y - pR, botY = player.y + pR;
+            let leftX = newX - pR, rightX = newX + pR;
+            let cLeft = Math.floor(leftX / TILE_SIZE), cRight = Math.floor(rightX / TILE_SIZE);
+            let rTop = Math.floor(topY / TILE_SIZE), rBot = Math.floor(botY / TILE_SIZE);
+            let canMoveX = true;
+            if (isSolid(cLeft, rTop) || isSolid(cLeft, rBot) || isSolid(cRight, rTop) || isSolid(cRight, rBot)) canMoveX = false;
+            if (canMoveX) player.x = newX;
+
+            let newY = player.y + dy;
+            leftX = player.x - pR; rightX = player.x + pR;
+            topY = newY - pR; botY = newY + pR;
+            cLeft = Math.floor(leftX / TILE_SIZE); cRight = Math.floor(rightX / TILE_SIZE);
+            rTop = Math.floor(topY / TILE_SIZE); rBot = Math.floor(botY / TILE_SIZE);
+            let canMoveY = true;
+            if (isSolid(cLeft, rTop) || isSolid(cLeft, rBot) || isSolid(cRight, rTop) || isSolid(cRight, rBot)) canMoveY = false;
+            if (canMoveY) player.y = newY;
+
+            camera.x = player.x - camera.w / 2;
+            camera.y = player.y - camera.h / 2;
+            if (screenShakeTimer > 0) { screenShakeTimer--; camera.x += (Math.random() - 0.5) * screenShakeIntensity; camera.y += (Math.random() - 0.5) * screenShakeIntensity; }
+            camera.x = Math.max(0, Math.min(camera.x, MAP_COLS*TILE_SIZE - camera.w));
+            camera.y = Math.max(0, Math.min(camera.y, MAP_ROWS*TILE_SIZE - camera.h));
+
+            if (player.x < TILE_SIZE * 1.5 || player.x > (MAP_COLS - 1.5) * TILE_SIZE || player.y < TILE_SIZE * 1.5 || player.y > (MAP_ROWS - 1.5) * TILE_SIZE) {
+                if (Date.now() - lastBoundaryWarning > 3000) { addFloatingText("¡LÍMITE DE LA MATRIX!", player.x, player.y - 30, '#ef4444'); lastBoundaryWarning = Date.now(); }
+            }
+
+            if (char.id === 'pepe' && char.stealthActive) {
+                char.stealthTime -= 1/60;
+                if (char.stealthTime <= 0) {
+                    char.stealthTime = 0; char.stealthActive = false;
+                    createParticles(player.x, player.y, '#ef4444', 25);
+                    addFloatingText("¡SIGILO AGOTADO!", player.x, player.y - 45, '#ef4444');
+                    addFloatingText("Busca cargadores", player.x, player.y - 25, '#38bdf8');
+                    playSound('alert');
+                    showGameToast("¡SIGILO DE PEPE AGOTADO!", "Debes conseguir cargadores azules por el mapa para volver a usarlo.", "#ef4444");
+                }
+                updateHUD();
+            }
+
+            keyToAvisar = null;
+            document.getElementById('btnAvisar').style.display = 'none';
+            for(let i=items.length-1; i>=0; i--) {
+                let item = items[i];
+                if(distance(player.x, player.y, item.x, item.y) < item.radius + player.w/2) {
+                    if(item.id.startsWith('key')) {
+                        keyToAvisar = item;
+                        document.getElementById('btnAvisar').style.display = 'flex';
+                    } else if (item.id === 'ammo_jostin' && char.id === 'jostin') {
+                        char.ammo += 5; items.splice(i,1); createParticles(item.x, item.y, '#ff3333'); addFloatingText("+5 Balas", item.x, item.y, '#ff3333'); playSound('pickup'); updateHUD();
+                    } else if (item.id === 'ammo_tavito' && char.id === 'tavito') {
+                        char.ammo += 10; items.splice(i,1); createParticles(item.x, item.y, '#a855f7'); addFloatingText("+10 Bombas", item.x, item.y, '#c084fc'); playSound('pickup'); updateHUD();
+                    } else if (item.id === 'stealth_pepe' && char.id === 'pepe') {
+                        char.stealthTime = Math.min(char.maxStealth, char.stealthTime + 80); items.splice(i,1); createParticles(item.x, item.y, '#38bdf8'); addFloatingText("+80s Sigilo", item.x, item.y, '#38bdf8'); playSound('pickup'); updateHUD();
+                    }
+                }
+            }
+
+            if (door && distance(player.x, player.y, door.x, door.y) < 45) endGame(true);
+
+            for(let i=projectiles.length-1; i>=0; i--) {
+                let p = projectiles[i]; p.x += p.dx; p.y += p.dy; p.life--;
+                let prC = Math.floor(p.x/TILE_SIZE), prR = Math.floor(p.y/TILE_SIZE);
+                if(p.life <= 0 || isSolid(prC, prR)) {
+                    if (isSolid(prC, prR)) createParticles(p.x, p.y, '#94a3b8', 6);
+                    if(p.type==='bazooka') createExplosion(p.x, p.y);
+                    projectiles.splice(i, 1); continue;
+                }
+                let hit = false;
+                for(let j=enemies.length-1; j>=0; j--) {
+                    let e = enemies[j];
+                    if(distance(p.x, p.y, e.x, e.y) < e.w/2 + p.r) {
+                        if(p.type === 'pistol') {
+                            e.hp -= 1;
+                            if(e.hp <= 0) { enemies.splice(j, 1); createParticles(e.x, e.y, '#00ffcc'); addFloatingText("-1 Glitch", e.x, e.y, '#38bdf8'); }
+                            else { createParticles(e.x, e.y, '#facc15', 4); addFloatingText("-1 HP", e.x, e.y - 15, '#facc15'); }
+                        } else if(p.type === 'bazooka') createExplosion(p.x, p.y);
+                        hit = true; break;
+                    }
+                }
+                if(hit) projectiles.splice(i, 1);
+            }
+
+            for(let i=particles.length-1; i>=0; i--) { let pt = particles[i]; pt.x += pt.dx; pt.y += pt.dy; pt.life--; if(pt.life <= 0) particles.splice(i,1); }
+            for(let i=floatingTexts.length-1; i>=0; i--) { let ft = floatingTexts[i]; ft.y -= 0.8; ft.life--; if(ft.life <= 0) floatingTexts.splice(i, 1); }
+
+            let isInvisible = (char.id === 'pepe' && char.stealthActive);
+            for(let i=enemies.length-1; i>=0; i--) {
+                let e = enemies[i];
+                let distToPlayer = distance(e.x, e.y, player.x, player.y);
+                if (!isInvisible && distToPlayer < e.visionRange) e.state = 'CHASE';
+                else if (distToPlayer > e.visionRange * 1.3 || isInvisible) { if (e.state === 'CHASE') e.state = 'PATROL'; }
+
+                let targetX = e.x, targetY = e.y;
+                if (e.state === 'CHASE') { targetX = player.x; targetY = player.y; }
+                else {
+                    e.patrolTimer--;
+                    if (e.patrolTimer <= 0 || distance(e.x, e.y, e.patrolTarget.x, e.patrolTarget.y) < 20) {
+                        let randC = Math.floor(Math.random() * (MAP_COLS - 2)) + 1;
+                        let randR = Math.floor(Math.random() * (MAP_ROWS - 2)) + 1;
+                        if (!isSolid(randC, randR)) { e.patrolTarget.x = randC * TILE_SIZE + TILE_SIZE/2; e.patrolTarget.y = randR * TILE_SIZE + TILE_SIZE/2; }
+                        e.patrolTimer = 180 + Math.random() * 140;
+                    }
+                    targetX = e.patrolTarget.x; targetY = e.patrolTarget.y;
+                }
+
+                let angle = Math.atan2(targetY - e.y, targetX - e.x);
+                let moveStep = e.state === 'CHASE' ? e.speed : e.speed * 0.65;
+                let nextX = e.x + Math.cos(angle) * moveStep;
+                let nextY = e.y + Math.sin(angle) * moveStep;
+                let cE_X = Math.floor(nextX / TILE_SIZE);
+                if (!isSolid(cE_X, Math.floor(e.y / TILE_SIZE))) e.x = nextX; else if (e.state === 'PATROL') e.patrolTimer = 0;
+                let cE_Y2 = Math.floor(nextY / TILE_SIZE);
+                if (!isSolid(Math.floor(e.x / TILE_SIZE), cE_Y2)) e.y = nextY; else if (e.state === 'PATROL') e.patrolTimer = 0;
+                if (!isInvisible && distToPlayer < (e.w/2 + player.w/2 - 4)) endGame(false);
+            }
+        }
+
+        function triggerAction() {
+            if (currentState !== STATES.PLAYING) return;
+            const char = party[activeCharIndex];
+            if (char.id === 'jostin' && char.ammo > 0) {
+                char.ammo--; projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 11, dy: player.dirY * 11, r: 4, color: '#00ffcc', life: 70, type: 'pistol' }); playSound('shoot'); updateHUD();
+            } else if (char.id === 'tavito' && char.ammo > 0) {
+                char.ammo--; projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 9, dy: player.dirY * 9, r: 8, color: '#a855f7', life: 90, type: 'bazooka' }); playSound('shoot'); updateHUD();
+            } else if (char.id === 'pepe') {
+                if(char.stealthTime > 0) { char.stealthActive = !char.stealthActive; playSound('click'); updateHUD(); }
+                else { char.stealthActive = false; showGameToast("¡NO TIENES SIGILO!", "Debes conseguir cargadores azules.", "#ef4444"); }
+            }
+        }
+
+        function createExplosion(ex, ey) {
+            createParticles(ex, ey, '#a855f7', 30); playSound('explosion'); screenShakeTimer = 16; screenShakeIntensity = 9; addFloatingText("¡BOOM!", ex, ey, '#facc15');
+            let killed = 0;
+            for(let j=enemies.length-1; j>=0; j--) {
+                if(killed >= 5) break;
+                if(distance(ex, ey, enemies[j].x, enemies[j].y) < 130) { createParticles(enemies[j].x, enemies[j].y, '#00ffcc'); enemies.splice(j, 1); killed++; }
+            }
+        }
+        function createParticles(x, y, color, count=12) {
+            for(let i=0; i<count; i++) particles.push({ x, y, dx: (Math.random()-0.5)*6, dy: (Math.random()-0.5)*6, life: 25 + Math.random()*20, color, size: Math.random()*4 + 2 });
+        }
+        function addFloatingText(text, x, y, color) { floatingTexts.push({ text, x, y, color, life: 55 }); }
+        function avisarLlave() {
+            if(keyToAvisar) {
+                globalKeysFound++;
+                let idx = items.indexOf(keyToAvisar);
+                if(idx > -1) items.splice(idx, 1);
+                document.getElementById('keyCount').innerText = globalKeysFound;
+                keyToAvisar = null;
+                document.getElementById('btnAvisar').style.display = 'none';
+                createParticles(player.x, player.y, '#facc15', 35); playSound('pickup'); addFloatingText("¡LLAVE ASEGURADA!", player.x, player.y - 20, '#facc15');
+                if(globalKeysFound >= 3) spawnDoor();
+            }
+        }
+        function spawnDoor() {
+            door = { x: player.x, y: player.y - TILE_SIZE*4 };
+            door.x = Math.max(TILE_SIZE, Math.min(door.x, (MAP_COLS-1)*TILE_SIZE));
+            door.y = Math.max(TILE_SIZE, Math.min(door.y, (MAP_ROWS-1)*TILE_SIZE));
+        }
+
+        function draw() {
+            if (currentState !== STATES.PLAYING) return;
+            camera.w = canvas.width; camera.h = canvas.height;
+            ctx.fillStyle = '#03050a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.save(); ctx.translate(-camera.x, -camera.y);
+            let startCol = Math.floor(camera.x / TILE_SIZE);
+            let endCol = startCol + (camera.w / TILE_SIZE) + 1;
+            let startRow = Math.floor(camera.y / TILE_SIZE);
+            let endRow = startRow + (camera.h / TILE_SIZE) + 1;
+            for(let r = startRow; r <= endRow; r++) for(let c = startCol; c <= endCol; c++) {
+                if(map[r] !== undefined && map[r][c] !== undefined) {
+                    let tx = c * TILE_SIZE, ty = r * TILE_SIZE, tileType = map[r][c];
+                    if(tileType === 1) { ctx.fillStyle = '#0f172a'; ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.strokeStyle = '#1e293b'; ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.fillStyle = '#10b981'; ctx.fillRect(tx + 4, ty + 4, 3, 3); }
+                    else if (tileType === 2) { ctx.fillStyle = '#090d16'; ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)'; ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.fillStyle = '#1e1b4b'; ctx.fillRect(tx+10, ty+10, 18, 18); ctx.fillRect(tx+34, ty+34, 14, 14); }
+                    else if (tileType === 3) { ctx.fillStyle = '#010203'; ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)'; ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE); }
+                    else { ctx.fillStyle = '#05080e'; ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)'; ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE); }
+                }
+            }
+            if (door) {
+                ctx.fillStyle = '#facc15'; ctx.fillRect(door.x - 32, door.y - 45, 64, 90); ctx.fillStyle = '#111'; ctx.fillRect(door.x - 24, door.y - 37, 48, 74); ctx.fillStyle = '#fff'; ctx.font = '9px "Press Start 2P"'; ctx.fillText("SALIDA", door.x - 26, door.y - 55);
+            }
+            for(let item of items) {
+                if (item.id.startsWith('key')) {
+                    ctx.save(); ctx.translate(item.x, item.y); ctx.rotate(-Math.PI / 6); ctx.shadowColor = item.color; ctx.shadowBlur = 8; ctx.fillStyle = item.color; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.arc(-8, 0, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.fillRect(-2, -2, 16, 4); ctx.strokeRect(-2, -2, 16, 4); ctx.fillRect(6, 2, 3, 5); ctx.strokeRect(6, 2, 3, 5); ctx.fillRect(11, 2, 3, 4); ctx.strokeRect(11, 2, 3, 4); ctx.shadowBlur = 0; ctx.fillStyle = '#03050a'; ctx.beginPath(); ctx.arc(-8, 0, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                } else { ctx.beginPath(); ctx.arc(item.x, item.y, item.radius, 0, Math.PI*2); ctx.fillStyle = item.color; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
+            }
+            for(let e of enemies) {
+                ctx.save(); ctx.translate(e.x, e.y);
+                let isChase = (e.state === 'CHASE'); let mainColor = isChase ? '#f43f5e' : '#10b981'; let glowColor = isChase ? '#ff003c' : '#00ffcc'; let pulse = Math.abs(Math.sin(Date.now() / (isChase ? 150 : 300)));
+                ctx.shadowColor = glowColor; ctx.shadowBlur = 10 + (pulse * 15); ctx.beginPath(); let s = (e.w/2) - 2;
+                ctx.moveTo(-s, -s/2); ctx.lineTo(-s/2, -s); ctx.lineTo(s/2, -s); ctx.lineTo(s, -s/2); ctx.lineTo(s, s/2); ctx.lineTo(s/2, s); ctx.lineTo(-s/2, s); ctx.lineTo(-s, s/2); ctx.closePath();
+                ctx.fillStyle = '#05080e'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = mainColor; ctx.stroke(); ctx.shadowBlur = 0;
+                ctx.fillStyle = mainColor; ctx.globalAlpha = 0.2 + (pulse * 0.4); ctx.beginPath(); ctx.arc(0, 0, s*0.5, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1.0;
+                ctx.fillStyle = '#fff'; ctx.fillRect(-6, -4, 4, 8); ctx.fillRect(2, -4, 4, 8); ctx.fillStyle = glowColor; ctx.fillRect(-2, -2, 4, 4); ctx.restore();
+                if (e.hp < 3) { ctx.fillStyle = '#ef4444'; ctx.fillRect(e.x - 12, e.y - 28, 24, 4); ctx.fillStyle = '#10b981'; ctx.fillRect(e.x - 12, e.y - 28, (24/3) * e.hp, 4); ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.strokeRect(e.x - 12, e.y - 28, 24, 4); }
+            }
+            const char = party[activeCharIndex];
+            ctx.save(); ctx.translate(player.x, player.y);
+            if(char.id === 'pepe' && char.stealthActive) ctx.globalAlpha = 0.4;
+            let facingFlip = player.dirX < 0 ? -1 : 1;
+            ctx.save(); if(facingFlip < 0) ctx.scale(-1, 1);
+            if(char.img && char.img.complete && char.img.naturalHeight !== 0) ctx.drawImage(char.img, -player.w/2, -player.h/2, player.w, player.h);
+            else { ctx.fillStyle = char.color; ctx.fillRect(-player.w/2, -player.h/2, player.w, player.h); }
+            ctx.restore();
+            if (char.id !== 'pepe') {
+                let aimAngle = Math.atan2(player.dirY, player.dirX); ctx.save(); ctx.rotate(aimAngle);
+                if (char.id === 'jostin') { ctx.fillStyle = '#94a3b8'; ctx.fillRect(12, -2, 12, 4); ctx.fillStyle = '#334155'; ctx.fillRect(12, 2, 4, 6); ctx.fillStyle = '#00ffcc'; ctx.fillRect(22, -3, 2, 2); }
+                else if (char.id === 'tavito') { ctx.fillStyle = '#475569'; ctx.fillRect(10, -5, 22, 10); ctx.fillStyle = '#1e293b'; ctx.fillRect(14, 5, 4, 6); ctx.fillRect(24, 5, 4, 6); ctx.fillStyle = '#a855f7'; ctx.fillRect(32, -6, 6, 12); ctx.fillStyle = '#ef4444'; ctx.fillRect(20, -8, 6, 3); }
+                ctx.restore();
+            }
+            ctx.restore();
+            for(let p of projectiles) { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.fill(); }
+            for(let pt of particles) { ctx.fillStyle = pt.color; ctx.fillRect(pt.x, pt.y, pt.size, pt.size); }
+            for(let ft of floatingTexts) { ctx.fillStyle = ft.color; ctx.font = '10px "Press Start 2P"'; ctx.fillText(ft.text, ft.x - 22, ft.y); }
+            ctx.restore();
+
+            let screenPad = 25;
+            let timePulse = Math.abs(Math.sin(Date.now() / 200));
+            for (let e of enemies) {
+                let dx = e.x - player.x, dy = e.y - player.y, dist = Math.hypot(dx, dy), maxWarningDist = e.visionRange * 2.5;
+                if (dist > 0 && dist < maxWarningDist) {
+                    let screenX = e.x - camera.x, screenY = e.y - camera.y;
+                    let isOffScreen = screenX < 0 || screenX > camera.w || screenY < 0 || screenY > camera.h;
+                    if (isOffScreen) {
+                        let indicatorX = Math.max(screenPad, Math.min(camera.w - screenPad, screenX));
+                        let indicatorY = Math.max(screenPad, Math.min(camera.h - screenPad, screenY));
+                        let warnAngle = Math.atan2(screenY - indicatorY, screenX - indicatorX);
+                        let alertOpacity = (1 - dist / maxWarningDist) * 0.8 + (0.2 * timePulse);
+                        ctx.save(); ctx.translate(indicatorX, indicatorY); ctx.rotate(warnAngle); ctx.shadowColor = '#f43f5e'; ctx.shadowBlur = 12;
+                        ctx.fillStyle = `rgba(244, 63, 94, ${Math.max(0.1, alertOpacity)})`;
+                        ctx.beginPath(); ctx.moveTo(14, 0); ctx.lineTo(-8, -10); ctx.lineTo(-8, 10); ctx.closePath(); ctx.fill(); ctx.restore();
+                    }
+                }
+            }
+            drawMinimap();
+        }
+
+        function drawMinimap() {
+            minimapCtx.fillStyle = '#03050a'; minimapCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+            let scaleX = minimapCanvas.width / (MAP_COLS * TILE_SIZE), scaleY = minimapCanvas.height / (MAP_ROWS * TILE_SIZE);
+            for(let r=0; r<MAP_ROWS; r+=2) for(let c=0; c<MAP_COLS; c+=2) {
+                if(map[r] && map[r][c] === 1) { minimapCtx.fillStyle = '#1e293b'; minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2); }
+                else if (map[r] && map[r][c] === 2) { minimapCtx.fillStyle = '#0f172a'; minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2); }
+            }
+            for(let item of items) { minimapCtx.fillStyle = item.color; minimapCtx.fillRect(item.x * scaleX - 1, item.y * scaleY - 1, 2, 2); }
+            if (door) { minimapCtx.fillStyle = '#facc15'; minimapCtx.fillRect(door.x * scaleX - 2, door.y * scaleY - 2, 4, 4); }
+            minimapCtx.fillStyle = '#38bdf8'; minimapCtx.fillRect(player.x * scaleX - 2, player.y * scaleY - 2, 4, 4);
+        }
+
+        function changeCharacter() {
+            activeCharIndex = (activeCharIndex + 1) % party.length;
+            if(party[2].stealthActive && activeCharIndex !== 2) party[2].stealthActive = false;
+            if (party[activeCharIndex].id === 'pepe') { player.w = 28; player.h = 28; } else { player.w = 36; player.h = 36; }
+            playSound('click'); updateHUD(); createParticles(player.x, player.y, '#fff', 12);
+        }
+
+        function updateHUD() {
+            const char = party[activeCharIndex];
+            document.getElementById('hudAvatar').src = char.img.src;
+            document.getElementById('hudName').innerText = char.name;
+            const varHighlight = getComputedStyle(document.documentElement).getPropertyValue('--highlight').trim();
+            let abilityText = '';
+            if (char.id === 'jostin') abilityText = `Balas: ${char.ammo}`;
+            else if (char.id === 'tavito') abilityText = `Bombas: ${char.ammo}`;
+            else if (char.id === 'pepe') abilityText = `Sigilo: ${Math.ceil(char.stealthTime)}s`;
+            document.getElementById('hudAbility').innerText = abilityText;
+            document.getElementById('hudName').style.color = (char.id === 'pepe' && char.stealthActive) ? '#38bdf8' : varHighlight;
+        }
+
+        function updateTimerDisplay() {
+            let mins = Math.floor(gameTime / 60).toString().padStart(2, '0');
+            let secs = (gameTime % 60).toString().padStart(2, '0');
+            document.getElementById('gameTimer').innerText = `${mins}:${secs}`;
+        }
+
+        /* =========================================================
+           EVENTOS DE CUENTAS / PERFIL
+           ========================================================= */
+        document.getElementById('btnAccountContinue').addEventListener('click', () => {
+            playSound('click');
+            if (!validateUsername(document.getElementById('accountUsername').value)) return;
+            goToAccountStep(2);
+        });
+
+        document.getElementById('accountUsername').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('btnAccountContinue').click();
+        });
+
+        document.getElementById('btnGenerateAbgId').addEventListener('click', () => {
+            playSound('click');
+            generatedAbgId = generateUniqueAbgId();
+            document.getElementById('accountAbgId').value = generatedAbgId;
+            document.getElementById('btnCreateAccount').disabled = false;
+            document.getElementById('btnGenerateAbgId').innerText = 'Generar otra';
+        });
+
+        document.getElementById('btnBackAccountStep').addEventListener('click', () => {
+            playSound('click');
+            goToAccountStep(1);
+        });
+
+        document.getElementById('btnCreateAccount').addEventListener('click', () => {
+            playSound('click');
+            finishAccountCreation();
+        });
+
+        document.getElementById('btnCancelAccountWizard').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('accountSetupScreen').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+            document.getElementById('currencyBadge').classList.remove('hidden');
+            currentState = STATES.MENU;
+            updateAccountUI();
+            attemptPlayBGM();
+        });
+
+        document.getElementById('btnProfile').addEventListener('click', () => {
+            playSound('click');
+            updateAccountUI();
+            document.getElementById('addAccountPanel').classList.remove('open');
+            document.getElementById('existingAbgIdInput').value = '';
+            document.getElementById('profileModal').classList.remove('hidden');
+            currentState = STATES.PROFILE;
+        });
+
+        document.getElementById('btnCloseProfile').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('profileModal').classList.add('hidden');
+            currentState = STATES.MENU;
+        });
+
+        document.getElementById('btnOpenAddAccount').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('addAccountPanel').classList.toggle('open');
+            if (document.getElementById('addAccountPanel').classList.contains('open')) setTimeout(() => document.getElementById('existingAbgIdInput').focus(), 30);
+        });
+
+        document.getElementById('btnCancelAddAccount').addEventListener('click', () => {
+            document.getElementById('addAccountPanel').classList.remove('open');
+            document.getElementById('existingAbgIdInput').value = '';
+        });
+
+        document.getElementById('existingAbgIdInput').addEventListener('input', e => {
+            e.target.value = normalizeAbgId(e.target.value).slice(0, 8);
+        });
+
+        document.getElementById('existingAbgIdInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('btnAddExistingAccount').click();
+        });
+
+        document.getElementById('btnAddExistingAccount').addEventListener('click', () => {
+            playSound('click');
+            const id = normalizeAbgId(document.getElementById('existingAbgIdInput').value);
+            if (!ACCOUNT_ID_REGEX.test(id)) {
+                showGameToast('ABG ID INVÁLIDA', 'Escribe exactamente 8 caracteres alfanuméricos.', '#ef4444');
+                return;
+            }
+            const target = getAccountById(id);
+            if (!target) {
+                showGameToast('CUENTA NO ENCONTRADA', 'Esa ABG ID no está guardada en este navegador. Para cuentas globales se necesita un backend.', '#facc15');
+                return;
+            }
+            setActiveAccount(target.abgId);
+            document.getElementById('addAccountPanel').classList.remove('open');
+            document.getElementById('existingAbgIdInput').value = '';
+            renderAccountList();
+        });
+
+        document.getElementById('btnCreateAnotherAccount').addEventListener('click', () => {
+            playSound('click');
+            openAccountWizard('additional');
+        });
+
+        document.getElementById('profileImageInput').addEventListener('change', e => {
+            const file = e.target.files && e.target.files[0];
+            cropAndSaveImage(file);
+            e.target.value = '';
+        });
+
+        const presetButtons = [
+            document.getElementById('presetAvatar1'),
+            document.getElementById('presetAvatar2'),
+            document.getElementById('presetAvatar3')
+        ];
+        presetButtons.forEach((btn, idx) => btn.addEventListener('click', () => {
+            playSound('click');
+            const source = ['Jostin.PNG', 'Tavito.PNG', 'Pepe.PNG'][idx];
+            setActiveAccountAvatar(source);
+            presetButtons.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            showGameToast('PERFIL ACTUALIZADO', 'Avatar de personaje seleccionado.', '#10b981');
+        }));
+
+        document.getElementById('btnSettings').addEventListener('click', () => {
+            playSound('click');
+            updateAccountUI();
+            document.getElementById('settingsModal').classList.remove('hidden');
+            currentState = STATES.MENU;
+        });
+
+        document.getElementById('btnCloseSettings').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('settingsModal').classList.add('hidden');
+            currentState = STATES.MENU;
+        });
+
+        /* =========================================================
+           JUEGO ORIGINAL
+           ========================================================= */
+        document.getElementById('btnStartGame').addEventListener('click', () => {
+            playSound('click');
+            bgMusic.pause();
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('currencyBadge').classList.add('hidden');
+            document.getElementById('dialogueScreen').classList.remove('hidden');
+            currentState = STATES.CUTSCENE;
+            currentDialogue = 0;
+            showNextDialogue();
+        });
+
+        document.getElementById('btnStore').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('storeModal').classList.remove('hidden');
+        });
+        document.getElementById('btnCloseStore').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('storeModal').classList.add('hidden');
+        });
+
+        document.getElementById('bgmVolumeSlider').addEventListener('input', (e) => {
+            bgmVolume = parseFloat(e.target.value);
+            bgMusic.volume = Math.max(0, Math.min(1, bgmVolume));
+            if (bgmVolume > 0 && soundEnabled && bgMusic.paused && currentState === STATES.MENU) attemptPlayBGM();
+        });
+
+        document.getElementById('sfxVolumeSlider').addEventListener('input', (e) => { sfxVolume = parseFloat(e.target.value); });
+        document.getElementById('sfxVolumeSlider').addEventListener('change', () => { if(soundEnabled) playSound('click'); });
+
+        document.getElementById('btnSkipDialogue').addEventListener('click', () => {
+            playSound('click');
+            if (typingTimeout) clearTimeout(typingTimeout);
+            isTyping = false;
+            document.getElementById('dialogueScreen').classList.add('hidden');
+            document.getElementById('instructionsScreen').classList.remove('hidden');
+            currentState = STATES.INSTRUCTIONS;
+        });
+
+        document.getElementById('dialogueBox').addEventListener('click', showNextDialogue);
+
+        function showNextDialogue() {
+            if (isTyping) {
+                clearTimeout(typingTimeout);
+                document.getElementById('dialogueText').innerHTML = story[currentDialogue - 1].t;
+                isTyping = false;
+                return;
+            }
+            if (currentDialogue >= story.length) {
                 document.getElementById('dialogueScreen').classList.add('hidden');
                 document.getElementById('instructionsScreen').classList.remove('hidden');
                 currentState = STATES.INSTRUCTIONS;
                 return;
             }
-            const data = CUTSCENE_DIALOGUES[idx];
-            document.getElementById('speakerName').innerText = data.speaker;
-            document.getElementById('dialogueText').innerText = '';
-            
-            const sceneImg = document.getElementById('sceneImage');
-            sceneImg.src = data.scene;
-            sceneImg.onerror = () => { sceneImg.style.display = 'none'; };
-
+            let d = story[currentDialogue];
+            document.getElementById('sceneImage').src = `Escena_${currentDialogue + 1}.PNG`;
+            document.getElementById('speakerName').innerText = d.s;
+            playSound('click');
+            let textEl = document.getElementById('dialogueText');
+            textEl.innerText = '';
             let i = 0;
-            if (typingTimeout) clearTimeout(typingTimeout);
-
+            isTyping = true;
             function typeWriter() {
-                if (i < data.text.length) {
-                    document.getElementById('dialogueText').innerText += data.text.charAt(i);
-                    i++;
-                    playSynthSound(600 + (i % 3) * 100, 'square', 0.03, 0.05);
-                    typingTimeout = setTimeout(typeWriter, 25);
-                }
+                if (i < d.t.length) { textEl.innerHTML += d.t.charAt(i); i++; typingTimeout = setTimeout(typeWriter, 20); }
+                else isTyping = false;
             }
             typeWriter();
+            currentDialogue++;
         }
 
-        const TILE_SIZE = 48;
-        const MAP_COLS = 32;
-        const MAP_ROWS = 32;
-        let tileMap = [];
-
-        // Tile types: 0 = Street, 1 = Destroyed Building, 2 = Open Plaza, 3 = Intact Building
-        function generateMap() {
-            tileMap = [];
-            for (let r = 0; r < MAP_ROWS; r++) {
-                const row = [];
-                for (let c = 0; c < MAP_COLS; c++) {
-                    if (r === 0 || r === MAP_ROWS - 1 || c === 0 || c === MAP_COLS - 1) {
-                        row.push(3); // Map boundary building
-                    } else {
-                        const rand = Math.random();
-                        if (rand < 0.25) row.push(1); // Destroyed building
-                        else if (rand < 0.35) row.push(3); // Intact building
-                        else if (rand < 0.55) row.push(2); // Plaza
-                        else row.push(0); // Street
-                    }
-                }
-                tileMap.push(row);
-            }
-            // Clear starting zone
-            for (let r = 1; r < 4; r++) {
-                for (let c = 1; c < 4; c++) {
-                    tileMap[r][c] = 0;
-                }
-            }
-        }
-
-        class Player {
-            constructor() {
-                this.x = 2 * TILE_SIZE;
-                this.y = 2 * TILE_SIZE;
-                this.radius = 16;
-                this.charIdx = 0; // 0: Jostin, 1: Tavito, 2: Pepe
-                this.bullets = 12;
-                this.bombs = 20;
-                this.stealthTimer = 0;
-                this.vx = 0;
-                this.vy = 0;
-            }
-
-            getSpeed() {
-                if (this.charIdx === 0) return 3.2;
-                if (this.charIdx === 1) return 2.8;
-                return 3.5; // Pepe
-            }
-
-            getName() {
-                return ['Jostin', 'Tavito', 'Pepe'][this.charIdx];
-            }
-
-            getAbilityText() {
-                if (this.charIdx === 0) return `Balas: ${this.bullets}`;
-                if (this.charIdx === 1) return `Bombas: ${this.bombs}`;
-                return this.stealthTimer > 0 ? `Sigilo: ${Math.ceil(this.stealthTimer)}s` : 'Sigilo: Listo';
-            }
-
-            update(dx, dy) {
-                const spd = this.getSpeed();
-                let nextX = this.x + dx * spd;
-                let nextY = this.y + dy * spd;
-
-                // Collision with buildings (type 3 and border 1)
-                const tileC1 = Math.floor((nextX - this.radius) / TILE_SIZE);
-                const tileC2 = Math.floor((nextX + this.radius) / TILE_SIZE);
-                const tileR1 = Math.floor((nextY - this.radius) / TILE_SIZE);
-                const tileR2 = Math.floor((nextY + this.radius) / TILE_SIZE);
-
-                let canMoveX = true;
-                let canMoveY = true;
-
-                if (tileC1 >= 0 && tileC2 < MAP_COLS && tileR1 >= 0 && tileR2 < MAP_ROWS) {
-                    if (tileMap[tileR1][tileC2] === 3 || tileMap[tileR2][tileC2] === 3 ||
-                        tileMap[tileR1][tileC1] === 3 || tileMap[tileR2][tileC1] === 3) {
-                        canMoveX = false;
-                        canMoveY = false;
-                    }
-                }
-
-                if (canMoveX) this.x = nextX;
-                if (canMoveY) this.y = nextY;
-
-                if (this.charIdx === 2 && this.stealthTimer > 0) {
-                    this.stealthTimer -= 1 / 60;
-                    if (this.stealthTimer < 0) this.stealthTimer = 0;
-                }
-            }
-
-            draw(ctx, camX, camY) {
-                const screenX = this.x - camX;
-                const screenY = this.y - camY;
-
-                ctx.save();
-                ctx.translate(screenX, screenY);
-
-                if (this.charIdx === 2 && this.stealthTimer > 0) {
-                    ctx.globalAlpha = 0.35;
-                }
-
-                // Player Body
-                const colors = ['#10b981', '#3b82f6', '#8b5cf6'];
-                ctx.fillStyle = colors[this.charIdx];
-                ctx.beginPath();
-                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // Eyes / Visor
-                ctx.fillStyle = '#000';
-                ctx.fillRect(-6, -4, 4, 4);
-                ctx.fillRect(2, -4, 4, 4);
-
-                ctx.restore();
-            }
-        }
-
-        class Enemy {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.radius = 14;
-                this.speed = 1.8;
-                this.dirAngle = Math.random() * Math.PI * 2;
-            }
-
-            update(player) {
-                // If Pepe is stealthed, enemies move randomly
-                const isPepeStealthed = player.charIdx === 2 && player.stealthTimer > 0;
-                
-                if (!isPepeStealthed) {
-                    const dist = Math.hypot(player.x - this.x, player.y - this.y);
-                    if (dist < 280) {
-                        this.dirAngle = Math.atan2(player.y - this.y, player.x - this.x);
-                    }
-                } else if (Math.random() < 0.02) {
-                    this.dirAngle = Math.random() * Math.PI * 2;
-                }
-
-                this.x += Math.cos(this.dirAngle) * this.speed;
-                this.y += Math.sin(this.dirAngle) * this.speed;
-
-                // Simple wall bounce
-                const c = Math.floor(this.x / TILE_SIZE);
-                const r = Math.floor(this.y / TILE_SIZE);
-                if (c <= 0 || c >= MAP_COLS - 1 || r <= 0 || r >= MAP_ROWS - 1 || tileMap[r][c] === 3) {
-                    this.dirAngle += Math.PI;
-                }
-            }
-
-            draw(ctx, camX, camY) {
-                const screenX = this.x - camX;
-                const screenY = this.y - camY;
-
-                ctx.save();
-                ctx.translate(screenX, screenY);
-
-                ctx.fillStyle = '#ef4444';
-                ctx.beginPath();
-                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#facc15';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // Glowing cyber core
-                ctx.fillStyle = '#facc15';
-                ctx.beginPath();
-                ctx.arc(0, 0, 5, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.restore();
-            }
-        }
-
-        class Projectile {
-            constructor(x, y, angle, type) {
-                this.x = x;
-                this.y = y;
-                this.angle = angle;
-                this.type = type; // 'bullet' or 'bomb'
-                this.speed = type === 'bullet' ? 8 : 5;
-                this.life = type === 'bullet' ? 40 : 60;
-                this.active = true;
-            }
-
-            update() {
-                this.x += Math.cos(this.angle) * this.speed;
-                this.y += Math.sin(this.angle) * this.speed;
-                this.life--;
-                if (this.life <= 0) this.active = false;
-            }
-
-            draw(ctx, camX, camY) {
-                const screenX = this.x - camX;
-                const screenY = this.y - camY;
-
-                ctx.save();
-                if (this.type === 'bullet') {
-                    ctx.fillStyle = '#10b981';
-                    ctx.beginPath();
-                    ctx.arc(screenX, screenY, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    ctx.fillStyle = '#facc15';
-                    ctx.beginPath();
-                    ctx.arc(screenX, screenY, 8, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = '#ef4444';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
-                ctx.restore();
-            }
-        }
-
-        let player = new Player();
-        let enemies = [];
-        let projectiles = [];
-        let keysList = [];
-        let collectedKeys = 0;
-        let gameSeconds = 0;
-        let gameTimerInterval = null;
-
-        // Joystick State
-        let joystickActive = false;
-        let joystickDx = 0;
-        let joystickDy = 0;
-        const joystickZone = document.getElementById('joystickZone');
-        const joystickKnob = document.getElementById('joystickKnob');
-
-        function setupJoystick() {
-            function handleTouch(e) {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const rect = joystickZone.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-
-                let dx = touch.clientX - centerX;
-                let dy = touch.clientY - centerY;
-                const dist = Math.hypot(dx, dy);
-                const maxDist = rect.width / 2;
-
-                if (dist > maxDist) {
-                    dx = (dx / dist) * maxDist;
-                    dy = (dy / dist) * maxDist;
-                }
-
-                joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-                joystickDx = dx / maxDist;
-                joystickDy = dy / maxDist;
-                joystickActive = true;
-            }
-
-            function resetJoystick() {
-                joystickKnob.style.transform = `translate(0px, 0px)`;
-                joystickDx = 0;
-                joystickDy = 0;
-                joystickActive = false;
-            }
-
-            joystickZone.addEventListener('touchstart', handleTouch, { passive: false });
-            joystickZone.addEventListener('touchmove', handleTouch, { passive: false });
-            joystickZone.addEventListener('touchend', resetJoystick);
-            joystickZone.addEventListener('touchcancel', resetJoystick);
-        }
-
-        // Keyboard State
-        const keysPressed = {};
-        window.addEventListener('keydown', (e) => {
-            keysPressed[e.code] = true;
-            if (e.code === 'KeyC') swapCharacter();
-            if (e.code === 'Space') handleActionBtn();
-            if (e.code === 'KeyE') handleAvisarBtn();
-        });
-        window.addEventListener('keyup', (e) => {
-            keysPressed[e.code] = false;
-        });
-
-        function swapCharacter() {
-            player.charIdx = (player.charIdx + 1) % 3;
-            playSynthSound(500, 'triangle', 0.1, 0.2);
-            updateHUDInfo();
-        }
-
-        function handleActionBtn() {
-            if (currentState !== STATES.PLAYING) return;
-
-            if (player.charIdx === 0) { // Jostin Pistol
-                if (player.bullets > 0) {
-                    player.bullets--;
-                    playSynthSound(800, 'square', 0.08, 0.3);
-                    const angle = joystickActive ? Math.atan2(joystickDy, joystickDx) : 0;
-                    projectiles.push(new Projectile(player.x, player.y, angle, 'bullet'));
-                } else {
-                    playSynthSound(200, 'sawtooth', 0.1, 0.2);
-                }
-            } else if (player.charIdx === 1) { // Tavito Bazooka
-                if (player.bombs > 0) {
-                    player.bombs--;
-                    playSynthSound(300, 'sawtooth', 0.2, 0.4);
-                    const angle = joystickActive ? Math.atan2(joystickDy, joystickDx) : 0;
-                    projectiles.push(new Projectile(player.x, player.y, angle, 'bomb'));
-                } else {
-                    playSynthSound(200, 'sawtooth', 0.1, 0.2);
-                }
-            } else if (player.charIdx === 2) { // Pepe Stealth
-                if (player.stealthTimer <= 0) {
-                    player.stealthTimer = 120; // 120 seconds stealth
-                    playSynthSound(900, 'sine', 0.3, 0.4);
-                }
-            }
-            updateHUDInfo();
-        }
-
-        function handleAvisarBtn() {
-            // Check if player is near a key
-            keysList.forEach(k => {
-                if (!k.collected) {
-                    const dist = Math.hypot(player.x - k.x, player.y - k.y);
-                    if (dist < 40) {
-                        k.collected = true;
-                        collectedKeys++;
-                        playSynthSound(1200, 'sine', 0.3, 0.5);
-                        document.getElementById('keyCount').innerText = collectedKeys;
-                        showGameToast('LLAVE RECOGIDA', `Llave ${k.id} obtenida con éxito.`, '#10b981');
-                    }
-                }
-            });
-            document.getElementById('btnAvisar').style.display = 'none';
-        }
-
-        function updateHUDInfo() {
-            const avatars = ['Jostin.PNG', 'Tavito.PNG', 'Pepe.PNG'];
-            const hudAvatar = document.getElementById('hudAvatar');
-            hudAvatar.src = avatars[player.charIdx];
-            hudAvatar.onerror = () => { hudAvatar.src = createInitialAvatarDataURL(player.getName()); };
-
-            document.getElementById('hudName').innerText = player.getName();
-            document.getElementById('hudAbility').innerText = player.getAbilityText();
-        }
-
-        function initNewGame() {
+        document.getElementById('btnPlayNow').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('instructionsScreen').classList.add('hidden');
+            document.getElementById('gameHUD').classList.remove('hidden');
+            document.getElementById('controlsLayer').classList.remove('hidden');
+            document.getElementById('btnPause').classList.remove('hidden');
+            document.getElementById('currencyBadge').classList.add('hidden');
             generateMap();
-            player = new Player();
-            enemies = [];
-            projectiles = [];
-            keysList = [];
-            collectedKeys = 0;
-            gameSeconds = 0;
+            updateHUD();
+            currentState = STATES.PLAYING;
+            gameTime = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => { if (currentState === STATES.PLAYING) { gameTime++; updateTimerDisplay(); } }, 1000);
+        });
 
-            // Spawn 3 keys in specific tile types
-            // Key 1: Destroyed building (Tile 1)
-            // Key 2: Open Plaza (Tile 2)
-            // Key 3: Intact Building (Tile 3)
-            const targetTypes = [1, 2, 3];
-            for (let i = 0; i < 3; i++) {
-                let placed = false;
-                while (!placed) {
-                    const r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
-                    const c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
-                    if (tileMap[r][c] === targetTypes[i]) {
-                        keysList.push({
-                            id: i + 1,
-                            x: c * TILE_SIZE + TILE_SIZE / 2,
-                            y: r * TILE_SIZE + TILE_SIZE / 2,
-                            collected: false
-                        });
-                        placed = true;
-                    }
-                }
-            }
-
-            // Spawn Cyber Enemies
-            for (let i = 0; i < 8; i++) {
-                const r = Math.floor(Math.random() * (MAP_ROWS - 6)) + 4;
-                const c = Math.floor(Math.random() * (MAP_COLS - 6)) + 4;
-                enemies.push(new Enemy(c * TILE_SIZE + TILE_SIZE / 2, r * TILE_SIZE + TILE_SIZE / 2));
-            }
-
-            document.getElementById('keyCount').innerText = '0';
-            updateHUDInfo();
-
-            if (gameTimerInterval) clearInterval(gameTimerInterval);
-            gameTimerInterval = setInterval(() => {
-                if (currentState === STATES.PLAYING) {
-                    gameSeconds++;
-                    const m = String(Math.floor(gameSeconds / 60)).padStart(2, '0');
-                    const s = String(gameSeconds % 60).padStart(2, '0');
-                    document.getElementById('gameTimer').innerText = `${m}:${s}`;
-                    document.getElementById('hudAbility').innerText = player.getAbilityText();
-                }
-            }, 1000);
-        }
-
-        function renderMap(camX, camY) {
-            const startCol = Math.max(0, Math.floor(camX / TILE_SIZE));
-            const endCol = Math.min(MAP_COLS, Math.ceil((camX + canvas.width) / TILE_SIZE));
-            const startRow = Math.max(0, Math.floor(camY / TILE_SIZE));
-            const endRow = Math.min(MAP_ROWS, Math.ceil((camY + canvas.height) / TILE_SIZE));
-
-            for (let r = startRow; r < endRow; r++) {
-                for (let c = startCol; c < endCol; c++) {
-                    const x = c * TILE_SIZE - camX;
-                    const y = r * TILE_SIZE - camY;
-                    const type = tileMap[r][c];
-
-                    if (type === 0) {
-                        ctx.fillStyle = '#0f172a'; // Street
-                    } else if (type === 1) {
-                        ctx.fillStyle = '#334155'; // Destroyed Building
-                    } else if (type === 2) {
-                        ctx.fillStyle = '#1e293b'; // Open Plaza
-                    } else {
-                        ctx.fillStyle = '#020617'; // Intact Building
-                    }
-                    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                    ctx.strokeStyle = '#1e293b';
-                    ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-                }
-            }
-        }
-
-        function drawKeys(camX, camY) {
-            let nearKey = false;
-            keysList.forEach(k => {
-                if (!k.collected) {
-                    const screenX = k.x - camX;
-                    const screenY = k.y - camY;
-
-                    ctx.save();
-                    ctx.fillStyle = '#facc15';
-                    ctx.beginPath();
-                    ctx.arc(screenX, screenY, 10, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-
-                    // Key Symbol
-                    ctx.fillStyle = '#000';
-                    ctx.fillRect(screenX - 2, screenY - 2, 4, 4);
-                    ctx.restore();
-
-                    const dist = Math.hypot(player.x - k.x, player.y - k.y);
-                    if (dist < 40) nearKey = true;
-                }
-            });
-
-            document.getElementById('btnAvisar').style.display = nearKey ? 'flex' : 'none';
-        }
-
-        function renderMinimap() {
-            minimapCtx.fillStyle = '#03050a';
-            minimapCtx.fillRect(0, 0, 100, 100);
-
-            const scaleX = 100 / (MAP_COLS * TILE_SIZE);
-            const scaleY = 100 / (MAP_ROWS * TILE_SIZE);
-
-            // Draw player on minimap
-            minimapCtx.fillStyle = '#10b981';
-            minimapCtx.beginPath();
-            minimapCtx.arc(player.x * scaleX, player.y * scaleY, 3, 0, Math.PI * 2);
-            minimapCtx.fill();
-
-            // Draw uncollected keys
-            minimapCtx.fillStyle = '#facc15';
-            keysList.forEach(k => {
-                if (!k.collected) {
-                    minimapCtx.fillRect(k.x * scaleX - 2, k.y * scaleY - 2, 4, 4);
-                }
-            });
-        }
-
-        function gameLoop() {
+        function togglePause() {
             if (currentState === STATES.PLAYING) {
-                // Determine movement vector from keyboard or joystick
-                let moveX = joystickDx;
-                let moveY = joystickDy;
-
-                if (keysPressed['KeyW'] || keysPressed['ArrowUp']) moveY = -1;
-                if (keysPressed['KeyS'] || keysPressed['ArrowDown']) moveY = 1;
-                if (keysPressed['KeyA'] || keysPressed['ArrowLeft']) moveX = -1;
-                if (keysPressed['KeyD'] || keysPressed['ArrowRight']) moveX = 1;
-
-                if (moveX !== 0 || moveY !== 0) {
-                    const len = Math.hypot(moveX, moveY);
-                    player.update(moveX / len, moveY / len);
-                }
-
-                // Camera follow player
-                const camX = player.x - canvas.width / 2;
-                const camY = player.y - canvas.height / 2;
-
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                renderMap(camX, camY);
-                drawKeys(camX, camY);
-
-                // Update & Draw Projectiles
-                projectiles.forEach(p => {
-                    p.update();
-                    p.draw(ctx, camX, camY);
-
-                    // Check projectile hit enemies
-                    enemies.forEach((e, idx) => {
-                        const dist = Math.hypot(p.x - e.x, p.y - e.y);
-                        if (dist < (p.type === 'bomb' ? 45 : 20)) {
-                            p.active = false;
-                            enemies.splice(idx, 1);
-                            playSynthSound(400, 'sawtooth', 0.15, 0.3);
-                        }
-                    });
-                });
-                projectiles = projectiles.filter(p => p.active);
-
-                // Update & Draw Enemies
-                const isPepeStealthed = player.charIdx === 2 && player.stealthTimer > 0;
-                enemies.forEach(e => {
-                    e.update(player);
-                    e.draw(ctx, camX, camY);
-
-                    // Check collision with player
-                    if (!isPepeStealthed) {
-                        const dist = Math.hypot(player.x - e.x, player.y - e.y);
-                        if (dist < player.radius + e.radius) {
-                            triggerGameOver();
-                        }
-                    }
-                });
-
-                player.draw(ctx, camX, camY);
-                renderMinimap();
-
-                // Victory check
-                if (collectedKeys >= 3) {
-                    triggerVictory();
-                }
-            }
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        async function triggerVictory() {
-            currentState = STATES.VICTORY;
-            document.getElementById('gameHUD').classList.add('hidden');
-            document.getElementById('controlsLayer').classList.add('hidden');
-            
-            const cupsEarned = 50;
-            playerCups += cupsEarned;
-            if (activeAccount) {
-                activeAccount.cups = playerCups;
-                saveAccounts();
-                if (window.CloudSync) {
-                    await window.CloudSync.saveAccount(activeAccount);
-                }
-            }
-            updateCupDisplay();
-
-            document.getElementById('endTitle').innerText = '¡VICTORIA!';
-            document.getElementById('endTitle').style.color = '#10b981';
-            document.getElementById('endDesc').innerText = '¡Has escapado con éxito de la Ciudad Abandonada de la Matrix!';
-            document.getElementById('endStats').innerText = `Tiempo Total: ${document.getElementById('gameTimer').innerText}`;
-            document.getElementById('rewardNotice').innerText = `🏆 ¡Ganaste +${cupsEarned} Copas Sincronizadas!`;
-
-            document.getElementById('endScreen').classList.remove('hidden');
-            playSynthSound(1000, 'sine', 0.5, 0.5);
-        }
-
-        function triggerGameOver() {
-            currentState = STATES.GAMEOVER;
-            document.getElementById('gameHUD').classList.add('hidden');
-            document.getElementById('controlsLayer').classList.add('hidden');
-
-            document.getElementById('endTitle').innerText = '¡GAME OVER!';
-            document.getElementById('endTitle').style.color = '#ef4444';
-            document.getElementById('endDesc').innerText = 'Las entidades cibernéticas han borrado tu código.';
-            document.getElementById('endStats').innerText = `Llaves Conseguidas: ${collectedKeys}/3`;
-            document.getElementById('rewardNotice').innerText = 'Inténtalo de nuevo.';
-
-            document.getElementById('endScreen').classList.remove('hidden');
-            playSynthSound(150, 'sawtooth', 0.6, 0.5);
-        }
-
-        function setupUIEvents() {
-            setupJoystick();
-
-            document.getElementById('btnStartGame').onclick = () => {
-                document.getElementById('mainMenu').classList.add('hidden');
-                document.getElementById('dialogueScreen').classList.remove('hidden');
-                currentState = STATES.CUTSCENE;
-                currentDialogueIdx = 0;
-                showDialogueStep(0);
-            };
-
-            document.getElementById('dialogueBox').onclick = () => {
-                currentDialogueIdx++;
-                showDialogueStep(currentDialogueIdx);
-            };
-
-            document.getElementById('btnSkipDialogue').onclick = () => {
-                document.getElementById('dialogueScreen').classList.add('hidden');
-                document.getElementById('instructionsScreen').classList.remove('hidden');
-                currentState = STATES.INSTRUCTIONS;
-            };
-
-            document.getElementById('btnPlayNow').onclick = () => {
-                document.getElementById('instructionsScreen').classList.add('hidden');
+                currentState = STATES.PAUSED;
+                document.getElementById('pauseScreen').classList.remove('hidden');
+                document.getElementById('gameHUD').classList.add('hidden');
+                document.getElementById('controlsLayer').classList.add('hidden');
+                document.getElementById('btnPause').classList.add('hidden');
+            } else if (currentState === STATES.PAUSED) {
+                currentState = STATES.PLAYING;
+                document.getElementById('pauseScreen').classList.add('hidden');
                 document.getElementById('gameHUD').classList.remove('hidden');
                 document.getElementById('controlsLayer').classList.remove('hidden');
-                currentState = STATES.PLAYING;
-                initNewGame();
-            };
-
-            document.getElementById('btnSwap').onclick = swapCharacter;
-            document.getElementById('btnAction').onclick = handleActionBtn;
-            document.getElementById('btnAvisar').onclick = handleAvisarBtn;
-
-            document.getElementById('btnProfile').onclick = () => {
-                document.getElementById('profileModal').classList.remove('hidden');
-            };
-            document.getElementById('btnCloseProfile').onclick = () => {
-                document.getElementById('profileModal').classList.add('hidden');
-            };
-
-            document.getElementById('btnSettings').onclick = () => {
-                document.getElementById('settingsModal').classList.remove('hidden');
-            };
-            document.getElementById('btnCloseSettings').onclick = () => {
-                document.getElementById('settingsModal').classList.add('hidden');
-            };
-
-            document.getElementById('btnStore').onclick = () => {
-                document.getElementById('storeModal').classList.remove('hidden');
-            };
-            document.getElementById('btnCloseStore').onclick = () => {
-                document.getElementById('storeModal').classList.add('hidden');
-            };
-
-            // Audio Sliders
-            document.getElementById('bgmVolumeSlider').oninput = (e) => {
-                bgmVolume = parseFloat(e.target.value);
-                bgMusic.volume = bgmVolume;
-            };
-            document.getElementById('sfxVolumeSlider').oninput = (e) => {
-                sfxVolume = parseFloat(e.target.value);
-            };
-
-            // Account Wizard Events
-            document.getElementById('btnAccountContinue').onclick = () => {
-                const name = document.getElementById('accountUsername').value;
-                if (validateUsername(name)) {
-                    goToAccountStep(2);
-                }
-            };
-            document.getElementById('btnBackAccountStep').onclick = () => goToAccountStep(1);
-            document.getElementById('btnGenerateAbgId').onclick = () => {
-                generatedAbgId = generateUniqueAbgId();
-                document.getElementById('accountAbgId').value = generatedAbgId;
-                document.getElementById('btnCreateAccount').disabled = false;
-            };
-            document.getElementById('btnCreateAccount').onclick = finishAccountCreation;
-
-            // Open Add Account Panel
-            document.getElementById('btnOpenAddAccount').onclick = () => {
-                document.getElementById('addAccountPanel').classList.toggle('open');
-            };
-            document.getElementById('btnCancelAddAccount').onclick = () => {
-                document.getElementById('addAccountPanel').classList.remove('open');
-            };
-
-            // Cloud Fetch existing ABG ID
-            document.getElementById('btnAddExistingAccount').onclick = async () => {
-                const idInput = normalizeAbgId(document.getElementById('existingAbgIdInput').value);
-                if (!ACCOUNT_ID_REGEX.test(idInput)) {
-                    showGameToast('ABG ID INVÁLIDA', 'Ingresa un código válido de 8 caracteres.', '#ef4444');
-                    return;
-                }
-
-                // Check local first
-                let targetAcc = getAccountById(idInput);
-
-                // If not local, search cloud!
-                if (!targetAcc && window.CloudSync) {
-                    showGameToast('BUSCANDO EN CLOUD', 'Conectando con Backend Cloud...', '#38bdf8');
-                    const cloudData = await window.CloudSync.fetchAccount(idInput);
-                    if (cloudData) {
-                        targetAcc = {
-                            id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-                            username: cloudData.username || 'Usuario Cloud',
-                            abgId: cloudData.abgId,
-                            avatar: cloudData.avatar || createInitialAvatarDataURL(cloudData.username),
-                            cups: Number(cloudData.cups) || 0,
-                            createdAt: new Date().toISOString()
-                        };
-                        accounts.push(targetAcc);
-                        saveAccounts();
-                        showGameToast('CUENTA DESCARGADA', 'Cuenta obtenida desde la Nube.', '#10b981');
-                    }
-                }
-
-                if (targetAcc) {
-                    setActiveAccount(targetAcc.abgId);
-                    document.getElementById('addAccountPanel').classList.remove('open');
-                } else {
-                    showGameToast('NO ENCONTRADA', 'La ABG ID no existe localmente ni en la Nube.', '#ef4444');
-                }
-            };
-
-            document.getElementById('btnCreateAnotherAccount').onclick = () => {
-                openAccountWizard('additional');
-            };
-
-            // Preset Avatars Selection
-            ['presetAvatar1', 'presetAvatar2', 'presetAvatar3'].forEach((id, idx) => {
-                document.getElementById(id).onclick = () => {
-                    const presetNames = ['Jostin', 'Tavito', 'Pepe'];
-                    if (activeAccount) {
-                        activeAccount.avatar = createInitialAvatarDataURL(presetNames[idx]);
-                        saveAccounts();
-                        updateAccountUI();
-                        showGameToast('AVATAR ACTUALIZADO', 'Foto de perfil cambiada.', '#10b981');
-                    }
-                };
-            });
-
-            // Image File Upload
-            document.getElementById('profileImageInput').onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (evt) => {
-                        if (activeAccount) {
-                            activeAccount.avatar = evt.target.result;
-                            saveAccounts();
-                            updateAccountUI();
-                            showGameToast('AVATAR CARGADO', 'Foto de perfil guardada.', '#10b981');
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
+                document.getElementById('btnPause').classList.remove('hidden');
+            }
         }
 
-        // Start Preloader Simulation
-        function runPreloader() {
-            let progress = 0;
-            const bar = document.getElementById('loadingBar');
-            const text = document.getElementById('loadingText');
-            const subtext = document.getElementById('loadingSubtext');
+        document.getElementById('btnPause').addEventListener('click', togglePause);
+        document.getElementById('btnResume').addEventListener('click', togglePause);
 
-            const interval = setInterval(() => {
-                progress += Math.floor(Math.random() * 15) + 5;
-                if (progress > 100) progress = 100;
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            let text = soundEnabled ? "🔊 Sonido: ON" : "🔇 Sonido: OFF";
+            document.getElementById('btnToggleAudio').innerText = text;
+            document.getElementById('btnPauseAudio').innerText = text;
+            bgMusic.muted = !soundEnabled;
+            if (soundEnabled) {
+                playSound('click');
+                if(currentState === STATES.MENU || currentState === STATES.PRELOAD) attemptPlayBGM();
+            } else {
+                bgMusic.pause(); bgMusicStarted = false;
+            }
+        }
+        document.getElementById('btnToggleAudio').addEventListener('click', toggleAudio);
+        document.getElementById('btnPauseAudio').addEventListener('click', toggleAudio);
 
-                bar.style.width = `${progress}%`;
-                text.innerText = `Cargando recursos... ${progress}%`;
+        function endGame(win) {
+            currentState = win ? STATES.VICTORY : STATES.GAMEOVER;
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('gameHUD').classList.add('hidden');
+            document.getElementById('controlsLayer').classList.add('hidden');
+            document.getElementById('btnPause').classList.add('hidden');
+            document.getElementById('currencyBadge').classList.remove('hidden');
 
-                if (progress === 100) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        document.getElementById('preloaderScreen').classList.add('hidden');
-                        initializeAccounts();
+            let endScreen = document.getElementById('endScreen');
+            endScreen.classList.remove('hidden');
+            let mins = Math.floor(gameTime / 60).toString().padStart(2, '0');
+            let secs = (gameTime % 60).toString().padStart(2, '0');
+            document.getElementById('endStats').innerText = `Tiempo de escape: ${mins}:${secs}`;
 
-                        if (!activeAccount) {
-                            openAccountWizard('first');
-                        } else {
-                            document.getElementById('mainMenu').classList.remove('hidden');
-                            document.getElementById('currencyBadge').classList.remove('hidden');
-                            currentState = STATES.MENU;
-                        }
-                    }, 400);
+            if(win) {
+                playerCups += 1;
+                if (activeAccount) {
+                    activeAccount.cups = playerCups;
+                    persistActiveAccount();
                 }
-            }, 120);
+                localStorage.setItem('emdcg_cups', playerCups);
+                updateCupDisplay();
+                document.getElementById('endTitle').innerText = "¡VICTORIA!";
+                document.getElementById('endTitle').style.color = "#facc15";
+                document.getElementById('endDesc').innerText = "Han escapado con éxito de La Ciudad EMCD.";
+                document.getElementById('rewardNotice').innerText = "🏆 ¡Has ganado +1 Copa!";
+            } else {
+                document.getElementById('endTitle').innerText = "BORRADOS";
+                document.getElementById('endTitle').style.color = "#f43f5e";
+                document.getElementById('endDesc').innerText = "Una entidad cibernética te ha borrado de la Matrix.";
+                document.getElementById('rewardNotice').innerText = "";
+            }
         }
 
-        window.onload = () => {
-            setupUIEvents();
-            runPreloader();
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'p' || e.key === 'P') {
+                if (currentState === STATES.PLAYING || currentState === STATES.PAUSED) togglePause();
+                return;
+            }
+            if(currentState !== STATES.PLAYING) return;
+            const key = e.key.toLowerCase();
+            if(key === 'w' || e.key === 'ArrowUp') keys.w = true;
+            if(key === 'a' || e.key === 'ArrowLeft') keys.a = true;
+            if(key === 's' || e.key === 'ArrowDown') keys.s = true;
+            if(key === 'd' || e.key === 'ArrowRight') keys.d = true;
+            if(key === '1') { activeCharIndex=0; changeCharacter(); }
+            if(key === '2') { activeCharIndex=1; changeCharacter(); }
+            if(key === '3') { activeCharIndex=2; changeCharacter(); }
+            if(key === ' ' && !keys.space) { keys.space = true; triggerAction(); }
+        });
+        window.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if(key === 'w' || e.key === 'ArrowUp') keys.w = false;
+            if(key === 'a' || e.key === 'ArrowLeft') keys.a = false;
+            if(key === 's' || e.key === 'ArrowDown') keys.s = false;
+            if(key === 'd' || e.key === 'ArrowRight') keys.d = false;
+            if(key === ' ') keys.space = false;
+        });
+
+        document.getElementById('btnAction').addEventListener('touchstart', (e) => { e.preventDefault(); triggerAction(); }, {passive:false});
+        document.getElementById('btnAction').addEventListener('mousedown', (e) => { e.preventDefault(); triggerAction(); });
+        document.getElementById('btnSwap').addEventListener('touchstart', (e) => { e.preventDefault(); changeCharacter(); }, {passive:false});
+        document.getElementById('btnSwap').addEventListener('mousedown', (e) => { e.preventDefault(); changeCharacter(); });
+        document.getElementById('btnAvisar').addEventListener('touchstart', (e) => { e.preventDefault(); avisarLlave(); }, {passive:false});
+        document.getElementById('btnAvisar').addEventListener('mousedown', (e) => { e.preventDefault(); avisarLlave(); });
+
+        const joystickZone = document.getElementById('joystickZone');
+        const joystickKnob = document.getElementById('joystickKnob');
+        let jzRect = null;
+
+        function handleJoystickMove(e) {
+            e.preventDefault();
+            if(!joystick.active) return;
+            let touch = e.touches ? e.touches[0] : e;
+            if(!jzRect) jzRect = joystickZone.getBoundingClientRect();
+            let centerX = jzRect.left + jzRect.width/2;
+            let centerY = jzRect.top + jzRect.height/2;
+            let dx = touch.clientX - centerX;
+            let dy = touch.clientY - centerY;
+            let mag = Math.hypot(dx, dy);
+            let maxR = jzRect.width/2 - 25;
+            if(mag > maxR) { dx = (dx/mag) * maxR; dy = (dy/mag) * maxR; }
+            joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+            joystick.dx = dx / maxR;
+            joystick.dy = dy / maxR;
+        }
+        joystickZone.addEventListener('touchstart', (e) => { e.preventDefault(); joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); }, {passive:false});
+        joystickZone.addEventListener('touchmove', handleJoystickMove, {passive:false});
+        joystickZone.addEventListener('touchend', (e) => { e.preventDefault(); joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }, {passive:false});
+        joystickZone.addEventListener('mousedown', (e) => { joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); });
+        document.addEventListener('mousemove', (e) => { if(joystick.active) handleJoystickMove(e); });
+        document.addEventListener('mouseup', () => { if(joystick.active) { joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }});
+
+        function gameLoop() {
+            update();
+            draw();
             requestAnimationFrame(gameLoop);
-        };
+        }
+
+        // Arranque del sistema de juego
+        initializeAccounts();
+        gameLoop();
     </script>
 </body>
 </html>
