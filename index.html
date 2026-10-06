@@ -27,14 +27,12 @@
             touch-action: none;
             color: var(--text-color);
         }
-        
         #gameCanvas {
             display: block;
             width: 100%;
             height: 100%;
             image-rendering: pixelated;
         }
-        
         .ui-layer {
             position: absolute;
             top: 0;
@@ -52,7 +50,9 @@
 
         #preloaderScreen { background: #03050a; z-index: 100; pointer-events: auto; }
         #mainMenu { background: rgba(3, 5, 10, 0.95); pointer-events: auto; }
-        
+        #accountSetupScreen { background: rgba(3, 5, 10, 0.985); z-index: 300; pointer-events: auto; padding: 20px; overflow-y: auto; }
+        #profileModal { background: rgba(3, 5, 10, 0.96); pointer-events: auto; z-index: 180; }
+
         .menu-logo-img {
             max-width: 92vw;
             max-height: 220px;
@@ -64,8 +64,7 @@
 
         .title { font-size: 6vw; color: #10b981; text-shadow: 3px 3px 0 #000, 0 0 15px rgba(16,185,129,0.5); text-align: center; margin-bottom: 1.5rem; line-height: 1.4; }
         .subtitle { font-size: 2.5vw; color: #38bdf8; margin-bottom: 2rem; text-align: center; padding: 0 15px; text-shadow: 0 0 8px rgba(56,189,248,0.4); }
-        
-        /* Etiqueta de versión en el menú principal */
+
         .version-label {
             position: absolute;
             bottom: 20px;
@@ -77,7 +76,7 @@
             letter-spacing: 1px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
-        
+
         .btn {
             background: var(--primary); border: 3px solid #fff; color: #000;
             padding: 14px 28px; font-size: 13px; font-family: inherit;
@@ -88,6 +87,8 @@
         .btn:active { transform: translate(4px, 4px); box-shadow: none; }
         .btn-secondary { background: #3b82f6; color: #fff; }
         .btn-accent { background: #8b5cf6; color: #fff; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-small { padding: 10px 14px; font-size: 9px; }
 
         .settings-icon-btn {
             position: absolute;
@@ -109,9 +110,40 @@
             z-index: 30;
             transition: transform 0.2s ease, border-color 0.2s;
         }
-        .settings-icon-btn:hover {
-            transform: rotate(45deg);
-            border-color: var(--highlight);
+        .settings-icon-btn:hover { transform: rotate(45deg); border-color: var(--highlight); }
+
+        .profile-mini-btn {
+            position: absolute;
+            top: 75px;
+            left: 18px;
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            border-radius: 50%;
+            border: 2px solid var(--highlight);
+            background: rgba(15, 23, 42, 0.96);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            cursor: pointer;
+            pointer-events: auto;
+            z-index: 30;
+            overflow: hidden;
+        }
+        .profile-mini-btn img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
+        .profile-mini-label {
+            position: absolute;
+            left: 72px;
+            top: 91px;
+            max-width: 130px;
+            padding: 6px 8px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(56,189,248,.35);
+            border-radius: 4px;
+            font-size: 8px;
+            color: #cbd5e1;
+            pointer-events: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .skip-dialogue-btn {
@@ -131,10 +163,7 @@
             pointer-events: auto;
             transition: background 0.2s, color 0.2s;
         }
-        .skip-dialogue-btn:hover {
-            background: #38bdf8;
-            color: #000;
-        }
+        .skip-dialogue-btn:hover { background: #38bdf8; color: #000; }
 
         .currency-badge {
             position: absolute;
@@ -154,10 +183,10 @@
             z-index: 25;
         }
 
-        #dialogueScreen { 
-            background: #000; 
-            pointer-events: auto; 
-            justify-content: flex-end; 
+        #dialogueScreen {
+            background: #000;
+            pointer-events: auto;
+            justify-content: flex-end;
             padding: 0;
             overflow: hidden;
         }
@@ -173,13 +202,7 @@
             background: #000;
             z-index: 1;
         }
-        .scene-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            image-rendering: pixelated;
-        }
-        
+        .scene-img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
         .dialogue-overlay-box {
             position: relative;
             z-index: 2;
@@ -199,75 +222,52 @@
         .speaker-header { color: var(--highlight); font-size: 12px; font-weight: bold; text-shadow: 0 0 6px rgba(250,204,21,0.4); }
         .dialogue-text-content { color: var(--text-color); font-size: 10px; line-height: 1.6; min-height: 35px; }
         .click-indicator { position: absolute; bottom: 8px; right: 12px; font-size: 8px; animation: blink 1s infinite; color: #38bdf8; }
-
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        #instructionsScreen { 
-            background: rgba(3, 5, 10, 0.96); 
-            pointer-events: auto; 
-            padding: 20px; 
-            text-align: center; 
+        #instructionsScreen {
+            background: rgba(3, 5, 10, 0.96);
+            pointer-events: auto;
+            padding: 20px;
+            text-align: center;
             overflow-y: auto;
             justify-content: flex-start;
             padding-top: 30px;
         }
-        .inst-content { 
-            max-width: 800px; 
-            text-align: left; 
-            line-height: 1.6; 
-            font-size: 10px; 
-            color: #cbd5e1;
-            margin-bottom: 15px;
-        }
+        .inst-content { max-width: 800px; text-align: left; line-height: 1.6; font-size: 10px; color: #cbd5e1; margin-bottom: 15px; }
         .inst-content h2 { color: var(--highlight); text-align: center; margin-bottom: 12px; font-size: 13px; text-shadow: 0 0 8px rgba(250,204,21,0.4); }
         .inst-content ul { list-style-type: square; margin-bottom: 12px; padding-left: 18px; }
         .inst-content li { margin-bottom: 6px; color: #f1f5f9; }
 
         #gameHUD { justify-content: space-between; padding: 15px; box-sizing: border-box; }
         .top-hud { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; gap: 10px; }
-        
         .char-info { background: rgba(10, 15, 30, 0.88); border: 2px solid #38bdf8; padding: 8px; display: flex; gap: 8px; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-radius: 6px; }
         .hud-avatar { width: 40px; height: 40px; border: 1px solid #777; image-rendering: pixelated; background: #222; object-fit: cover; border-radius: 4px; }
         .stats { display: flex; flex-direction: column; gap: 4px; font-size: 9px; color: #fff; }
-        
         .hud-center { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .timer-badge { background: rgba(10, 15, 30, 0.88); border: 2px solid #38bdf8; padding: 8px 12px; color: #60a5fa; font-size: 10px; border-radius: 6px; }
         .keys-info { background: rgba(10, 15, 30, 0.88); border: 2px solid var(--highlight); padding: 10px 14px; color: var(--highlight); font-size: 11px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-radius: 6px; }
-
         .minimap-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-
-        .minimap-container {
-            width: 100px;
-            height: 100px;
-            background: rgba(5, 8, 15, 0.95);
-            border: 2px solid #38bdf8;
-            position: relative;
-            overflow: hidden;
-            border-radius: 6px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-        }
+        .minimap-container { width: 100px; height: 100px; background: rgba(5, 8, 15, 0.95); border: 2px solid #38bdf8; position: relative; overflow: hidden; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); }
         #minimapCanvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
 
-        .controls-area { 
-            position: fixed; 
-            bottom: 0; left: 0; width: 100%; 
-            pointer-events: none; display: flex; 
-            justify-content: space-between; align-items: flex-end; 
+        .controls-area {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            pointer-events: none; display: flex;
+            justify-content: space-between; align-items: flex-end;
             padding: 20px; box-sizing: border-box; z-index: 15;
             padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
-        
-        #joystickZone { 
-            width: 130px; height: 130px; background: rgba(255,255,255,0.08); 
-            border-radius: 50%; border: 2px solid rgba(56, 189, 248, 0.3); 
-            position: relative; pointer-events: auto; touch-action: none; 
+        #joystickZone {
+            width: 130px; height: 130px; background: rgba(255,255,255,0.08);
+            border-radius: 50%; border: 2px solid rgba(56, 189, 248, 0.3);
+            position: relative; pointer-events: auto; touch-action: none;
             display: flex; justify-content: center; align-items: center;
         }
         #joystickKnob { width: 50px; height: 50px; background: rgba(56, 189, 248, 0.5); border-radius: 50%; position: absolute; pointer-events: none; box-shadow: 0 0 10px rgba(56,189,248,0.5); }
-
         .action-buttons { display: flex; flex-direction: column; gap: 10px; pointer-events: auto; align-items: flex-end; }
-        .action-btn { 
-            width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; 
+        .action-btn {
+            width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff;
             background: rgba(10, 15, 30, 0.85); color: #fff; font-size: 8px; font-family: inherit;
             display: flex; justify-content: center; align-items: center; text-align: center; cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.6);
@@ -276,12 +276,12 @@
         #btnAvisar { border-color: var(--highlight); color: var(--highlight); animation: pulse 2s infinite; display: none; }
         #btnAction { width: 75px; height: 75px; font-size: 9px; background: rgba(16, 185, 129, 0.5); border-color: #10b981; }
         #btnPause { width: 100px; height: 32px; pointer-events: auto; z-index: 20; font-size: 9px; border-radius: 6px; border-color: #3b82f6; color: #60a5fa; }
-        
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
-        #pauseScreen, #endScreen, #storeModal, #settingsModal { background: rgba(3, 5, 10, 0.96); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
+        #pauseScreen, #endScreen, #storeModal, #settingsModal {
+            background: rgba(3, 5, 10, 0.96); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;
+        }
         .menu-buttons { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 15px; }
-
         #storeModal, #settingsModal { z-index: 150; }
         .store-box {
             background: rgba(15, 23, 42, 0.95);
@@ -290,21 +290,75 @@
             border-radius: 12px;
             max-width: 400px;
             width: 90%;
+            max-height: 88vh;
+            overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             text-align: center;
+            box-sizing: border-box;
         }
 
-        input[type=range] {
-            accent-color: #38bdf8;
-            height: 6px;
-            border-radius: 4px;
+        input[type=range] { accent-color: #38bdf8; height: 6px; border-radius: 4px; outline: none; }
+        input[type=text], input[type=file] {
+            width: 100%;
+            box-sizing: border-box;
+            background: #020617;
+            border: 2px solid #334155;
+            color: #fff;
+            font-family: inherit;
+            border-radius: 6px;
+            padding: 12px;
             outline: none;
+            pointer-events: auto;
         }
-        
-        @keyframes slideDownAlert {
-            0% { transform: translateY(-20px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
+        input[type=text]:focus { border-color: #38bdf8; box-shadow: 0 0 12px rgba(56,189,248,.25); }
+        input[readonly] { color: var(--highlight); border-color: rgba(250,204,21,.55); letter-spacing: 2px; text-align: center; font-size: 13px; }
+
+        .wizard-step { display: none; }
+        .wizard-step.active { display: block; }
+        .wizard-progress { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
+        .wizard-dot { width: 28px; height: 8px; border: 1px solid #334155; background: #0f172a; border-radius: 2px; }
+        .wizard-dot.active { background: #10b981; border-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,.45); }
+        .wizard-note { color: #94a3b8; font-size: 8px; line-height: 1.6; margin: 12px 0 18px; }
+
+        .account-info-card {
+            background: rgba(2, 6, 23, 0.72);
+            border: 2px solid rgba(56,189,248,.45);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
+        .account-info-card img { width: 58px; height: 58px; border-radius: 8px; border: 2px solid var(--highlight); object-fit: cover; image-rendering: pixelated; background:#020617; }
+        .account-meta { text-align: left; min-width: 0; }
+        .account-meta .account-name { font-size: 10px; color: #fff; margin-bottom: 8px; overflow-wrap:anywhere; }
+        .account-meta .account-id { font-size: 9px; color: var(--highlight); letter-spacing: 1px; }
+        .account-section-title { text-align: left; color: #38bdf8; font-size: 10px; margin-bottom: 10px; }
+        .account-list { display: flex; flex-direction: column; gap: 8px; max-height: 190px; overflow-y: auto; text-align: left; margin-bottom: 12px; }
+        .account-row {
+            display: flex; align-items: center; gap: 8px; padding: 8px;
+            background: rgba(2, 6, 23, .8); border: 1px solid #334155; border-radius: 6px;
+        }
+        .account-row.active { border-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,.18); }
+        .account-row img { width: 36px; height: 36px; border-radius: 4px; object-fit: cover; image-rendering: pixelated; flex: 0 0 auto; }
+        .account-row-info { flex: 1; min-width: 0; }
+        .account-row-name { font-size: 8px; color: #fff; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .account-row-id { font-size: 7px; color: #94a3b8; letter-spacing: 1px; }
+        .account-row-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+        .mini-btn { border: 1px solid #fff; background: #0f172a; color: #fff; font: 7px 'Press Start 2P'; padding: 7px 8px; border-radius: 3px; cursor: pointer; }
+        .mini-btn.use { border-color:#10b981; color:#10b981; }
+        .mini-btn.delete { border-color:#ef4444; color:#ef4444; }
+        .avatar-tools { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin: 12px 0; }
+        .avatar-preset { width: 54px; height: 54px; border:2px solid #475569; background:#020617; border-radius:6px; padding:0; overflow:hidden; cursor:pointer; }
+        .avatar-preset:hover, .avatar-preset.selected { border-color:var(--highlight); box-shadow:0 0 12px rgba(250,204,21,.25); }
+        .avatar-preset img { width:100%; height:100%; object-fit:cover; image-rendering:pixelated; }
+        .plus-btn { width: 60px; height:60px; border-radius:8px; border:3px dashed #38bdf8; color:#38bdf8; background:#020617; font: 24px 'Press Start 2P'; cursor:pointer; box-shadow:0 0 15px rgba(56,189,248,.14); }
+        .add-account-panel { margin-top: 10px; padding: 12px; border: 1px dashed #334155; background:rgba(2,6,23,.5); border-radius:8px; display:none; }
+        .add-account-panel.open { display:block; }
+        .profile-small-line { color:#94a3b8; font-size:7px; line-height:1.6; margin-top:8px; }
+        .settings-account-grid { display:grid; grid-template-columns: 1fr; gap:10px; }
+
+        @keyframes slideDownAlert { 0% { transform: translateY(-20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
         #toastAlertContainer {
             animation: slideDownAlert 0.3s ease-out;
             background: rgba(15, 23, 42, 0.95);
@@ -319,6 +373,14 @@
             max-width: 80%;
         }
 
+        @media (max-width: 600px) {
+            .profile-mini-label { display:none; }
+            .settings-icon-btn { top: max(14px, env(safe-area-inset-top)); left: 14px; }
+            .profile-mini-btn { top: 68px; left: 12px; }
+            .currency-badge { top: max(14px, env(safe-area-inset-top)); right: 14px; font-size: 9px; padding: 8px 10px; }
+            .store-box { padding: 22px 16px; }
+            .account-row-actions { flex-direction: column; }
+        }
         @media (min-width: 1024px) {
             #joystickZone { opacity: 0.5; }
             .inst-content { font-size: 11px; }
@@ -330,15 +392,13 @@
 <body>
     <canvas id="gameCanvas"></canvas>
 
-    <!-- Reproductor de Música de Fondo -->
     <audio id="bgMusic" src="Escape_City_EMDCG_Music_1.mp3" loop preload="auto"></audio>
 
-    <div class="currency-badge" id="currencyBadge">
+    <div class="currency-badge hidden" id="currencyBadge">
         <span>🏆 Copas: <span id="cupCount">0</span></span>
     </div>
 
-    <!-- Contenedor para Notificaciones Flotantes / Toast -->
-    <div id="toastAlert" class="ui-layer hidden" style="justify-content: flex-start; padding-top: 80px; z-index: 200;">
+    <div id="toastAlert" class="ui-layer hidden" style="justify-content: flex-start; padding-top: 80px; z-index: 400;">
         <div id="toastAlertContainer">
             <span id="toastMsgText" style="display: block; color: #ef4444; font-weight: bold; margin-bottom: 5px;">¡ALERTA!</span>
             <span id="toastSubText">Mensaje secundario</span>
@@ -354,8 +414,45 @@
         <p id="loadingSubtext" style="font-size:9px; color:#38bdf8; margin:0; font-family:inherit; min-height:16px;">Iniciando carga de archivos...</p>
     </div>
 
+    <!-- Flujo inicial / creación de cuentas -->
+    <div id="accountSetupScreen" class="ui-layer hidden">
+        <div class="store-box" style="border-color:#10b981; max-width:460px;">
+            <h2 id="accountWizardTitle" style="color:#10b981; margin-bottom:10px; font-size:16px;">CREAR CUENTA</h2>
+            <p id="accountWizardIntro" style="font-size:9px; color:#cbd5e1; line-height:1.6; margin-bottom:18px;">Crea tu cuenta local de Escape City EMDCG para continuar.</p>
+
+            <div class="wizard-progress" aria-hidden="true">
+                <div class="wizard-dot active" id="wizardDot1"></div>
+                <div class="wizard-dot" id="wizardDot2"></div>
+            </div>
+
+            <div class="wizard-step active" id="accountStep1">
+                <label for="accountUsername" style="display:block; text-align:left; font-size:10px; color:#fff; margin-bottom:8px;">Paso 1 · Nombre de usuario</label>
+                <input id="accountUsername" type="text" maxlength="18" placeholder="Escribe tu nombre" autocomplete="nickname" spellcheck="false">
+                <p class="wizard-note">Usa entre 2 y 18 caracteres. El nombre se guardará en este dispositivo.</p>
+                <button class="btn" id="btnAccountContinue">CONTINUAR</button>
+            </div>
+
+            <div class="wizard-step" id="accountStep2">
+                <label for="accountAbgId" style="display:block; text-align:left; font-size:10px; color:#fff; margin-bottom:8px;">Paso 2 · Tu ABG ID</label>
+                <input id="accountAbgId" type="text" readonly placeholder="--------">
+                <p class="wizard-note">Pulsa <b>Generar ABG ID</b> para crear un código único de 8 caracteres alfanuméricos.</p>
+                <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+                    <button class="btn btn-secondary" id="btnGenerateAbgId">Generar ABG ID</button>
+                    <button class="btn" id="btnCreateAccount" disabled>COMENZAR</button>
+                </div>
+                <button class="btn btn-small" id="btnBackAccountStep" style="margin-top:12px; background:#334155; color:#fff; border-color:#94a3b8;">Atrás</button>
+                <button class="btn btn-small btn-danger hidden" id="btnCancelAccountWizard" style="margin-top:12px;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="mainMenu" class="ui-layer hidden">
         <button class="settings-icon-btn" id="btnSettings" title="Configuración">⚙️</button>
+        <button class="profile-mini-btn" id="btnProfile" title="Perfil y cuentas">
+            <img id="mainProfileAvatar" src="" alt="Perfil">
+        </button>
+        <div class="profile-mini-label" id="mainProfileLabel">Cuenta</div>
+
         <img src="Escape_City_EMDCG.PNG" alt="Escape City EMDCG" class="menu-logo-img" id="menuLogoImg" onerror="this.style.display='none'; document.getElementById('fallbackTitle').style.display='block';">
         <h1 id="fallbackTitle" class="title" style="display:none;">ESCAPE CITY<br>EMDCG</h1>
         <p class="subtitle">Un fallo en la Matrix...</p>
@@ -364,9 +461,53 @@
             <button class="btn btn-accent" id="btnStore">Tienda</button>
             <button class="btn btn-secondary" id="btnToggleAudio" style="font-size: 10px; padding: 12px 20px;">🔊 Sonido: ON</button>
         </div>
-        
-        <!-- Nuevo texto de versión fijo en la parte inferior del menú -->
         <div class="version-label">v0.1.0-Beta</div>
+    </div>
+
+    <div id="profileModal" class="ui-layer hidden">
+        <div class="store-box" style="border-color:#facc15; max-width:480px;">
+            <h2 style="color:#facc15; margin-bottom:16px; font-size:16px;">PERFIL & CUENTAS</h2>
+
+            <div class="account-info-card" style="margin-bottom:16px;">
+                <img id="profileAvatarPreview" src="" alt="Avatar actual">
+                <div class="account-meta">
+                    <div class="account-name" id="profileUsernameDisplay">Usuario</div>
+                    <div class="account-id" id="profileAbgIdDisplay">--------</div>
+                    <div class="profile-small-line">Cuenta activa</div>
+                </div>
+            </div>
+
+            <div class="account-section-title">PERSONALIZAR FOTO DE PERFIL</div>
+            <div class="avatar-tools">
+                <button class="avatar-preset" id="presetAvatar1" title="Jostin"><img src="Jostin.PNG" alt="Jostin"></button>
+                <button class="avatar-preset" id="presetAvatar2" title="Tavito"><img src="Tavito.PNG" alt="Tavito"></button>
+                <button class="avatar-preset" id="presetAvatar3" title="Pepe"><img src="Pepe.PNG" alt="Pepe"></button>
+            </div>
+            <label class="btn btn-small" for="profileImageInput" style="display:inline-flex; align-items:center; justify-content:center; margin-bottom:10px;">Subir una foto</label>
+            <input id="profileImageInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
+
+            <div style="height:1px; background:#334155; margin:12px 0 16px;"></div>
+
+            <div class="account-section-title">AGREGAR OTRA CUENTA</div>
+            <button class="plus-btn" id="btnOpenAddAccount" title="Agregar una cuenta existente">+</button>
+            <div class="add-account-panel" id="addAccountPanel">
+                <label for="existingAbgIdInput" style="display:block; text-align:left; font-size:8px; color:#cbd5e1; margin-bottom:8px;">Ingresa únicamente la ABG ID</label>
+                <input id="existingAbgIdInput" type="text" maxlength="8" placeholder="AB12CD34" autocomplete="off" spellcheck="false" style="text-transform:uppercase;">
+                <p class="profile-small-line">En esta versión, la cuenta existente debe estar guardada previamente en este mismo dispositivo/navegador.</p>
+                <div style="display:flex; gap:8px; justify-content:center; margin-top:10px;">
+                    <button class="btn btn-small" id="btnAddExistingAccount">Agregar y usar</button>
+                    <button class="btn btn-small" id="btnCancelAddAccount" style="background:#334155; color:#fff; border-color:#94a3b8;">Cancelar</button>
+                </div>
+            </div>
+
+            <button class="btn btn-accent btn-small" id="btnCreateAnotherAccount" style="margin-top:14px;">Crear una Nueva</button>
+
+            <div style="height:1px; background:#334155; margin:18px 0 14px;"></div>
+            <div class="account-section-title">CUENTAS GUARDADAS</div>
+            <div class="account-list" id="accountList"></div>
+
+            <button class="btn" id="btnCloseProfile">Cerrar</button>
+        </div>
     </div>
 
     <div id="storeModal" class="ui-layer hidden">
@@ -380,19 +521,26 @@
     <div id="settingsModal" class="ui-layer hidden">
         <div class="store-box" style="border-color: #38bdf8;">
             <h2 style="color: #38bdf8; margin-bottom: 20px; font-size: 16px;">CONFIGURACIÓN ⚙️</h2>
-            
             <div style="text-align: left; margin-bottom: 20px;">
                 <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;">Música de Fondo (Menú)</label>
                 <input type="range" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="width: 100%; cursor: pointer;">
             </div>
-            
-            <div style="text-align: left; margin-bottom: 30px;">
+            <div style="text-align: left; margin-bottom: 18px;">
                 <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;">Efectos de Sonido (Juego)</label>
                 <input type="range" id="sfxVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="width: 100%; cursor: pointer;">
             </div>
 
-            <p style="font-size: 8px; color: #94a3b8; margin-bottom: 20px; line-height: 1.5; font-family: inherit;">© 2026 ABG Productions & Sprunki Animations Studios Todos los derechos reservados</p>
+            <!-- Información de cuenta exactamente debajo de Efectos de Sonido (Juego) -->
+            <div class="account-info-card" style="border-color:rgba(16,185,129,.55); margin-bottom:20px;">
+                <img id="settingsAccountAvatar" src="" alt="Avatar">
+                <div class="account-meta">
+                    <div style="font-size:8px; color:#94a3b8; margin-bottom:7px;">CUENTA ACTIVA</div>
+                    <div class="account-name" id="settingsAccountName">Usuario</div>
+                    <div class="account-id" id="settingsAccountId">--------</div>
+                </div>
+            </div>
 
+            <p style="font-size: 8px; color: #94a3b8; margin-bottom: 20px; line-height: 1.5; font-family: inherit;">© 2026 ABG Productions & Sprunki Animations Studios Todos los derechos reservados</p>
             <button class="btn" id="btnCloseSettings">Cerrar</button>
         </div>
     </div>
@@ -485,7 +633,7 @@
         const ctx = canvas.getContext('2d');
         const minimapCanvas = document.getElementById('minimapCanvas');
         const minimapCtx = minimapCanvas.getContext('2d');
-        
+
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -494,63 +642,440 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        let playerCups = parseInt(localStorage.getItem('emdcg_cups') || '0', 10);
-        let typingTimeout = null; 
-
+        let typingTimeout = null;
         let audioCtx = null;
         let soundEnabled = true;
-        let sfxVolume = 0.5; 
-        let bgmVolume = 0.5; 
+        let sfxVolume = 0.5;
+        let bgmVolume = 0.5;
         let bgMusicStarted = false;
-        
+
         const bgMusic = document.getElementById('bgMusic');
         bgMusic.volume = bgmVolume;
 
-        // Intentar reproducir música atrapando errores de Autoplay policy
+        const STATES = {
+            PRELOAD: 0,
+            MENU: 1,
+            CUTSCENE: 2,
+            INSTRUCTIONS: 3,
+            PLAYING: 4,
+            PAUSED: 5,
+            GAMEOVER: 6,
+            VICTORY: 7,
+            ACCOUNT_SETUP: 8,
+            PROFILE: 9
+        };
+        let currentState = STATES.PRELOAD;
+
+        /* =========================================================
+           SISTEMA DE CUENTAS EMDCG
+           - Persistencia local por navegador/dispositivo.
+           - ABG ID de 8 caracteres A-Z / 0-9.
+           - Una cuenta activa + múltiples cuentas guardadas.
+           ========================================================= */
+        const ACCOUNT_STORAGE_KEY = 'emdcg_accounts_v2';
+        const ACTIVE_ACCOUNT_KEY = 'emdcg_active_account_v2';
+        const ACCOUNT_ID_REGEX = /^[A-Z0-9]{8}$/;
+        let accounts = [];
+        let activeAccount = null;
+        let accountWizardMode = 'first'; // first | additional
+        let accountWizardStep = 1;
+        let generatedAbgId = '';
+
+        function normalizeAbgId(value) {
+            return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
+        }
+
+        function loadAccounts() {
+            try {
+                const raw = localStorage.getItem(ACCOUNT_STORAGE_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                accounts = Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+            } catch (e) {
+                accounts = [];
+            }
+        }
+
+        function saveAccounts() {
+            try {
+                localStorage.setItem(ACCOUNT_STORAGE_KEY, JSON.stringify(accounts));
+                return true;
+            } catch (e) {
+                showGameToast('NO SE PUDO GUARDAR', 'El almacenamiento local del navegador está lleno.', '#ef4444');
+                return false;
+            }
+        }
+
+        function getAccountById(abgId) {
+            const id = normalizeAbgId(abgId);
+            return accounts.find(acc => normalizeAbgId(acc.abgId) === id) || null;
+        }
+
+        function generateUniqueAbgId() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let id = '';
+            let guard = 0;
+            do {
+                id = '';
+                for (let i = 0; i < 8; i++) {
+                    id += chars[Math.floor(Math.random() * chars.length)];
+                }
+                guard++;
+            } while (getAccountById(id) && guard < 5000);
+            return id;
+        }
+
+        function createInitialAvatarDataURL(username) {
+            const c = document.createElement('canvas');
+            c.width = 128;
+            c.height = 128;
+            const x = c.getContext('2d');
+            x.imageSmoothingEnabled = false;
+
+            const seedText = String(username || 'U');
+            let seed = 0;
+            for (let i = 0; i < seedText.length; i++) seed = ((seed << 5) - seed + seedText.charCodeAt(i)) | 0;
+            const palette = ['#10b981', '#38bdf8', '#8b5cf6', '#facc15', '#f43f5e', '#14b8a6'];
+            const base = palette[Math.abs(seed) % palette.length];
+
+            x.fillStyle = '#020617';
+            x.fillRect(0, 0, 128, 128);
+            x.fillStyle = base;
+            x.fillRect(8, 8, 112, 112);
+            x.fillStyle = '#03050a';
+            x.fillRect(16, 16, 96, 96);
+            x.fillStyle = base;
+            x.fillRect(24, 24, 80, 80);
+            x.fillStyle = '#03050a';
+            x.font = '56px monospace';
+            x.textAlign = 'center';
+            x.textBaseline = 'middle';
+            x.fillText(seedText.charAt(0).toUpperCase(), 64, 67);
+            x.fillStyle = '#fff';
+            x.fillRect(18, 18, 10, 10);
+            x.fillRect(100, 18, 10, 10);
+            x.fillRect(18, 100, 10, 10);
+            x.fillRect(100, 100, 10, 10);
+            return c.toDataURL('image/png');
+        }
+
+        function syncLegacyCupStorage() {
+            if (!activeAccount) {
+                playerCups = 0;
+                return;
+            }
+            playerCups = Number.isFinite(Number(activeAccount.cups)) ? Number(activeAccount.cups) : 0;
+            localStorage.setItem('emdcg_cups', String(playerCups));
+        }
+
+        function updateAccountUI() {
+            if (!activeAccount) return;
+            const avatar = activeAccount.avatar || createInitialAvatarDataURL(activeAccount.username);
+            document.getElementById('mainProfileAvatar').src = avatar;
+            document.getElementById('mainProfileAvatar').alt = `Perfil de ${activeAccount.username}`;
+            document.getElementById('mainProfileLabel').innerText = activeAccount.username;
+
+            document.getElementById('profileAvatarPreview').src = avatar;
+            document.getElementById('profileUsernameDisplay').innerText = activeAccount.username;
+            document.getElementById('profileAbgIdDisplay').innerText = activeAccount.abgId;
+
+            document.getElementById('settingsAccountAvatar').src = avatar;
+            document.getElementById('settingsAccountName').innerText = activeAccount.username;
+            document.getElementById('settingsAccountId').innerText = activeAccount.abgId;
+
+            updateCupDisplay();
+            renderAccountList();
+        }
+
+        function setActiveAccount(abgId, feedback = true) {
+            const target = getAccountById(abgId);
+            if (!target) return false;
+            activeAccount = target;
+            localStorage.setItem(ACTIVE_ACCOUNT_KEY, target.abgId);
+            syncLegacyCupStorage();
+            updateAccountUI();
+            if (feedback) showGameToast('CUENTA ACTIVA', `${target.username} · ${target.abgId}`, '#10b981');
+            return true;
+        }
+
+        function initializeAccounts() {
+            loadAccounts();
+            const savedActiveId = normalizeAbgId(localStorage.getItem(ACTIVE_ACCOUNT_KEY) || '');
+            activeAccount = getAccountById(savedActiveId) || accounts[0] || null;
+            if (activeAccount) {
+                localStorage.setItem(ACTIVE_ACCOUNT_KEY, activeAccount.abgId);
+                syncLegacyCupStorage();
+                updateAccountUI();
+            } else {
+                playerCups = 0;
+                localStorage.setItem('emdcg_cups', '0');
+            }
+        }
+
+        function openAccountWizard(mode = 'first') {
+            accountWizardMode = mode;
+            accountWizardStep = 1;
+            generatedAbgId = '';
+
+            document.getElementById('accountWizardTitle').innerText = mode === 'first' ? 'CREAR CUENTA' : 'CREAR OTRA CUENTA';
+            document.getElementById('accountWizardIntro').innerText = mode === 'first'
+                ? 'Crea tu cuenta local de Escape City EMDCG para continuar.'
+                : 'Registra una cuenta adicional y quedará guardada junto a tus otras cuentas.';
+
+            document.getElementById('accountUsername').value = '';
+            document.getElementById('accountAbgId').value = '';
+            document.getElementById('btnCreateAccount').disabled = true;
+            document.getElementById('accountStep1').classList.add('active');
+            document.getElementById('accountStep2').classList.remove('active');
+            document.getElementById('wizardDot1').classList.add('active');
+            document.getElementById('wizardDot2').classList.remove('active');
+            document.getElementById('btnCancelAccountWizard').classList.toggle('hidden', mode === 'first');
+
+            document.getElementById('profileModal').classList.add('hidden');
+            document.getElementById('settingsModal').classList.add('hidden');
+            document.getElementById('accountSetupScreen').classList.remove('hidden');
+            currentState = STATES.ACCOUNT_SETUP;
+            setTimeout(() => document.getElementById('accountUsername').focus(), 40);
+        }
+
+        function goToAccountStep(step) {
+            accountWizardStep = step;
+            document.getElementById('accountStep1').classList.toggle('active', step === 1);
+            document.getElementById('accountStep2').classList.toggle('active', step === 2);
+            document.getElementById('wizardDot1').classList.toggle('active', step >= 1);
+            document.getElementById('wizardDot2').classList.toggle('active', step >= 2);
+        }
+
+        function validateUsername(username) {
+            const clean = String(username || '').trim();
+            if (clean.length < 2 || clean.length > 18) {
+                showGameToast('NOMBRE INVÁLIDO', 'Usa entre 2 y 18 caracteres.', '#facc15');
+                return false;
+            }
+            return true;
+        }
+
+        function finishAccountCreation() {
+            const username = String(document.getElementById('accountUsername').value || '').trim();
+            const abgId = normalizeAbgId(document.getElementById('accountAbgId').value);
+
+            if (!validateUsername(username)) {
+                goToAccountStep(1);
+                return;
+            }
+            if (!ACCOUNT_ID_REGEX.test(abgId)) {
+                showGameToast('ABG ID INVÁLIDA', 'Genera una ABG ID de 8 caracteres.', '#ef4444');
+                return;
+            }
+            if (getAccountById(abgId)) {
+                showGameToast('ABG ID DUPLICADA', 'Genera una nueva ABG ID.', '#ef4444');
+                return;
+            }
+
+            const newAccount = {
+                id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                username,
+                abgId,
+                avatar: createInitialAvatarDataURL(username),
+                cups: 0,
+                createdAt: new Date().toISOString()
+            };
+
+            accounts.push(newAccount);
+            if (!saveAccounts()) return;
+            activeAccount = newAccount;
+            localStorage.setItem(ACTIVE_ACCOUNT_KEY, newAccount.abgId);
+            syncLegacyCupStorage();
+            updateAccountUI();
+
+            document.getElementById('accountSetupScreen').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+            document.getElementById('currencyBadge').classList.remove('hidden');
+            document.getElementById('profileModal').classList.add('hidden');
+            document.getElementById('addAccountPanel').classList.remove('open');
+            currentState = STATES.MENU;
+            attemptPlayBGM();
+            showGameToast('CUENTA CREADA', `${username} · ${abgId}`, '#10b981');
+        }
+
+        function renderAccountList() {
+            const list = document.getElementById('accountList');
+            if (!list) return;
+            list.innerHTML = '';
+
+            if (!accounts.length) {
+                const empty = document.createElement('div');
+                empty.style.cssText = 'font-size:8px;color:#94a3b8;text-align:center;padding:12px;';
+                empty.innerText = 'No hay cuentas guardadas.';
+                list.appendChild(empty);
+                return;
+            }
+
+            accounts.forEach(acc => {
+                const row = document.createElement('div');
+                row.className = `account-row ${activeAccount && acc.abgId === activeAccount.abgId ? 'active' : ''}`;
+
+                const img = document.createElement('img');
+                img.src = acc.avatar || createInitialAvatarDataURL(acc.username);
+                img.alt = acc.username;
+
+                const info = document.createElement('div');
+                info.className = 'account-row-info';
+                const name = document.createElement('div');
+                name.className = 'account-row-name';
+                name.innerText = acc.username;
+                const id = document.createElement('div');
+                id.className = 'account-row-id';
+                id.innerText = acc.abgId;
+                info.append(name, id);
+
+                const actions = document.createElement('div');
+                actions.className = 'account-row-actions';
+
+                const useBtn = document.createElement('button');
+                useBtn.className = 'mini-btn use';
+                useBtn.innerText = acc.abgId === (activeAccount && activeAccount.abgId) ? 'ACTIVA' : 'USAR';
+                useBtn.disabled = acc.abgId === (activeAccount && activeAccount.abgId);
+                useBtn.addEventListener('click', () => {
+                    if (setActiveAccount(acc.abgId)) renderAccountList();
+                });
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'mini-btn delete';
+                deleteBtn.innerText = 'BORRAR';
+                deleteBtn.addEventListener('click', () => removeAccount(acc.abgId));
+
+                actions.append(useBtn, deleteBtn);
+                row.append(img, info, actions);
+                list.appendChild(row);
+            });
+        }
+
+        function removeAccount(abgId) {
+            const target = getAccountById(abgId);
+            if (!target) return;
+            if (!confirm(`¿Borrar la cuenta ${target.username} (${target.abgId}) de este dispositivo?`)) return;
+
+            accounts = accounts.filter(acc => acc.abgId !== target.abgId);
+            if (!accounts.length) {
+                activeAccount = null;
+                saveAccounts();
+                localStorage.removeItem(ACTIVE_ACCOUNT_KEY);
+                document.getElementById('profileModal').classList.add('hidden');
+                document.getElementById('currencyBadge').classList.add('hidden');
+                openAccountWizard('first');
+                return;
+            }
+
+            if (!activeAccount || activeAccount.abgId === target.abgId) {
+                activeAccount = accounts[0];
+                localStorage.setItem(ACTIVE_ACCOUNT_KEY, activeAccount.abgId);
+            }
+            saveAccounts();
+            syncLegacyCupStorage();
+            updateAccountUI();
+            showGameToast('CUENTA ELIMINADA', `${target.username} ya no está guardada en este dispositivo.`, '#f43f5e');
+        }
+
+        function persistActiveAccount() {
+            if (!activeAccount) return;
+            const idx = accounts.findIndex(acc => acc.abgId === activeAccount.abgId);
+            if (idx < 0) return;
+            accounts[idx] = activeAccount;
+            saveAccounts();
+        }
+
+        function setActiveAccountAvatar(dataUrl) {
+            if (!activeAccount) return;
+            activeAccount.avatar = dataUrl;
+            persistActiveAccount();
+            updateAccountUI();
+        }
+
+        function cropAndSaveImage(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                showGameToast('ARCHIVO INVÁLIDO', 'Selecciona una imagen válida.', '#ef4444');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    const size = 256;
+                    const c = document.createElement('canvas');
+                    c.width = size; c.height = size;
+                    const x = c.getContext('2d');
+                    x.imageSmoothingEnabled = false;
+                    const ratio = Math.max(size / img.width, size / img.height);
+                    const sw = size / ratio;
+                    const sh = size / ratio;
+                    const sx = (img.width - sw) / 2;
+                    const sy = (img.height - sh) / 2;
+                    x.fillStyle = '#020617';
+                    x.fillRect(0,0,size,size);
+                    x.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
+                    const dataUrl = c.toDataURL('image/webp', 0.78);
+                    setActiveAccountAvatar(dataUrl);
+                    showGameToast('PERFIL ACTUALIZADO', 'Tu foto de perfil fue guardada.', '#10b981');
+                };
+                img.onerror = () => showGameToast('ERROR DE IMAGEN', 'No se pudo leer la foto.', '#ef4444');
+                img.src = e.target.result;
+            };
+            reader.onerror = () => showGameToast('ERROR DE ARCHIVO', 'No se pudo leer el archivo seleccionado.', '#ef4444');
+            reader.readAsDataURL(file);
+        }
+
+        function finishPreloader() {
+            document.getElementById('preloaderScreen').classList.add('hidden');
+            initializeAccounts();
+            if (!activeAccount) {
+                document.getElementById('mainMenu').classList.add('hidden');
+                document.getElementById('currencyBadge').classList.add('hidden');
+                openAccountWizard('first');
+            } else {
+                document.getElementById('mainMenu').classList.remove('hidden');
+                document.getElementById('currencyBadge').classList.remove('hidden');
+                currentState = STATES.MENU;
+                updateAccountUI();
+                attemptPlayBGM();
+            }
+        }
+
+        // Música de fondo / audio
         function attemptPlayBGM() {
             if (!soundEnabled) return;
             bgMusic.volume = bgmVolume;
             const playPromise = bgMusic.play();
             if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    bgMusicStarted = true;
-                }).catch(error => {
-                    // Silenciar advertencias en consola de reproducción automática bloqueada
-                    bgMusicStarted = false;
-                });
+                playPromise.then(() => { bgMusicStarted = true; }).catch(() => { bgMusicStarted = false; });
             }
         }
 
-        // Desbloquear audio en la primera interacción del usuario
         function unlockAudioContext() {
-            initAudio(); // Inicializa o resume el AudioContext
+            initAudio();
             if (!bgMusicStarted && soundEnabled && (currentState === STATES.MENU || currentState === STATES.PRELOAD)) {
                 attemptPlayBGM();
             }
-            // Eliminar listeners después de interactuar
             document.removeEventListener('click', unlockAudioContext);
             document.removeEventListener('touchstart', unlockAudioContext);
             document.removeEventListener('keydown', unlockAudioContext);
         }
 
-        // Escuchar eventos globales para garantizar el arranque de la música
         document.addEventListener('click', unlockAudioContext);
-        document.addEventListener('touchstart', unlockAudioContext);
+        document.addEventListener('touchstart', unlockAudioContext, {passive:true});
         document.addEventListener('keydown', unlockAudioContext);
 
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+            } catch (e) {}
         }
 
         function playSound(type) {
             if (!soundEnabled) return;
             try {
                 initAudio();
+                if (!audioCtx) return;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
@@ -563,40 +1088,35 @@
                     osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
                     gain.gain.setValueAtTime(0.15 * sfxVolume, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
-                    osc.start(now);
-                    osc.stop(now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
                 } else if (type === 'explosion') {
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(120, now);
                     osc.frequency.linearRampToValueAtTime(30, now + 0.3);
                     gain.gain.setValueAtTime(0.3 * sfxVolume, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
                 } else if (type === 'pickup') {
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(400, now);
                     osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
                     gain.gain.setValueAtTime(0.35 * sfxVolume, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
-                    osc.start(now);
-                    osc.stop(now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
                 } else if (type === 'click') {
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(500, now);
                     osc.frequency.setValueAtTime(300, now + 0.05);
                     gain.gain.setValueAtTime(0.25 * sfxVolume, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
-                    osc.start(now);
-                    osc.stop(now + 0.08);
+                    osc.start(now); osc.stop(now + 0.08);
                 } else if (type === 'alert') {
                     osc.type = 'square';
                     osc.frequency.setValueAtTime(150, now);
                     osc.frequency.setValueAtTime(100, now + 0.15);
                     gain.gain.setValueAtTime(0.3 * sfxVolume, now);
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
                 }
             } catch(e) {}
         }
@@ -608,22 +1128,15 @@
             document.getElementById('toastMsgText').innerText = title;
             document.getElementById('toastMsgText').style.color = color;
             document.getElementById('toastSubText').innerText = message;
-            
             container.style.borderColor = color;
             container.style.boxShadow = `0 0 20px ${color}99`;
-            
             toastEl.classList.remove('hidden');
-            
             if(toastTimeoutId) clearTimeout(toastTimeoutId);
-            toastTimeoutId = setTimeout(() => {
-                toastEl.classList.add('hidden');
-            }, 4500);
+            toastTimeoutId = setTimeout(() => toastEl.classList.add('hidden'), 4500);
         }
 
-        function updateCupDisplay() {
-            document.getElementById('cupCount').innerText = playerCups;
-        }
-        updateCupDisplay();
+        let playerCups = 0;
+        function updateCupDisplay() { document.getElementById('cupCount').innerText = playerCups; }
 
         const charImages = {
             jostin: new Image(),
@@ -642,32 +1155,18 @@
             { key: 'Tavito.PNG', img: charImages.tavito, src: 'Tavito.PNG' },
             { key: 'Pepe.PNG', img: charImages.pepe, src: 'Pepe.PNG' }
         ];
-        
         const allAssets = assetList.concat(sceneImages);
-
         let loadedCount = 0;
-        const totalAssets = allAssets.length + 1; 
+        const totalAssets = allAssets.length + 1;
 
         function updatePreloader(assetName) {
             loadedCount++;
             let pct = Math.floor((loadedCount / totalAssets) * 100);
             document.getElementById('loadingText').innerText = `Cargando recursos... ${pct}%`;
             document.getElementById('loadingBar').style.width = `${pct}%`;
-            
-            if(assetName) {
-                document.getElementById('loadingSubtext').innerText = `[${loadedCount}/${totalAssets}] Cargado: ${assetName}`;
-            }
-
+            if(assetName) document.getElementById('loadingSubtext').innerText = `[${loadedCount}/${totalAssets}] Cargado: ${assetName}`;
             if (loadedCount >= totalAssets) {
-                setTimeout(() => {
-                    document.getElementById('preloaderScreen').classList.add('hidden');
-                    document.getElementById('mainMenu').classList.remove('hidden');
-                    currentState = STATES.MENU;
-                    
-                    // Iniciar la música de fondo utilizando la lógica mejorada al entrar al menú
-                    attemptPlayBGM();
-                    
-                }, 400);
+                setTimeout(finishPreloader, 400);
             }
         }
 
@@ -695,9 +1194,6 @@
             bgMusic.load();
         }
 
-        const STATES = { PRELOAD: 0, MENU: 1, CUTSCENE: 2, INSTRUCTIONS: 3, PLAYING: 4, PAUSED: 5, GAMEOVER: 6, VICTORY: 7 };
-        let currentState = STATES.PRELOAD;
-
         const story = [
             { s: 'Jostin', t: 'Estábamos tranquilos, Pepe y yo jugando en la Play… y, de repente… ¿qué pasó?' },
             { s: 'Tavito', t: '¡¿Qué es esto?! ¡¿Dónde estamos?! ¡Yo solo estaba en mi celular! ¡¿Cómo terminamos aquí?!' },
@@ -723,11 +1219,10 @@
         let screenShakeIntensity = 0;
         let gameTime = 0;
         let timerInterval = null;
-        let lastBoundaryWarning = 0; 
-        
+        let lastBoundaryWarning = 0;
         const keys = { w: false, a: false, s: false, d: false, space: false };
         let joystick = { active: false, dx: 0, dy: 0 };
-        
+
         const party = [
             { id: 'jostin', name: 'Jostin', color: '#ff0000', speed: 4, ammo: 12, maxAmmo: 12, ability: 'Pistola', img: charImages.jostin },
             { id: 'tavito', name: 'Tavito', color: '#888888', speed: 3.5, ammo: 20, maxAmmo: 20, ability: 'Bazuca', img: charImages.tavito },
@@ -736,7 +1231,6 @@
         let activeCharIndex = 0;
         let globalKeysFound = 0;
         let keyToAvisar = null;
-
         let player = { x: TILE_SIZE * 2, y: TILE_SIZE * 2, w: 36, h: 36, dirX: 0, dirY: 1 };
         let map = [];
         let items = [];
@@ -751,9 +1245,7 @@
             for(let r=0; r<MAP_ROWS; r++) {
                 let row = [];
                 for(let c=0; c<MAP_COLS; c++) {
-                    if(r===0 || r===MAP_ROWS-1 || c===0 || c===MAP_COLS-1) {
-                        row.push(1); continue;
-                    }
+                    if(r===0 || r===MAP_ROWS-1 || c===0 || c===MAP_COLS-1) { row.push(1); continue; }
                     let rand = Math.random();
                     if(rand < 0.10) row.push(1);
                     else if(rand < 0.45) row.push(2);
@@ -762,14 +1254,12 @@
                 }
                 map.push(row);
             }
-            
             const cornerZones = [
-                { rMin: 4, rMax: 18, cMin: 4, cMax: 18 },       
-                { rMin: 4, rMax: 18, cMin: MAP_COLS-19, cMax: MAP_COLS-5 }, 
-                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: 4, cMax: 18 }, 
-                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: MAP_COLS-19, cMax: MAP_COLS-5 } 
+                { rMin: 4, rMax: 18, cMin: 4, cMax: 18 },
+                { rMin: 4, rMax: 18, cMin: MAP_COLS-19, cMax: MAP_COLS-5 },
+                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: 4, cMax: 18 },
+                { rMin: MAP_ROWS-19, rMax: MAP_ROWS-5, cMin: MAP_COLS-19, cMax: MAP_COLS-5 }
             ];
-
             cornerZones.forEach(zone => {
                 for(let r = zone.rMin; r <= zone.rMax; r++) {
                     for(let c = zone.cMin; c <= zone.cMax; c++) {
@@ -779,30 +1269,20 @@
                     }
                 }
             });
-
-            for(let r=1; r<=3; r++) {
-                for(let c=1; c<=3; c++) {
-                    map[r][c] = 0;
-                }
-            }
+            for(let r=1; r<=3; r++) for(let c=1; c<=3; c++) map[r][c] = 0;
             player.x = TILE_SIZE * 2; player.y = TILE_SIZE * 2;
-            
             player.w = party[activeCharIndex].id === 'pepe' ? 28 : 36;
             player.h = party[activeCharIndex].id === 'pepe' ? 28 : 36;
-
             items = [];
             enemies = [];
-            
             placeItemInZone(2, 'key1', '#facc15');
             placeItemInZone(0, 'key2', '#facc15');
             placeItemNear(1, 'key3', '#facc15');
-
             for(let i=0; i<12; i++) {
                 placeItemInZone(2, 'ammo_jostin', '#ff3333');
                 placeItemInZone(0, 'ammo_tavito', '#a855f7');
                 placeItemInZone(2, 'stealth_pepe', '#38bdf8');
             }
-
             for(let i=0; i<60; i++) {
                 let ex, ey;
                 do {
@@ -811,25 +1291,12 @@
                     ex = c * TILE_SIZE + TILE_SIZE/2;
                     ey = r * TILE_SIZE + TILE_SIZE/2;
                 } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*8);
-                
-                enemies.push({ 
-                    x: ex, 
-                    y: ey, 
-                    w: 40,
-                    h: 40, 
-                    speed: 1.4 + Math.random() * 0.6, 
-                    state: 'PATROL',
-                    patrolTarget: { x: ex, y: ey },
-                    patrolTimer: 0,
-                    visionRange: 300,
-                    hp: 3 
-                });
+                enemies.push({ x: ex, y: ey, w: 40, h: 40, speed: 1.4 + Math.random() * 0.6, state: 'PATROL', patrolTarget: { x: ex, y: ey }, patrolTimer: 0, visionRange: 300, hp: 3 });
             }
         }
 
         function placeItemInZone(tileType, id, color) {
-            let placed = false;
-            let attempts = 0;
+            let placed = false, attempts = 0;
             while(!placed && attempts < 400) {
                 attempts++;
                 let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
@@ -843,8 +1310,7 @@
         }
 
         function placeItemNear(tileType, id, color) {
-            let placed = false;
-            let attempts = 0;
+            let placed = false, attempts = 0;
             while(!placed && attempts < 400) {
                 attempts++;
                 let r = Math.floor(Math.random() * (MAP_ROWS-2)) + 1;
@@ -860,7 +1326,6 @@
         }
 
         function distance(x1, y1, x2, y2) { return Math.hypot(x2-x1, y2-y1); }
-
         function isSolid(tileX, tileY) {
             if (tileX < 0 || tileX >= MAP_COLS || tileY < 0 || tileY >= MAP_ROWS) return true;
             return map[tileY][tileX] === 1;
@@ -868,43 +1333,30 @@
 
         function update() {
             if (currentState !== STATES.PLAYING) return;
-
             const char = party[activeCharIndex];
-            
-            let dx = 0; let dy = 0;
-            if (joystick.active) {
-                dx = joystick.dx * char.speed;
-                dy = joystick.dy * char.speed;
-            } else {
+            let dx = 0, dy = 0;
+            if (joystick.active) { dx = joystick.dx * char.speed; dy = joystick.dy * char.speed; }
+            else {
                 if (keys.w) dy -= char.speed;
                 if (keys.s) dy += char.speed;
                 if (keys.a) dx -= char.speed;
                 if (keys.d) dx += char.speed;
             }
-            
             if(!joystick.active && dx !== 0 && dy !== 0) {
                 const length = Math.sqrt(dx*dx + dy*dy);
                 dx = (dx/length) * char.speed;
                 dy = (dy/length) * char.speed;
             }
-
-            if(dx !== 0 || dy !== 0) {
-                let mag = Math.hypot(dx, dy);
-                player.dirX = dx/mag; player.dirY = dy/mag;
-            }
+            if(dx !== 0 || dy !== 0) { let mag = Math.hypot(dx, dy); player.dirX = dx/mag; player.dirY = dy/mag; }
 
             let newX = player.x + dx;
             let pR = player.w / 2;
             let topY = player.y - pR, botY = player.y + pR;
-            
             let leftX = newX - pR, rightX = newX + pR;
             let cLeft = Math.floor(leftX / TILE_SIZE), cRight = Math.floor(rightX / TILE_SIZE);
             let rTop = Math.floor(topY / TILE_SIZE), rBot = Math.floor(botY / TILE_SIZE);
-
             let canMoveX = true;
-            if (isSolid(cLeft, rTop) || isSolid(cLeft, rBot) || isSolid(cRight, rTop) || isSolid(cRight, rBot)) {
-                canMoveX = false;
-            }
+            if (isSolid(cLeft, rTop) || isSolid(cLeft, rBot) || isSolid(cRight, rTop) || isSolid(cRight, rBot)) canMoveX = false;
             if (canMoveX) player.x = newX;
 
             let newY = player.y + dy;
@@ -912,45 +1364,28 @@
             topY = newY - pR; botY = newY + pR;
             cLeft = Math.floor(leftX / TILE_SIZE); cRight = Math.floor(rightX / TILE_SIZE);
             rTop = Math.floor(topY / TILE_SIZE); rBot = Math.floor(botY / TILE_SIZE);
-
             let canMoveY = true;
-            if (isSolid(cLeft, rTop) || isSolid(cLeft, rBot) || isSolid(cRight, rTop) || isSolid(cRight, rBot)) {
-                canMoveY = false;
-            }
+            if (isSolid(cLeft, rTop) || isSolid(cLeft, rBot) || isSolid(cRight, rTop) || isSolid(cRight, rBot)) canMoveY = false;
             if (canMoveY) player.y = newY;
 
             camera.x = player.x - camera.w / 2;
             camera.y = player.y - camera.h / 2;
-            
-            if (screenShakeTimer > 0) {
-                screenShakeTimer--;
-                camera.x += (Math.random() - 0.5) * screenShakeIntensity;
-                camera.y += (Math.random() - 0.5) * screenShakeIntensity;
-            }
-
+            if (screenShakeTimer > 0) { screenShakeTimer--; camera.x += (Math.random() - 0.5) * screenShakeIntensity; camera.y += (Math.random() - 0.5) * screenShakeIntensity; }
             camera.x = Math.max(0, Math.min(camera.x, MAP_COLS*TILE_SIZE - camera.w));
             camera.y = Math.max(0, Math.min(camera.y, MAP_ROWS*TILE_SIZE - camera.h));
 
-            if (player.x < TILE_SIZE * 1.5 || player.x > (MAP_COLS - 1.5) * TILE_SIZE || 
-                player.y < TILE_SIZE * 1.5 || player.y > (MAP_ROWS - 1.5) * TILE_SIZE) {
-                if (Date.now() - lastBoundaryWarning > 3000) {
-                    addFloatingText("¡LÍMITE DE LA MATRIX!", player.x, player.y - 30, '#ef4444');
-                    lastBoundaryWarning = Date.now();
-                }
+            if (player.x < TILE_SIZE * 1.5 || player.x > (MAP_COLS - 1.5) * TILE_SIZE || player.y < TILE_SIZE * 1.5 || player.y > (MAP_ROWS - 1.5) * TILE_SIZE) {
+                if (Date.now() - lastBoundaryWarning > 3000) { addFloatingText("¡LÍMITE DE LA MATRIX!", player.x, player.y - 30, '#ef4444'); lastBoundaryWarning = Date.now(); }
             }
 
             if (char.id === 'pepe' && char.stealthActive) {
                 char.stealthTime -= 1/60;
-                
                 if (char.stealthTime <= 0) {
-                    char.stealthTime = 0;
-                    char.stealthActive = false;
-                    
+                    char.stealthTime = 0; char.stealthActive = false;
                     createParticles(player.x, player.y, '#ef4444', 25);
                     addFloatingText("¡SIGILO AGOTADO!", player.x, player.y - 45, '#ef4444');
                     addFloatingText("Busca cargadores", player.x, player.y - 25, '#38bdf8');
                     playSound('alert');
-                    
                     showGameToast("¡SIGILO DE PEPE AGOTADO!", "Debes conseguir cargadores azules por el mapa para volver a usarlo.", "#ef4444");
                 }
                 updateHUD();
@@ -958,7 +1393,6 @@
 
             keyToAvisar = null;
             document.getElementById('btnAvisar').style.display = 'none';
-
             for(let i=items.length-1; i>=0; i--) {
                 let item = items[i];
                 if(distance(player.x, player.y, item.x, item.y) < item.radius + player.w/2) {
@@ -969,206 +1403,109 @@
                         char.ammo += 5; items.splice(i,1); createParticles(item.x, item.y, '#ff3333'); addFloatingText("+5 Balas", item.x, item.y, '#ff3333'); playSound('pickup'); updateHUD();
                     } else if (item.id === 'ammo_tavito' && char.id === 'tavito') {
                         char.ammo += 10; items.splice(i,1); createParticles(item.x, item.y, '#a855f7'); addFloatingText("+10 Bombas", item.x, item.y, '#c084fc'); playSound('pickup'); updateHUD();
-                    } 
-                    else if (item.id === 'stealth_pepe' && char.id === 'pepe') {
-                        char.stealthTime = Math.min(char.maxStealth, char.stealthTime + 80); 
-                        items.splice(i,1); 
-                        createParticles(item.x, item.y, '#38bdf8'); 
-                        addFloatingText("+80s Sigilo", item.x, item.y, '#38bdf8'); 
-                        playSound('pickup'); 
-                        updateHUD();
+                    } else if (item.id === 'stealth_pepe' && char.id === 'pepe') {
+                        char.stealthTime = Math.min(char.maxStealth, char.stealthTime + 80); items.splice(i,1); createParticles(item.x, item.y, '#38bdf8'); addFloatingText("+80s Sigilo", item.x, item.y, '#38bdf8'); playSound('pickup'); updateHUD();
                     }
                 }
             }
 
-            if (door && distance(player.x, player.y, door.x, door.y) < 45) {
-                endGame(true);
-            }
+            if (door && distance(player.x, player.y, door.x, door.y) < 45) endGame(true);
 
             for(let i=projectiles.length-1; i>=0; i--) {
-                let p = projectiles[i];
-                p.x += p.dx; p.y += p.dy; p.life--;
-                
-                let prC = Math.floor(p.x/TILE_SIZE); let prR = Math.floor(p.y/TILE_SIZE);
+                let p = projectiles[i]; p.x += p.dx; p.y += p.dy; p.life--;
+                let prC = Math.floor(p.x/TILE_SIZE), prR = Math.floor(p.y/TILE_SIZE);
                 if(p.life <= 0 || isSolid(prC, prR)) {
-                    if (isSolid(prC, prR)) {
-                        createParticles(p.x, p.y, '#94a3b8', 6);
-                    }
+                    if (isSolid(prC, prR)) createParticles(p.x, p.y, '#94a3b8', 6);
                     if(p.type==='bazooka') createExplosion(p.x, p.y);
-                    projectiles.splice(i, 1);
-                    continue;
+                    projectiles.splice(i, 1); continue;
                 }
-
                 let hit = false;
                 for(let j=enemies.length-1; j>=0; j--) {
                     let e = enemies[j];
                     if(distance(p.x, p.y, e.x, e.y) < e.w/2 + p.r) {
                         if(p.type === 'pistol') {
                             e.hp -= 1;
-                            if(e.hp <= 0) {
-                                enemies.splice(j, 1);
-                                createParticles(e.x, e.y, '#00ffcc');
-                                addFloatingText("-1 Glitch", e.x, e.y, '#38bdf8');
-                            } else {
-                                createParticles(e.x, e.y, '#facc15', 4);
-                                addFloatingText("-1 HP", e.x, e.y - 15, '#facc15');
-                            }
-                        } else if(p.type === 'bazooka') {
-                            createExplosion(p.x, p.y); 
-                        }
-                        hit = true;
-                        break;
+                            if(e.hp <= 0) { enemies.splice(j, 1); createParticles(e.x, e.y, '#00ffcc'); addFloatingText("-1 Glitch", e.x, e.y, '#38bdf8'); }
+                            else { createParticles(e.x, e.y, '#facc15', 4); addFloatingText("-1 HP", e.x, e.y - 15, '#facc15'); }
+                        } else if(p.type === 'bazooka') createExplosion(p.x, p.y);
+                        hit = true; break;
                     }
                 }
-                if(hit) {
-                    projectiles.splice(i, 1);
-                }
+                if(hit) projectiles.splice(i, 1);
             }
 
-            for(let i=particles.length-1; i>=0; i--) {
-                let pt = particles[i];
-                pt.x += pt.dx; pt.y += pt.dy; pt.life--;
-                if(pt.life <= 0) particles.splice(i,1);
-            }
-
-            for(let i=floatingTexts.length-1; i>=0; i--) {
-                let ft = floatingTexts[i];
-                ft.y -= 0.8; ft.life--;
-                if(ft.life <= 0) floatingTexts.splice(i, 1);
-            }
+            for(let i=particles.length-1; i>=0; i--) { let pt = particles[i]; pt.x += pt.dx; pt.y += pt.dy; pt.life--; if(pt.life <= 0) particles.splice(i,1); }
+            for(let i=floatingTexts.length-1; i>=0; i--) { let ft = floatingTexts[i]; ft.y -= 0.8; ft.life--; if(ft.life <= 0) floatingTexts.splice(i, 1); }
 
             let isInvisible = (char.id === 'pepe' && char.stealthActive);
             for(let i=enemies.length-1; i>=0; i--) {
                 let e = enemies[i];
                 let distToPlayer = distance(e.x, e.y, player.x, player.y);
-
-                if (!isInvisible && distToPlayer < e.visionRange) {
-                    e.state = 'CHASE';
-                } else if (distToPlayer > e.visionRange * 1.3 || isInvisible) {
-                    if (e.state === 'CHASE') e.state = 'PATROL';
-                }
+                if (!isInvisible && distToPlayer < e.visionRange) e.state = 'CHASE';
+                else if (distToPlayer > e.visionRange * 1.3 || isInvisible) { if (e.state === 'CHASE') e.state = 'PATROL'; }
 
                 let targetX = e.x, targetY = e.y;
-                if (e.state === 'CHASE') {
-                    targetX = player.x;
-                    targetY = player.y;
-                } else {
+                if (e.state === 'CHASE') { targetX = player.x; targetY = player.y; }
+                else {
                     e.patrolTimer--;
                     if (e.patrolTimer <= 0 || distance(e.x, e.y, e.patrolTarget.x, e.patrolTarget.y) < 20) {
                         let randC = Math.floor(Math.random() * (MAP_COLS - 2)) + 1;
                         let randR = Math.floor(Math.random() * (MAP_ROWS - 2)) + 1;
-                        if (!isSolid(randC, randR)) {
-                            e.patrolTarget.x = randC * TILE_SIZE + TILE_SIZE/2;
-                            e.patrolTarget.y = randR * TILE_SIZE + TILE_SIZE/2;
-                        }
+                        if (!isSolid(randC, randR)) { e.patrolTarget.x = randC * TILE_SIZE + TILE_SIZE/2; e.patrolTarget.y = randR * TILE_SIZE + TILE_SIZE/2; }
                         e.patrolTimer = 180 + Math.random() * 140;
                     }
-                    targetX = e.patrolTarget.x;
-                    targetY = e.patrolTarget.y;
+                    targetX = e.patrolTarget.x; targetY = e.patrolTarget.y;
                 }
 
                 let angle = Math.atan2(targetY - e.y, targetX - e.x);
                 let moveStep = e.state === 'CHASE' ? e.speed : e.speed * 0.65;
                 let nextX = e.x + Math.cos(angle) * moveStep;
                 let nextY = e.y + Math.sin(angle) * moveStep;
-
                 let cE_X = Math.floor(nextX / TILE_SIZE);
-                if (!isSolid(cE_X, Math.floor(e.y / TILE_SIZE))) {
-                    e.x = nextX;
-                } else {
-                    if (e.state === 'PATROL') e.patrolTimer = 0;
-                }
-
+                if (!isSolid(cE_X, Math.floor(e.y / TILE_SIZE))) e.x = nextX; else if (e.state === 'PATROL') e.patrolTimer = 0;
                 let cE_Y2 = Math.floor(nextY / TILE_SIZE);
-                if (!isSolid(Math.floor(e.x / TILE_SIZE), cE_Y2)) {
-                    e.y = nextY;
-                } else {
-                    if (e.state === 'PATROL') e.patrolTimer = 0;
-                }
-
-                if (!isInvisible && distToPlayer < (e.w/2 + player.w/2 - 4)) {
-                    endGame(false);
-                }
+                if (!isSolid(Math.floor(e.x / TILE_SIZE), cE_Y2)) e.y = nextY; else if (e.state === 'PATROL') e.patrolTimer = 0;
+                if (!isInvisible && distToPlayer < (e.w/2 + player.w/2 - 4)) endGame(false);
             }
         }
 
         function triggerAction() {
             if (currentState !== STATES.PLAYING) return;
             const char = party[activeCharIndex];
-            
             if (char.id === 'jostin' && char.ammo > 0) {
-                char.ammo--;
-                projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 11, dy: player.dirY * 11, r: 4, color: '#00ffcc', life: 70, type: 'pistol' });
-                playSound('shoot');
-                updateHUD();
+                char.ammo--; projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 11, dy: player.dirY * 11, r: 4, color: '#00ffcc', life: 70, type: 'pistol' }); playSound('shoot'); updateHUD();
             } else if (char.id === 'tavito' && char.ammo > 0) {
-                char.ammo--;
-                projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 9, dy: player.dirY * 9, r: 8, color: '#a855f7', life: 90, type: 'bazooka' });
-                playSound('shoot');
-                updateHUD();
+                char.ammo--; projectiles.push({ x: player.x, y: player.y, dx: player.dirX * 9, dy: player.dirY * 9, r: 8, color: '#a855f7', life: 90, type: 'bazooka' }); playSound('shoot'); updateHUD();
             } else if (char.id === 'pepe') {
-                if(char.stealthTime > 0) {
-                    char.stealthActive = !char.stealthActive;
-                    playSound('click');
-                    updateHUD();
-                } else {
-                    char.stealthActive = false;
-                    showGameToast("¡NO TIENES SIGILO!", "Debes conseguir cargadores azules.", "#ef4444");
-                }
+                if(char.stealthTime > 0) { char.stealthActive = !char.stealthActive; playSound('click'); updateHUD(); }
+                else { char.stealthActive = false; showGameToast("¡NO TIENES SIGILO!", "Debes conseguir cargadores azules.", "#ef4444"); }
             }
         }
 
         function createExplosion(ex, ey) {
-            createParticles(ex, ey, '#a855f7', 30);
-            playSound('explosion');
-            screenShakeTimer = 16;
-            screenShakeIntensity = 9;
-            addFloatingText("¡BOOM!", ex, ey, '#facc15');
+            createParticles(ex, ey, '#a855f7', 30); playSound('explosion'); screenShakeTimer = 16; screenShakeIntensity = 9; addFloatingText("¡BOOM!", ex, ey, '#facc15');
             let killed = 0;
             for(let j=enemies.length-1; j>=0; j--) {
                 if(killed >= 5) break;
-                if(distance(ex, ey, enemies[j].x, enemies[j].y) < 130) {
-                    createParticles(enemies[j].x, enemies[j].y, '#00ffcc');
-                    enemies.splice(j, 1);
-                    killed++;
-                }
+                if(distance(ex, ey, enemies[j].x, enemies[j].y) < 130) { createParticles(enemies[j].x, enemies[j].y, '#00ffcc'); enemies.splice(j, 1); killed++; }
             }
         }
-
         function createParticles(x, y, color, count=12) {
-            for(let i=0; i<count; i++) {
-                particles.push({
-                    x: x, y: y,
-                    dx: (Math.random()-0.5)*6, dy: (Math.random()-0.5)*6,
-                    life: 25 + Math.random()*20, color: color, size: Math.random()*4 + 2
-                });
-            }
+            for(let i=0; i<count; i++) particles.push({ x, y, dx: (Math.random()-0.5)*6, dy: (Math.random()-0.5)*6, life: 25 + Math.random()*20, color, size: Math.random()*4 + 2 });
         }
-
-        function addFloatingText(text, x, y, color) {
-            floatingTexts.push({ text: text, x: x, y: y, color: color, life: 55 });
-        }
-
+        function addFloatingText(text, x, y, color) { floatingTexts.push({ text, x, y, color, life: 55 }); }
         function avisarLlave() {
             if(keyToAvisar) {
                 globalKeysFound++;
                 let idx = items.indexOf(keyToAvisar);
                 if(idx > -1) items.splice(idx, 1);
-                
                 document.getElementById('keyCount').innerText = globalKeysFound;
                 keyToAvisar = null;
                 document.getElementById('btnAvisar').style.display = 'none';
-                
-                createParticles(player.x, player.y, '#facc15', 35);
-                playSound('pickup');
-                addFloatingText("¡LLAVE ASEGURADA!", player.x, player.y - 20, '#facc15');
-
-                if(globalKeysFound >= 3) {
-                    spawnDoor();
-                }
+                createParticles(player.x, player.y, '#facc15', 35); playSound('pickup'); addFloatingText("¡LLAVE ASEGURADA!", player.x, player.y - 20, '#facc15');
+                if(globalKeysFound >= 3) spawnDoor();
             }
         }
-
         function spawnDoor() {
             door = { x: player.x, y: player.y - TILE_SIZE*4 };
             door.x = Math.max(TILE_SIZE, Math.min(door.x, (MAP_COLS-1)*TILE_SIZE));
@@ -1177,343 +1514,110 @@
 
         function draw() {
             if (currentState !== STATES.PLAYING) return;
-
             camera.w = canvas.width; camera.h = canvas.height;
-
-            ctx.fillStyle = '#03050a';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.save();
-            ctx.translate(-camera.x, -camera.y);
-
+            ctx.fillStyle = '#03050a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.save(); ctx.translate(-camera.x, -camera.y);
             let startCol = Math.floor(camera.x / TILE_SIZE);
             let endCol = startCol + (camera.w / TILE_SIZE) + 1;
             let startRow = Math.floor(camera.y / TILE_SIZE);
             let endRow = startRow + (camera.h / TILE_SIZE) + 1;
-
-            for(let r = startRow; r <= endRow; r++) {
-                for(let c = startCol; c <= endCol; c++) {
-                    if(map[r] !== undefined && map[r][c] !== undefined) {
-                        let tx = c * TILE_SIZE;
-                        let ty = r * TILE_SIZE;
-                        let tileType = map[r][c];
-                        
-                        if(tileType === 1) {
-                            ctx.fillStyle = '#0f172a';
-                            ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = '#1e293b';
-                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = '#10b981';
-                            ctx.fillRect(tx + 4, ty + 4, 3, 3);
-                        } else if (tileType === 2) {
-                            ctx.fillStyle = '#090d16';
-                            ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
-                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = '#1e1b4b';
-                            ctx.fillRect(tx+10, ty+10, 18, 18);
-                            ctx.fillRect(tx+34, ty+34, 14, 14);
-                        } else if (tileType === 3) {
-                            ctx.fillStyle = '#010203'; 
-                            ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
-                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                        } else {
-                            ctx.fillStyle = '#05080e';
-                            ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                        }
-                    }
+            for(let r = startRow; r <= endRow; r++) for(let c = startCol; c <= endCol; c++) {
+                if(map[r] !== undefined && map[r][c] !== undefined) {
+                    let tx = c * TILE_SIZE, ty = r * TILE_SIZE, tileType = map[r][c];
+                    if(tileType === 1) { ctx.fillStyle = '#0f172a'; ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.strokeStyle = '#1e293b'; ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.fillStyle = '#10b981'; ctx.fillRect(tx + 4, ty + 4, 3, 3); }
+                    else if (tileType === 2) { ctx.fillStyle = '#090d16'; ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)'; ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.fillStyle = '#1e1b4b'; ctx.fillRect(tx+10, ty+10, 18, 18); ctx.fillRect(tx+34, ty+34, 14, 14); }
+                    else if (tileType === 3) { ctx.fillStyle = '#010203'; ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)'; ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE); }
+                    else { ctx.fillStyle = '#05080e'; ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE); ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)'; ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE); }
                 }
             }
-
             if (door) {
-                ctx.fillStyle = '#facc15';
-                ctx.fillRect(door.x - 32, door.y - 45, 64, 90);
-                ctx.fillStyle = '#111';
-                ctx.fillRect(door.x - 24, door.y - 37, 48, 74);
-                ctx.fillStyle = '#fff';
-                ctx.font = '9px "Press Start 2P"';
-                ctx.fillText("SALIDA", door.x - 26, door.y - 55);
+                ctx.fillStyle = '#facc15'; ctx.fillRect(door.x - 32, door.y - 45, 64, 90); ctx.fillStyle = '#111'; ctx.fillRect(door.x - 24, door.y - 37, 48, 74); ctx.fillStyle = '#fff'; ctx.font = '9px "Press Start 2P"'; ctx.fillText("SALIDA", door.x - 26, door.y - 55);
             }
-
             for(let item of items) {
                 if (item.id.startsWith('key')) {
-                    ctx.save();
-                    ctx.translate(item.x, item.y);
-                    ctx.rotate(-Math.PI / 6);
-
-                    ctx.shadowColor = item.color;
-                    ctx.shadowBlur = 8;
-                    
-                    ctx.fillStyle = item.color;
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 1;
-
-                    ctx.beginPath();
-                    ctx.arc(-8, 0, 7, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.fillRect(-2, -2, 16, 4);
-                    ctx.strokeRect(-2, -2, 16, 4);
-
-                    ctx.fillRect(6, 2, 3, 5);
-                    ctx.strokeRect(6, 2, 3, 5);
-                    ctx.fillRect(11, 2, 3, 4);
-                    ctx.strokeRect(11, 2, 3, 4);
-
-                    ctx.shadowBlur = 0;
-
-                    ctx.fillStyle = '#03050a';
-                    ctx.beginPath();
-                    ctx.arc(-8, 0, 2.5, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    ctx.restore();
-                } else {
-                    ctx.beginPath();
-                    ctx.arc(item.x, item.y, item.radius, 0, Math.PI*2);
-                    ctx.fillStyle = item.color;
-                    ctx.fill();
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
+                    ctx.save(); ctx.translate(item.x, item.y); ctx.rotate(-Math.PI / 6); ctx.shadowColor = item.color; ctx.shadowBlur = 8; ctx.fillStyle = item.color; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.arc(-8, 0, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.fillRect(-2, -2, 16, 4); ctx.strokeRect(-2, -2, 16, 4); ctx.fillRect(6, 2, 3, 5); ctx.strokeRect(6, 2, 3, 5); ctx.fillRect(11, 2, 3, 4); ctx.strokeRect(11, 2, 3, 4); ctx.shadowBlur = 0; ctx.fillStyle = '#03050a'; ctx.beginPath(); ctx.arc(-8, 0, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                } else { ctx.beginPath(); ctx.arc(item.x, item.y, item.radius, 0, Math.PI*2); ctx.fillStyle = item.color; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
             }
-
             for(let e of enemies) {
-                ctx.save();
-                ctx.translate(e.x, e.y);
-                
-                let isChase = (e.state === 'CHASE');
-                let mainColor = isChase ? '#f43f5e' : '#10b981';
-                let glowColor = isChase ? '#ff003c' : '#00ffcc';
-                
-                let pulse = Math.abs(Math.sin(Date.now() / (isChase ? 150 : 300)));
-                
-                ctx.shadowColor = glowColor;
-                ctx.shadowBlur = 10 + (pulse * 15);
-                
-                ctx.beginPath();
-                let s = (e.w/2) - 2; 
-                ctx.moveTo(-s, -s/2);
-                ctx.lineTo(-s/2, -s);
-                ctx.lineTo(s/2, -s);
-                ctx.lineTo(s, -s/2);
-                ctx.lineTo(s, s/2);
-                ctx.lineTo(s/2, s);
-                ctx.lineTo(-s/2, s);
-                ctx.lineTo(-s, s/2);
-                ctx.closePath();
-                
-                ctx.fillStyle = '#05080e';
-                ctx.fill();
-                
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = mainColor;
-                ctx.stroke();
-                
-                ctx.shadowBlur = 0;
-                
-                ctx.fillStyle = mainColor;
-                ctx.globalAlpha = 0.2 + (pulse * 0.4);
-                ctx.beginPath();
-                ctx.arc(0, 0, s*0.5, 0, Math.PI*2);
-                ctx.fill();
-                ctx.globalAlpha = 1.0;
-                
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(-6, -4, 4, 8);
-                ctx.fillRect(2, -4, 4, 8);
-                
-                ctx.fillStyle = glowColor;
-                ctx.fillRect(-2, -2, 4, 4);
-
-                ctx.restore();
-
-                if (e.hp < 3) {
-                    ctx.fillStyle = '#ef4444';
-                    ctx.fillRect(e.x - 12, e.y - 28, 24, 4);
-                    ctx.fillStyle = '#10b981';
-                    ctx.fillRect(e.x - 12, e.y - 28, (24/3) * e.hp, 4);
-                    ctx.strokeStyle = '#000';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(e.x - 12, e.y - 28, 24, 4);
-                }
+                ctx.save(); ctx.translate(e.x, e.y);
+                let isChase = (e.state === 'CHASE'); let mainColor = isChase ? '#f43f5e' : '#10b981'; let glowColor = isChase ? '#ff003c' : '#00ffcc'; let pulse = Math.abs(Math.sin(Date.now() / (isChase ? 150 : 300)));
+                ctx.shadowColor = glowColor; ctx.shadowBlur = 10 + (pulse * 15); ctx.beginPath(); let s = (e.w/2) - 2;
+                ctx.moveTo(-s, -s/2); ctx.lineTo(-s/2, -s); ctx.lineTo(s/2, -s); ctx.lineTo(s, -s/2); ctx.lineTo(s, s/2); ctx.lineTo(s/2, s); ctx.lineTo(-s/2, s); ctx.lineTo(-s, s/2); ctx.closePath();
+                ctx.fillStyle = '#05080e'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = mainColor; ctx.stroke(); ctx.shadowBlur = 0;
+                ctx.fillStyle = mainColor; ctx.globalAlpha = 0.2 + (pulse * 0.4); ctx.beginPath(); ctx.arc(0, 0, s*0.5, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1.0;
+                ctx.fillStyle = '#fff'; ctx.fillRect(-6, -4, 4, 8); ctx.fillRect(2, -4, 4, 8); ctx.fillStyle = glowColor; ctx.fillRect(-2, -2, 4, 4); ctx.restore();
+                if (e.hp < 3) { ctx.fillStyle = '#ef4444'; ctx.fillRect(e.x - 12, e.y - 28, 24, 4); ctx.fillStyle = '#10b981'; ctx.fillRect(e.x - 12, e.y - 28, (24/3) * e.hp, 4); ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.strokeRect(e.x - 12, e.y - 28, 24, 4); }
             }
-
             const char = party[activeCharIndex];
-            
-            ctx.save();
-            ctx.translate(player.x, player.y);
-            
-            if(char.id === 'pepe' && char.stealthActive) {
-                ctx.globalAlpha = 0.4;
-            }
-
+            ctx.save(); ctx.translate(player.x, player.y);
+            if(char.id === 'pepe' && char.stealthActive) ctx.globalAlpha = 0.4;
             let facingFlip = player.dirX < 0 ? -1 : 1;
-            ctx.save();
-            if(facingFlip < 0) ctx.scale(-1, 1);
-
-            if(char.img && char.img.complete && char.img.naturalHeight !== 0) {
-                ctx.drawImage(char.img, -player.w/2, -player.h/2, player.w, player.h);
-            } else {
-                ctx.fillStyle = char.color;
-                ctx.fillRect(-player.w/2, -player.h/2, player.w, player.h);
-            }
+            ctx.save(); if(facingFlip < 0) ctx.scale(-1, 1);
+            if(char.img && char.img.complete && char.img.naturalHeight !== 0) ctx.drawImage(char.img, -player.w/2, -player.h/2, player.w, player.h);
+            else { ctx.fillStyle = char.color; ctx.fillRect(-player.w/2, -player.h/2, player.w, player.h); }
             ctx.restore();
-
             if (char.id !== 'pepe') {
-                let aimAngle = Math.atan2(player.dirY, player.dirX);
-                ctx.save();
-                ctx.rotate(aimAngle);
-                
-                if (char.id === 'jostin') {
-                    ctx.fillStyle = '#94a3b8'; ctx.fillRect(12, -2, 12, 4); 
-                    ctx.fillStyle = '#334155'; ctx.fillRect(12, 2, 4, 6);  
-                    ctx.fillStyle = '#00ffcc'; ctx.fillRect(22, -3, 2, 2); 
-                } else if (char.id === 'tavito') {
-                    ctx.fillStyle = '#475569'; ctx.fillRect(10, -5, 22, 10); 
-                    ctx.fillStyle = '#1e293b'; ctx.fillRect(14, 5, 4, 6); ctx.fillRect(24, 5, 4, 6);
-                    ctx.fillStyle = '#a855f7'; ctx.fillRect(32, -6, 6, 12);  
-                    ctx.fillStyle = '#ef4444'; ctx.fillRect(20, -8, 6, 3);
-                }
+                let aimAngle = Math.atan2(player.dirY, player.dirX); ctx.save(); ctx.rotate(aimAngle);
+                if (char.id === 'jostin') { ctx.fillStyle = '#94a3b8'; ctx.fillRect(12, -2, 12, 4); ctx.fillStyle = '#334155'; ctx.fillRect(12, 2, 4, 6); ctx.fillStyle = '#00ffcc'; ctx.fillRect(22, -3, 2, 2); }
+                else if (char.id === 'tavito') { ctx.fillStyle = '#475569'; ctx.fillRect(10, -5, 22, 10); ctx.fillStyle = '#1e293b'; ctx.fillRect(14, 5, 4, 6); ctx.fillRect(24, 5, 4, 6); ctx.fillStyle = '#a855f7'; ctx.fillRect(32, -6, 6, 12); ctx.fillStyle = '#ef4444'; ctx.fillRect(20, -8, 6, 3); }
                 ctx.restore();
             }
-
             ctx.restore();
-
-            for(let p of projectiles) {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-                ctx.fillStyle = p.color;
-                ctx.fill();
-            }
-
-            for(let pt of particles) {
-                ctx.fillStyle = pt.color;
-                ctx.fillRect(pt.x, pt.y, pt.size, pt.size);
-            }
-
-            for(let ft of floatingTexts) {
-                ctx.fillStyle = ft.color;
-                ctx.font = '10px "Press Start 2P"';
-                ctx.fillText(ft.text, ft.x - 22, ft.y);
-            }
-
+            for(let p of projectiles) { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.fill(); }
+            for(let pt of particles) { ctx.fillStyle = pt.color; ctx.fillRect(pt.x, pt.y, pt.size, pt.size); }
+            for(let ft of floatingTexts) { ctx.fillStyle = ft.color; ctx.font = '10px "Press Start 2P"'; ctx.fillText(ft.text, ft.x - 22, ft.y); }
             ctx.restore();
 
             let screenPad = 25;
-            let timePulse = Math.abs(Math.sin(Date.now() / 200)); 
-            
+            let timePulse = Math.abs(Math.sin(Date.now() / 200));
             for (let e of enemies) {
-                let dx = e.x - player.x;
-                let dy = e.y - player.y;
-                let dist = Math.hypot(dx, dy);
-                
-                let maxWarningDist = e.visionRange * 2.5; 
-                
+                let dx = e.x - player.x, dy = e.y - player.y, dist = Math.hypot(dx, dy), maxWarningDist = e.visionRange * 2.5;
                 if (dist > 0 && dist < maxWarningDist) {
-                    let screenX = e.x - camera.x;
-                    let screenY = e.y - camera.y;
-                    
+                    let screenX = e.x - camera.x, screenY = e.y - camera.y;
                     let isOffScreen = screenX < 0 || screenX > camera.w || screenY < 0 || screenY > camera.h;
-                    
                     if (isOffScreen) {
                         let indicatorX = Math.max(screenPad, Math.min(camera.w - screenPad, screenX));
                         let indicatorY = Math.max(screenPad, Math.min(camera.h - screenPad, screenY));
-                        
                         let warnAngle = Math.atan2(screenY - indicatorY, screenX - indicatorX);
                         let alertOpacity = (1 - dist / maxWarningDist) * 0.8 + (0.2 * timePulse);
-                        
-                        ctx.save();
-                        ctx.translate(indicatorX, indicatorY);
-                        ctx.rotate(warnAngle);
-                        
-                        ctx.shadowColor = '#f43f5e';
-                        ctx.shadowBlur = 12;
-                        
+                        ctx.save(); ctx.translate(indicatorX, indicatorY); ctx.rotate(warnAngle); ctx.shadowColor = '#f43f5e'; ctx.shadowBlur = 12;
                         ctx.fillStyle = `rgba(244, 63, 94, ${Math.max(0.1, alertOpacity)})`;
-                        ctx.beginPath();
-                        ctx.moveTo(14, 0);
-                        ctx.lineTo(-8, -10);
-                        ctx.lineTo(-8, 10);
-                        ctx.closePath();
-                        ctx.fill();
-                        
-                        ctx.restore();
+                        ctx.beginPath(); ctx.moveTo(14, 0); ctx.lineTo(-8, -10); ctx.lineTo(-8, 10); ctx.closePath(); ctx.fill(); ctx.restore();
                     }
                 }
             }
-
             drawMinimap();
         }
 
         function drawMinimap() {
-            minimapCtx.fillStyle = '#03050a';
-            minimapCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
-
-            let scaleX = minimapCanvas.width / (MAP_COLS * TILE_SIZE);
-            let scaleY = minimapCanvas.height / (MAP_ROWS * TILE_SIZE);
-
-            for(let r=0; r<MAP_ROWS; r+=2) {
-                for(let c=0; c<MAP_COLS; c+=2) {
-                    if(map[r] && map[r][c] === 1) {
-                        minimapCtx.fillStyle = '#1e293b';
-                        minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
-                    } else if (map[r] && map[r][c] === 2) {
-                        minimapCtx.fillStyle = '#0f172a';
-                        minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
-                    }
-                }
+            minimapCtx.fillStyle = '#03050a'; minimapCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+            let scaleX = minimapCanvas.width / (MAP_COLS * TILE_SIZE), scaleY = minimapCanvas.height / (MAP_ROWS * TILE_SIZE);
+            for(let r=0; r<MAP_ROWS; r+=2) for(let c=0; c<MAP_COLS; c+=2) {
+                if(map[r] && map[r][c] === 1) { minimapCtx.fillStyle = '#1e293b'; minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2); }
+                else if (map[r] && map[r][c] === 2) { minimapCtx.fillStyle = '#0f172a'; minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2); }
             }
-
-            for(let item of items) {
-                minimapCtx.fillStyle = item.color;
-                minimapCtx.fillRect(item.x * scaleX - 1, item.y * scaleY - 1, 2, 2);
-            }
-
-            if (door) {
-                minimapCtx.fillStyle = '#facc15';
-                minimapCtx.fillRect(door.x * scaleX - 2, door.y * scaleY - 2, 4, 4);
-            }
-
-            minimapCtx.fillStyle = '#38bdf8';
-            minimapCtx.fillRect(player.x * scaleX - 2, player.y * scaleY - 2, 4, 4);
+            for(let item of items) { minimapCtx.fillStyle = item.color; minimapCtx.fillRect(item.x * scaleX - 1, item.y * scaleY - 1, 2, 2); }
+            if (door) { minimapCtx.fillStyle = '#facc15'; minimapCtx.fillRect(door.x * scaleX - 2, door.y * scaleY - 2, 4, 4); }
+            minimapCtx.fillStyle = '#38bdf8'; minimapCtx.fillRect(player.x * scaleX - 2, player.y * scaleY - 2, 4, 4);
         }
 
         function changeCharacter() {
             activeCharIndex = (activeCharIndex + 1) % party.length;
-            if(party[2].stealthActive && activeCharIndex !== 2) {
-                party[2].stealthActive = false;
-            }
-            
-            if (party[activeCharIndex].id === 'pepe') {
-                player.w = 28; player.h = 28;
-            } else {
-                player.w = 36; player.h = 36;
-            }
-
-            playSound('click');
-            updateHUD();
-            createParticles(player.x, player.y, '#fff', 12);
+            if(party[2].stealthActive && activeCharIndex !== 2) party[2].stealthActive = false;
+            if (party[activeCharIndex].id === 'pepe') { player.w = 28; player.h = 28; } else { player.w = 36; player.h = 36; }
+            playSound('click'); updateHUD(); createParticles(player.x, player.y, '#fff', 12);
         }
 
         function updateHUD() {
             const char = party[activeCharIndex];
             document.getElementById('hudAvatar').src = char.img.src;
             document.getElementById('hudName').innerText = char.name;
-            
             const varHighlight = getComputedStyle(document.documentElement).getPropertyValue('--highlight').trim();
-            
             let abilityText = '';
             if (char.id === 'jostin') abilityText = `Balas: ${char.ammo}`;
             else if (char.id === 'tavito') abilityText = `Bombas: ${char.ammo}`;
-            else if (char.id === 'pepe') {
-                abilityText = `Sigilo: ${Math.ceil(char.stealthTime)}s`;
-            }
+            else if (char.id === 'pepe') abilityText = `Sigilo: ${Math.ceil(char.stealthTime)}s`;
             document.getElementById('hudAbility').innerText = abilityText;
             document.getElementById('hudName').style.color = (char.id === 'pepe' && char.stealthActive) ? '#38bdf8' : varHighlight;
         }
@@ -1524,10 +1628,143 @@
             document.getElementById('gameTimer').innerText = `${mins}:${secs}`;
         }
 
+        /* =========================================================
+           EVENTOS DE CUENTAS / PERFIL
+           ========================================================= */
+        document.getElementById('btnAccountContinue').addEventListener('click', () => {
+            playSound('click');
+            if (!validateUsername(document.getElementById('accountUsername').value)) return;
+            goToAccountStep(2);
+        });
+
+        document.getElementById('accountUsername').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('btnAccountContinue').click();
+        });
+
+        document.getElementById('btnGenerateAbgId').addEventListener('click', () => {
+            playSound('click');
+            generatedAbgId = generateUniqueAbgId();
+            document.getElementById('accountAbgId').value = generatedAbgId;
+            document.getElementById('btnCreateAccount').disabled = false;
+            document.getElementById('btnGenerateAbgId').innerText = 'Generar otra';
+        });
+
+        document.getElementById('btnBackAccountStep').addEventListener('click', () => {
+            playSound('click');
+            goToAccountStep(1);
+        });
+
+        document.getElementById('btnCreateAccount').addEventListener('click', () => {
+            playSound('click');
+            finishAccountCreation();
+        });
+
+        document.getElementById('btnCancelAccountWizard').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('accountSetupScreen').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+            document.getElementById('currencyBadge').classList.remove('hidden');
+            currentState = STATES.MENU;
+            updateAccountUI();
+            attemptPlayBGM();
+        });
+
+        document.getElementById('btnProfile').addEventListener('click', () => {
+            playSound('click');
+            updateAccountUI();
+            document.getElementById('addAccountPanel').classList.remove('open');
+            document.getElementById('existingAbgIdInput').value = '';
+            document.getElementById('profileModal').classList.remove('hidden');
+            currentState = STATES.PROFILE;
+        });
+
+        document.getElementById('btnCloseProfile').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('profileModal').classList.add('hidden');
+            currentState = STATES.MENU;
+        });
+
+        document.getElementById('btnOpenAddAccount').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('addAccountPanel').classList.toggle('open');
+            if (document.getElementById('addAccountPanel').classList.contains('open')) setTimeout(() => document.getElementById('existingAbgIdInput').focus(), 30);
+        });
+
+        document.getElementById('btnCancelAddAccount').addEventListener('click', () => {
+            document.getElementById('addAccountPanel').classList.remove('open');
+            document.getElementById('existingAbgIdInput').value = '';
+        });
+
+        document.getElementById('existingAbgIdInput').addEventListener('input', e => {
+            e.target.value = normalizeAbgId(e.target.value).slice(0, 8);
+        });
+
+        document.getElementById('existingAbgIdInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('btnAddExistingAccount').click();
+        });
+
+        document.getElementById('btnAddExistingAccount').addEventListener('click', () => {
+            playSound('click');
+            const id = normalizeAbgId(document.getElementById('existingAbgIdInput').value);
+            if (!ACCOUNT_ID_REGEX.test(id)) {
+                showGameToast('ABG ID INVÁLIDA', 'Escribe exactamente 8 caracteres alfanuméricos.', '#ef4444');
+                return;
+            }
+            const target = getAccountById(id);
+            if (!target) {
+                showGameToast('CUENTA NO ENCONTRADA', 'Esa ABG ID no está guardada en este navegador. Para cuentas globales se necesita un backend.', '#facc15');
+                return;
+            }
+            setActiveAccount(target.abgId);
+            document.getElementById('addAccountPanel').classList.remove('open');
+            document.getElementById('existingAbgIdInput').value = '';
+            renderAccountList();
+        });
+
+        document.getElementById('btnCreateAnotherAccount').addEventListener('click', () => {
+            playSound('click');
+            openAccountWizard('additional');
+        });
+
+        document.getElementById('profileImageInput').addEventListener('change', e => {
+            const file = e.target.files && e.target.files[0];
+            cropAndSaveImage(file);
+            e.target.value = '';
+        });
+
+        const presetButtons = [
+            document.getElementById('presetAvatar1'),
+            document.getElementById('presetAvatar2'),
+            document.getElementById('presetAvatar3')
+        ];
+        presetButtons.forEach((btn, idx) => btn.addEventListener('click', () => {
+            playSound('click');
+            const source = ['Jostin.PNG', 'Tavito.PNG', 'Pepe.PNG'][idx];
+            setActiveAccountAvatar(source);
+            presetButtons.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            showGameToast('PERFIL ACTUALIZADO', 'Avatar de personaje seleccionado.', '#10b981');
+        }));
+
+        document.getElementById('btnSettings').addEventListener('click', () => {
+            playSound('click');
+            updateAccountUI();
+            document.getElementById('settingsModal').classList.remove('hidden');
+            currentState = STATES.MENU;
+        });
+
+        document.getElementById('btnCloseSettings').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('settingsModal').classList.add('hidden');
+            currentState = STATES.MENU;
+        });
+
+        /* =========================================================
+           JUEGO ORIGINAL
+           ========================================================= */
         document.getElementById('btnStartGame').addEventListener('click', () => {
             playSound('click');
             bgMusic.pause();
-            
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('currencyBadge').classList.add('hidden');
             document.getElementById('dialogueScreen').classList.remove('hidden');
@@ -1545,31 +1782,14 @@
             document.getElementById('storeModal').classList.add('hidden');
         });
 
-        document.getElementById('btnSettings').addEventListener('click', () => {
-            playSound('click');
-            document.getElementById('settingsModal').classList.remove('hidden');
-        });
-        
-        document.getElementById('btnCloseSettings').addEventListener('click', () => {
-            playSound('click');
-            document.getElementById('settingsModal').classList.add('hidden');
-        });
-        
-        // Volumen dinámico de la música para no requerir pausas ni reinicios
         document.getElementById('bgmVolumeSlider').addEventListener('input', (e) => {
             bgmVolume = parseFloat(e.target.value);
             bgMusic.volume = Math.max(0, Math.min(1, bgmVolume));
-            if (bgmVolume > 0 && soundEnabled && bgMusic.paused) {
-                attemptPlayBGM();
-            }
+            if (bgmVolume > 0 && soundEnabled && bgMusic.paused && currentState === STATES.MENU) attemptPlayBGM();
         });
 
-        document.getElementById('sfxVolumeSlider').addEventListener('input', (e) => {
-            sfxVolume = parseFloat(e.target.value);
-        });
-        document.getElementById('sfxVolumeSlider').addEventListener('change', () => {
-            if(soundEnabled) playSound('click');
-        });
+        document.getElementById('sfxVolumeSlider').addEventListener('input', (e) => { sfxVolume = parseFloat(e.target.value); });
+        document.getElementById('sfxVolumeSlider').addEventListener('change', () => { if(soundEnabled) playSound('click'); });
 
         document.getElementById('btnSkipDialogue').addEventListener('click', () => {
             playSound('click');
@@ -1589,35 +1809,25 @@
                 isTyping = false;
                 return;
             }
-
             if (currentDialogue >= story.length) {
                 document.getElementById('dialogueScreen').classList.add('hidden');
                 document.getElementById('instructionsScreen').classList.remove('hidden');
                 currentState = STATES.INSTRUCTIONS;
                 return;
             }
-            
             let d = story[currentDialogue];
             document.getElementById('sceneImage').src = `Escena_${currentDialogue + 1}.PNG`;
             document.getElementById('speakerName').innerText = d.s;
             playSound('click');
-            
             let textEl = document.getElementById('dialogueText');
             textEl.innerText = '';
             let i = 0;
             isTyping = true;
-            
             function typeWriter() {
-                if (i < d.t.length) {
-                    textEl.innerHTML += d.t.charAt(i);
-                    i++;
-                    typingTimeout = setTimeout(typeWriter, 20);
-                } else {
-                    isTyping = false;
-                }
+                if (i < d.t.length) { textEl.innerHTML += d.t.charAt(i); i++; typingTimeout = setTimeout(typeWriter, 20); }
+                else isTyping = false;
             }
             typeWriter();
-            
             currentDialogue++;
         }
 
@@ -1628,19 +1838,12 @@
             document.getElementById('controlsLayer').classList.remove('hidden');
             document.getElementById('btnPause').classList.remove('hidden');
             document.getElementById('currencyBadge').classList.add('hidden');
-            
             generateMap();
             updateHUD();
             currentState = STATES.PLAYING;
-            
             gameTime = 0;
             if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if (currentState === STATES.PLAYING) {
-                    gameTime++;
-                    updateTimerDisplay();
-                }
-            }, 1000);
+            timerInterval = setInterval(() => { if (currentState === STATES.PLAYING) { gameTime++; updateTimerDisplay(); } }, 1000);
         });
 
         function togglePause() {
@@ -1662,24 +1865,17 @@
         document.getElementById('btnPause').addEventListener('click', togglePause);
         document.getElementById('btnResume').addEventListener('click', togglePause);
 
-        // Control dinámico de Sonido Robusto
         function toggleAudio() {
             soundEnabled = !soundEnabled;
             let text = soundEnabled ? "🔊 Sonido: ON" : "🔇 Sonido: OFF";
             document.getElementById('btnToggleAudio').innerText = text;
             document.getElementById('btnPauseAudio').innerText = text;
-            
-            bgMusic.muted = !soundEnabled; 
-
+            bgMusic.muted = !soundEnabled;
             if (soundEnabled) {
                 playSound('click');
-                // Intentar recuperar la música de fondo solo si estamos en los menús apropiados
-                if(currentState === STATES.MENU || currentState === STATES.PRELOAD) {
-                    attemptPlayBGM();
-                }
+                if(currentState === STATES.MENU || currentState === STATES.PRELOAD) attemptPlayBGM();
             } else {
-                bgMusic.pause();
-                bgMusicStarted = false;
+                bgMusic.pause(); bgMusicStarted = false;
             }
         }
         document.getElementById('btnToggleAudio').addEventListener('click', toggleAudio);
@@ -1691,22 +1887,22 @@
             document.getElementById('gameHUD').classList.add('hidden');
             document.getElementById('controlsLayer').classList.add('hidden');
             document.getElementById('btnPause').classList.add('hidden');
-            
-            updateCupDisplay();
             document.getElementById('currencyBadge').classList.remove('hidden');
 
             let endScreen = document.getElementById('endScreen');
             endScreen.classList.remove('hidden');
-            
             let mins = Math.floor(gameTime / 60).toString().padStart(2, '0');
             let secs = (gameTime % 60).toString().padStart(2, '0');
             document.getElementById('endStats').innerText = `Tiempo de escape: ${mins}:${secs}`;
 
             if(win) {
                 playerCups += 1;
+                if (activeAccount) {
+                    activeAccount.cups = playerCups;
+                    persistActiveAccount();
+                }
                 localStorage.setItem('emdcg_cups', playerCups);
                 updateCupDisplay();
-
                 document.getElementById('endTitle').innerText = "¡VICTORIA!";
                 document.getElementById('endTitle').style.color = "#facc15";
                 document.getElementById('endDesc').innerText = "Han escapado con éxito de La Ciudad EMCD.";
@@ -1730,14 +1926,10 @@
             if(key === 'a' || e.key === 'ArrowLeft') keys.a = true;
             if(key === 's' || e.key === 'ArrowDown') keys.s = true;
             if(key === 'd' || e.key === 'ArrowRight') keys.d = true;
-            
             if(key === '1') { activeCharIndex=0; changeCharacter(); }
             if(key === '2') { activeCharIndex=1; changeCharacter(); }
             if(key === '3') { activeCharIndex=2; changeCharacter(); }
-            
-            if(key === ' ' && !keys.space) {
-                keys.space = true; triggerAction();
-            }
+            if(key === ' ' && !keys.space) { keys.space = true; triggerAction(); }
         });
         window.addEventListener('keyup', (e) => {
             const key = e.key.toLowerCase();
@@ -1748,13 +1940,11 @@
             if(key === ' ') keys.space = false;
         });
 
-        document.getElementById('btnAction').addEventListener('touchstart', (e) => { e.preventDefault(); triggerAction(); });
+        document.getElementById('btnAction').addEventListener('touchstart', (e) => { e.preventDefault(); triggerAction(); }, {passive:false});
         document.getElementById('btnAction').addEventListener('mousedown', (e) => { e.preventDefault(); triggerAction(); });
-        
-        document.getElementById('btnSwap').addEventListener('touchstart', (e) => { e.preventDefault(); changeCharacter(); });
+        document.getElementById('btnSwap').addEventListener('touchstart', (e) => { e.preventDefault(); changeCharacter(); }, {passive:false});
         document.getElementById('btnSwap').addEventListener('mousedown', (e) => { e.preventDefault(); changeCharacter(); });
-
-        document.getElementById('btnAvisar').addEventListener('touchstart', (e) => { e.preventDefault(); avisarLlave(); });
+        document.getElementById('btnAvisar').addEventListener('touchstart', (e) => { e.preventDefault(); avisarLlave(); }, {passive:false});
         document.getElementById('btnAvisar').addEventListener('mousedown', (e) => { e.preventDefault(); avisarLlave(); });
 
         const joystickZone = document.getElementById('joystickZone');
@@ -1764,33 +1954,22 @@
         function handleJoystickMove(e) {
             e.preventDefault();
             if(!joystick.active) return;
-            
             let touch = e.touches ? e.touches[0] : e;
             if(!jzRect) jzRect = joystickZone.getBoundingClientRect();
-            
             let centerX = jzRect.left + jzRect.width/2;
             let centerY = jzRect.top + jzRect.height/2;
-            
             let dx = touch.clientX - centerX;
             let dy = touch.clientY - centerY;
-            
             let mag = Math.hypot(dx, dy);
             let maxR = jzRect.width/2 - 25;
-            
-            if(mag > maxR) {
-                dx = (dx/mag) * maxR;
-                dy = (dy/mag) * maxR;
-            }
-            
+            if(mag > maxR) { dx = (dx/mag) * maxR; dy = (dy/mag) * maxR; }
             joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
             joystick.dx = dx / maxR;
             joystick.dy = dy / maxR;
         }
-
         joystickZone.addEventListener('touchstart', (e) => { e.preventDefault(); joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); }, {passive:false});
         joystickZone.addEventListener('touchmove', handleJoystickMove, {passive:false});
         joystickZone.addEventListener('touchend', (e) => { e.preventDefault(); joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }, {passive:false});
-        
         joystickZone.addEventListener('mousedown', (e) => { joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); });
         document.addEventListener('mousemove', (e) => { if(joystick.active) handleJoystickMove(e); });
         document.addEventListener('mouseup', () => { if(joystick.active) { joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }});
@@ -1801,6 +1980,8 @@
             requestAnimationFrame(gameLoop);
         }
 
+        // Arranque del sistema de juego
+        initializeAccounts();
         gameLoop();
     </script>
 </body>
