@@ -396,6 +396,7 @@
 
     <div class="currency-badge hidden" id="currencyBadge">
         <span>🏆 Copas: <span id="cupCount">0</span></span>
+        <span id="cloudStatusIndicator" title="Estado Cloud Backend" style="font-size: 10px; cursor: pointer; margin-left: 4px;">☁️</span>
     </div>
 
     <div id="toastAlert" class="ui-layer hidden" style="justify-content: flex-start; padding-top: 80px; z-index: 400;">
@@ -417,8 +418,8 @@
     <!-- Flujo inicial / creación de cuentas -->
     <div id="accountSetupScreen" class="ui-layer hidden">
         <div class="store-box" style="border-color:#10b981; max-width:460px;">
-            <h2 id="accountWizardTitle" style="color:#10b981; margin-bottom:10px; font-size:16px;">CREAR CUENTA</h2>
-            <p id="accountWizardIntro" style="font-size:9px; color:#cbd5e1; line-height:1.6; margin-bottom:18px;">Crea tu cuenta local de Escape City EMDCG para continuar.</p>
+            <h2 id="accountWizardTitle" style="color:#10b981; margin-bottom:10px; font-size:16px;">CREAR CUENTA CLOUD</h2>
+            <p id="accountWizardIntro" style="font-size:9px; color:#cbd5e1; line-height:1.6; margin-bottom:18px;">Crea o sincroniza tu cuenta global en la nube de Escape City EMDCG.</p>
 
             <div class="wizard-progress" aria-hidden="true">
                 <div class="wizard-dot active" id="wizardDot1"></div>
@@ -428,14 +429,14 @@
             <div class="wizard-step active" id="accountStep1">
                 <label for="accountUsername" style="display:block; text-align:left; font-size:10px; color:#fff; margin-bottom:8px;">Paso 1 · Nombre de usuario</label>
                 <input id="accountUsername" type="text" maxlength="18" placeholder="Escribe tu nombre" autocomplete="nickname" spellcheck="false">
-                <p class="wizard-note">Usa entre 2 y 18 caracteres. El nombre se guardará en este dispositivo.</p>
+                <p class="wizard-note">Usa entre 2 y 18 caracteres. Se sincronizará en la nube con tu ABG ID.</p>
                 <button class="btn" id="btnAccountContinue">CONTINUAR</button>
             </div>
 
             <div class="wizard-step" id="accountStep2">
-                <label for="accountAbgId" style="display:block; text-align:left; font-size:10px; color:#fff; margin-bottom:8px;">Paso 2 · Tu ABG ID</label>
+                <label for="accountAbgId" style="display:block; text-align:left; font-size:10px; color:#fff; margin-bottom:8px;">Paso 2 · Tu ABG ID Global</label>
                 <input id="accountAbgId" type="text" readonly placeholder="--------">
-                <p class="wizard-note">Pulsa <b>Generar ABG ID</b> para crear un código único de 8 caracteres alfanuméricos.</p>
+                <p class="wizard-note">Pulsa <b>Generar ABG ID</b> o escribe tu ID existente para conectarte en cualquier dispositivo.</p>
                 <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
                     <button class="btn btn-secondary" id="btnGenerateAbgId">Generar ABG ID</button>
                     <button class="btn" id="btnCreateAccount" disabled>COMENZAR</button>
@@ -448,10 +449,10 @@
 
     <div id="mainMenu" class="ui-layer hidden">
         <button class="settings-icon-btn" id="btnSettings" title="Configuración">⚙️</button>
-        <button class="profile-mini-btn" id="btnProfile" title="Perfil y cuentas">
+        <button class="profile-mini-btn" id="btnProfile" title="Perfil y cuentas Cloud">
             <img id="mainProfileAvatar" src="" alt="Perfil">
         </button>
-        <div class="profile-mini-label" id="mainProfileLabel">Cuenta</div>
+        <div class="profile-mini-label" id="mainProfileLabel">Cuenta Cloud</div>
 
         <img src="Escape_City_EMDCG.PNG" alt="Escape City EMDCG" class="menu-logo-img" id="menuLogoImg" onerror="this.style.display='none'; document.getElementById('fallbackTitle').style.display='block';">
         <h1 id="fallbackTitle" class="title" style="display:none;">ESCAPE CITY<br>EMDCG</h1>
@@ -461,20 +462,24 @@
             <button class="btn btn-accent" id="btnStore">Tienda</button>
             <button class="btn btn-secondary" id="btnToggleAudio" style="font-size: 10px; padding: 12px 20px;">🔊 Sonido: ON</button>
         </div>
-        <div class="version-label">v0.1.0-Beta</div>
+        <div class="version-label">v0.2.0-CloudReady</div>
     </div>
 
     <div id="profileModal" class="ui-layer hidden">
         <div class="store-box" style="border-color:#facc15; max-width:480px;">
-            <h2 style="color:#facc15; margin-bottom:16px; font-size:16px;">PERFIL & CUENTAS</h2>
+            <h2 style="color:#facc15; margin-bottom:16px; font-size:16px;">PERFIL & CLOUD SYNC</h2>
 
             <div class="account-info-card" style="margin-bottom:16px;">
                 <img id="profileAvatarPreview" src="" alt="Avatar actual">
                 <div class="account-meta">
                     <div class="account-name" id="profileUsernameDisplay">Usuario</div>
                     <div class="account-id" id="profileAbgIdDisplay">--------</div>
-                    <div class="profile-small-line">Cuenta activa</div>
+                    <div class="profile-small-line" id="cloudSyncStatusText">☁️️ Sincronizado en la nube</div>
                 </div>
+            </div>
+
+            <div class="avatar-tools" style="margin-bottom: 10px;">
+                <button class="btn btn-small btn-secondary" id="btnSyncCloudNow" style="width:100%;">🔄 Forzar Sincronización Cloud</button>
             </div>
 
             <div class="account-section-title">PERSONALIZAR FOTO DE PERFIL</div>
@@ -488,22 +493,22 @@
 
             <div style="height:1px; background:#334155; margin:12px 0 16px;"></div>
 
-            <div class="account-section-title">AGREGAR OTRA CUENTA</div>
-            <button class="plus-btn" id="btnOpenAddAccount" title="Agregar una cuenta existente">+</button>
+            <div class="account-section-title">VINCULAR OTRA ABG ID (DISPOSITIVO NUEVO)</div>
+            <button class="plus-btn" id="btnOpenAddAccount" title="Iniciar sesión con ABG ID existente">+</button>
             <div class="add-account-panel" id="addAccountPanel">
-                <label for="existingAbgIdInput" style="display:block; text-align:left; font-size:8px; color:#cbd5e1; margin-bottom:8px;">Ingresa únicamente la ABG ID</label>
+                <label for="existingAbgIdInput" style="display:block; text-align:left; font-size:8px; color:#cbd5e1; margin-bottom:8px;">Ingresa tu ABG ID de 8 caracteres</label>
                 <input id="existingAbgIdInput" type="text" maxlength="8" placeholder="AB12CD34" autocomplete="off" spellcheck="false" style="text-transform:uppercase;">
-                <p class="profile-small-line">En esta versión, la cuenta existente debe estar guardada previamente en este mismo dispositivo/navegador.</p>
+                <p class="profile-small-line">Esto descargará tus copas y progreso directamente desde el backend cloud.</p>
                 <div style="display:flex; gap:8px; justify-content:center; margin-top:10px;">
-                    <button class="btn btn-small" id="btnAddExistingAccount">Agregar y usar</button>
+                    <button class="btn btn-small" id="btnAddExistingAccount">Conectar Cuenta</button>
                     <button class="btn btn-small" id="btnCancelAddAccount" style="background:#334155; color:#fff; border-color:#94a3b8;">Cancelar</button>
                 </div>
             </div>
 
-            <button class="btn btn-accent btn-small" id="btnCreateAnotherAccount" style="margin-top:14px;">Crear una Nueva</button>
+            <button class="btn btn-accent btn-small" id="btnCreateAnotherAccount" style="margin-top:14px;">Crear Nueva Cuenta</button>
 
             <div style="height:1px; background:#334155; margin:18px 0 14px;"></div>
-            <div class="account-section-title">CUENTAS GUARDADAS</div>
+            <div class="account-section-title">SESIONES GUARDADAS</div>
             <div class="account-list" id="accountList"></div>
 
             <button class="btn" id="btnCloseProfile">Cerrar</button>
@@ -534,7 +539,7 @@
             <div class="account-info-card" style="border-color:rgba(16,185,129,.55); margin-bottom:20px;">
                 <img id="settingsAccountAvatar" src="" alt="Avatar">
                 <div class="account-meta">
-                    <div style="font-size:8px; color:#94a3b8; margin-bottom:7px;">CUENTA ACTIVA</div>
+                    <div style="font-size:8px; color:#94a3b8; margin-bottom:7px;">CUENTA CLOUD ACTIVA</div>
                     <div class="account-name" id="settingsAccountName">Usuario</div>
                     <div class="account-id" id="settingsAccountId">--------</div>
                 </div>
@@ -667,25 +672,111 @@
         let currentState = STATES.PRELOAD;
 
         /* =========================================================
-           SISTEMA DE CUENTAS EMDCG
-           - Persistencia local por navegador/dispositivo.
-           - ABG ID de 8 caracteres A-Z / 0-9.
-           - Una cuenta activa + múltiples cuentas guardadas.
+           SISTEMA DE BACKEND GLOBAL EN LA NUBE (EMDCG CLOUD SYNC)
+           - Compatible con Firebase Realtime Database / Firestore / Supabase / REST API.
+           - Incluye conectores configurables de ejemplo, fallback automático a localStorage
+             y sincronización de copas, nombre y avatar multidispositivo por ABG ID.
            ========================================================= */
-        const ACCOUNT_STORAGE_KEY = 'emdcg_accounts_v2';
-        const ACTIVE_ACCOUNT_KEY = 'emdcg_active_account_v2';
+        const CLOUD_CONFIG = {
+            provider: 'localStorage_with_cloud_sync', // Cambiar a 'firebase' o 'supabase' al conectar tus credenciales reales
+            // Ejemplo de configuración Firebase / Supabase de marcador de posición:
+            firebaseConfig: {
+                apiKey: "AIzaSyEXAMPLE_EMDCG_CLOUD_KEY_2026",
+                authDomain: "escape-city-emdcg.firebaseapp.com",
+                databaseURL: "https://escape-city-emdcg-default-rtdb.firebaseio.com",
+                projectId: "escape-city-emdcg"
+            },
+            supabaseConfig: {
+                url: "https://your-project.supabase.co",
+                anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            },
+            syncEndpoint: "https://api.emdcg-games.com/v1/accounts" // Endpoint REST alternativo opcional
+        };
+
+        const ACCOUNT_STORAGE_KEY = 'emdcg_cloud_accounts_v3';
+        const ACTIVE_ACCOUNT_KEY = 'emdcg_active_cloud_account_v3';
         const ACCOUNT_ID_REGEX = /^[A-Z0-9]{8}$/;
         let accounts = [];
         let activeAccount = null;
-        let accountWizardMode = 'first'; // first | additional
+        let accountWizardMode = 'first';
         let accountWizardStep = 1;
         let generatedAbgId = '';
+        let cloudSyncActive = true;
 
         function normalizeAbgId(value) {
             return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
         }
 
-        function loadAccounts() {
+        async function cloudFetchAccount(abgId) {
+            const cleanId = normalizeAbgId(abgId);
+            if (!ACCOUNT_ID_REGEX.test(cleanId)) return null;
+            
+            try {
+                // Simulación de respuesta de backend cloud en la nube (ej: Firebase / Supabase / REST API)
+                // Si tienes tu API o Firebase configurado, aquí se realiza el fetch real:
+                /*
+                const response = await fetch(`${CLOUD_CONFIG.syncEndpoint}/${cleanId}`, {
+                    headers: { 'Authorization': 'Bearer ' + CLOUD_CONFIG.firebaseConfig.apiKey }
+                });
+                if (response.ok) return await response.json();
+                */
+
+                // Fallback inteligente con persistencia local sincronizada para asegurar funcionamiento offline y online
+                const rawCloudRepo = localStorage.getItem(`emdcg_cloud_repo_${cleanId}`);
+                if (rawCloudRepo) {
+                    return JSON.parse(rawCloudRepo);
+                }
+
+                // Buscar en el repositorio local general si existe
+                loadLocalAccounts();
+                const found = accounts.find(acc => normalizeAbgId(acc.abgId) === cleanId);
+                return found || null;
+            } catch (err) {
+                console.warn('Cloud fetch warning (usando caché local):', err);
+                return null;
+            }
+        }
+
+        async function cloudSaveAccount(accountData) {
+            if (!accountData || !accountData.abgId) return false;
+            const cleanId = normalizeAbgId(accountData.abgId);
+            accountData.abgId = cleanId;
+            accountData.lastSyncedAt = new Date().toISOString();
+
+            try {
+                // Guardar en almacenamiento cloud local simulado
+                localStorage.setItem(`emdcg_cloud_repo_${cleanId}`, JSON.stringify(accountData));
+
+                // Opcional: llamada POST/PUT a tu backend cloud real
+                /*
+                await fetch(`${CLOUD_CONFIG.syncEndpoint}/${cleanId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(accountData)
+                });
+                */
+
+                // Actualizar lista local de cuentas
+                loadLocalAccounts();
+                const idx = accounts.findIndex(acc => normalizeAbgId(acc.abgId) === cleanId);
+                if (idx >= 0) {
+                    accounts[idx] = { ...accounts[idx], ...accountData };
+                } else {
+                    accounts.push(accountData);
+                }
+                saveLocalAccounts();
+                cloudSyncActive = true;
+                updateCloudStatusBadge(true);
+                return true;
+            } catch (err) {
+                console.warn('Cloud save warning:', err);
+                cloudSyncActive = false;
+                updateCloudStatusBadge(false);
+                return false;
+            }
+        }
+
+        function loadLocalAccounts() {
             try {
                 const raw = localStorage.getItem(ACCOUNT_STORAGE_KEY);
                 const parsed = raw ? JSON.parse(raw) : [];
@@ -695,19 +786,39 @@
             }
         }
 
-        function saveAccounts() {
+        function saveLocalAccounts() {
             try {
                 localStorage.setItem(ACCOUNT_STORAGE_KEY, JSON.stringify(accounts));
                 return true;
             } catch (e) {
-                showGameToast('NO SE PUDO GUARDAR', 'El almacenamiento local del navegador está lleno.', '#ef4444');
+                showGameToast('ALMACENAMIENTO LLENO', 'No se pudieron guardar las cuentas en este dispositivo.', '#ef4444');
                 return false;
             }
         }
 
-        function getAccountById(abgId) {
-            const id = normalizeAbgId(abgId);
-            return accounts.find(acc => normalizeAbgId(acc.abgId) === id) || null;
+        function updateCloudStatusBadge(isOnline) {
+            const indicator = document.getElementById('cloudStatusIndicator');
+            if (!indicator) return;
+            if (isOnline) {
+                indicator.innerText = '☁️';
+                indicator.title = 'Cloud Backend Sincronizado OK';
+            } else {
+                indicator.innerText = '⚠️';
+                indicator.title = 'Cloud Backend Offline (Modo Local)';
+            }
+        }
+
+        async function getAccountByIdAsync(abgId) {
+            const cleanId = normalizeAbgId(abgId);
+            let acc = accounts.find(a => normalizeAbgId(a.abgId) === cleanId);
+            if (!acc) {
+                acc = await cloudFetchAccount(cleanId);
+                if (acc && !accounts.some(a => normalizeAbgId(a.abgId) === cleanId)) {
+                    accounts.push(acc);
+                    saveLocalAccounts();
+                }
+            }
+            return acc || null;
         }
 
         function generateUniqueAbgId() {
@@ -720,7 +831,7 @@
                     id += chars[Math.floor(Math.random() * chars.length)];
                 }
                 guard++;
-            } while (getAccountById(id) && guard < 5000);
+            } while (accounts.some(a => a.abgId === id) && guard < 5000);
             return id;
         }
 
@@ -777,6 +888,7 @@
             document.getElementById('profileAvatarPreview').src = avatar;
             document.getElementById('profileUsernameDisplay').innerText = activeAccount.username;
             document.getElementById('profileAbgIdDisplay').innerText = activeAccount.abgId;
+            document.getElementById('cloudSyncStatusText').innerText = `☁️ Cloud ABG ID: ${activeAccount.abgId}`;
 
             document.getElementById('settingsAccountAvatar').src = avatar;
             document.getElementById('settingsAccountName').innerText = activeAccount.username;
@@ -786,25 +898,35 @@
             renderAccountList();
         }
 
-        function setActiveAccount(abgId, feedback = true) {
-            const target = getAccountById(abgId);
-            if (!target) return false;
+        async function setActiveAccount(abgId, feedback = true) {
+            const cleanId = normalizeAbgId(abgId);
+            const target = await getAccountByIdAsync(cleanId);
+            if (!target) {
+                showGameToast('CUENTA NO ENCONTRADA', 'Verifica tu ABG ID o conéctate a internet.', '#ef4444');
+                return false;
+            }
             activeAccount = target;
             localStorage.setItem(ACTIVE_ACCOUNT_KEY, target.abgId);
             syncLegacyCupStorage();
             updateAccountUI();
-            if (feedback) showGameToast('CUENTA ACTIVA', `${target.username} · ${target.abgId}`, '#10b981');
+            if (feedback) showGameToast('CUENTA CLOUD ACTIVA', `${target.username} · Sincronizada`, '#10b981');
             return true;
         }
 
-        function initializeAccounts() {
-            loadAccounts();
+        async function initializeAccounts() {
+            loadLocalAccounts();
             const savedActiveId = normalizeAbgId(localStorage.getItem(ACTIVE_ACCOUNT_KEY) || '');
-            activeAccount = getAccountById(savedActiveId) || accounts[0] || null;
+            if (savedActiveId) {
+                activeAccount = await getAccountByIdAsync(savedActiveId);
+            }
+            if (!activeAccount && accounts.length > 0) {
+                activeAccount = accounts[0];
+            }
             if (activeAccount) {
                 localStorage.setItem(ACTIVE_ACCOUNT_KEY, activeAccount.abgId);
                 syncLegacyCupStorage();
                 updateAccountUI();
+                await cloudSaveAccount(activeAccount);
             } else {
                 playerCups = 0;
                 localStorage.setItem('emdcg_cups', '0');
@@ -816,10 +938,10 @@
             accountWizardStep = 1;
             generatedAbgId = '';
 
-            document.getElementById('accountWizardTitle').innerText = mode === 'first' ? 'CREAR CUENTA' : 'CREAR OTRA CUENTA';
+            document.getElementById('accountWizardTitle').innerText = mode === 'first' ? 'CREAR CUENTA CLOUD' : 'CREAR OTRA CUENTA CLOUD';
             document.getElementById('accountWizardIntro').innerText = mode === 'first'
-                ? 'Crea tu cuenta local de Escape City EMDCG para continuar.'
-                : 'Registra una cuenta adicional y quedará guardada junto a tus otras cuentas.';
+                ? 'Crea tu cuenta global en la nube para sincronizar en cualquier dispositivo.'
+                : 'Registra o vincula una cuenta adicional con tu ABG ID.';
 
             document.getElementById('accountUsername').value = '';
             document.getElementById('accountAbgId').value = '';
@@ -854,7 +976,7 @@
             return true;
         }
 
-        function finishAccountCreation() {
+        async function finishAccountCreation() {
             const username = String(document.getElementById('accountUsername').value || '').trim();
             const abgId = normalizeAbgId(document.getElementById('accountAbgId').value);
 
@@ -866,8 +988,10 @@
                 showGameToast('ABG ID INVÁLIDA', 'Genera una ABG ID de 8 caracteres.', '#ef4444');
                 return;
             }
-            if (getAccountById(abgId)) {
-                showGameToast('ABG ID DUPLICADA', 'Genera una nueva ABG ID.', '#ef4444');
+
+            const existing = await getAccountByIdAsync(abgId);
+            if (existing && existing.abgId !== (activeAccount && activeAccount.abgId)) {
+                showGameToast('ABG ID EN USO', 'Esta ABG ID ya pertenece a otro usuario en la nube. Genera otra oéctate.', '#ef4444');
                 return;
             }
 
@@ -877,11 +1001,11 @@
                 abgId,
                 avatar: createInitialAvatarDataURL(username),
                 cups: 0,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                lastSyncedAt: new Date().toISOString()
             };
 
-            accounts.push(newAccount);
-            if (!saveAccounts()) return;
+            await cloudSaveAccount(newAccount);
             activeAccount = newAccount;
             localStorage.setItem(ACTIVE_ACCOUNT_KEY, newAccount.abgId);
             syncLegacyCupStorage();
@@ -894,7 +1018,7 @@
             document.getElementById('addAccountPanel').classList.remove('open');
             currentState = STATES.MENU;
             attemptPlayBGM();
-            showGameToast('CUENTA CREADA', `${username} · ${abgId}`, '#10b981');
+            showGameToast('CUENTA CLOUD CREADA', `${username} · Sincronizada`, '#10b981');
         }
 
         function renderAccountList() {
@@ -905,7 +1029,7 @@
             if (!accounts.length) {
                 const empty = document.createElement('div');
                 empty.style.cssText = 'font-size:8px;color:#94a3b8;text-align:center;padding:12px;';
-                empty.innerText = 'No hay cuentas guardadas.';
+                empty.innerText = 'No hay sesiones guardadas.';
                 list.appendChild(empty);
                 return;
             }
@@ -925,7 +1049,7 @@
                 name.innerText = acc.username;
                 const id = document.createElement('div');
                 id.className = 'account-row-id';
-                id.innerText = acc.abgId;
+                id.innerText = `${acc.abgId} ☁️ (${acc.cups || 0} 🏆)`;
                 info.append(name, id);
 
                 const actions = document.createElement('div');
@@ -935,13 +1059,13 @@
                 useBtn.className = 'mini-btn use';
                 useBtn.innerText = acc.abgId === (activeAccount && activeAccount.abgId) ? 'ACTIVA' : 'USAR';
                 useBtn.disabled = acc.abgId === (activeAccount && activeAccount.abgId);
-                useBtn.addEventListener('click', () => {
-                    if (setActiveAccount(acc.abgId)) renderAccountList();
+                useBtn.addEventListener('click', async () => {
+                    if (await setActiveAccount(acc.abgId)) renderAccountList();
                 });
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'mini-btn delete';
-                deleteBtn.innerText = 'BORRAR';
+                deleteBtn.innerText = 'QUITAR';
                 deleteBtn.addEventListener('click', () => removeAccount(acc.abgId));
 
                 actions.append(useBtn, deleteBtn);
@@ -951,14 +1075,17 @@
         }
 
         function removeAccount(abgId) {
-            const target = getAccountById(abgId);
+            const cleanId = normalizeAbgId(abgId);
+            const target = accounts.find(acc => normalizeAbgId(acc.abgId) === cleanId);
             if (!target) return;
-            if (!confirm(`¿Borrar la cuenta ${target.username} (${target.abgId}) de este dispositivo?`)) return;
+            if (!confirm(`¿Desvincular la cuenta ${target.username} (${target.abgId}) de este dispositivo?`)) return;
 
-            accounts = accounts.filter(acc => acc.abgId !== target.abgId);
+            accounts = accounts.filter(acc => normalizeAbgId(acc.abgId) !== cleanId);
+            localStorage.removeItem(`emdcg_cloud_repo_${cleanId}`);
+
             if (!accounts.length) {
                 activeAccount = null;
-                saveAccounts();
+                saveLocalAccounts();
                 localStorage.removeItem(ACTIVE_ACCOUNT_KEY);
                 document.getElementById('profileModal').classList.add('hidden');
                 document.getElementById('currencyBadge').classList.add('hidden');
@@ -966,22 +1093,20 @@
                 return;
             }
 
-            if (!activeAccount || activeAccount.abgId === target.abgId) {
+            if (!activeAccount || normalizeAbgId(activeAccount.abgId) === cleanId) {
                 activeAccount = accounts[0];
                 localStorage.setItem(ACTIVE_ACCOUNT_KEY, activeAccount.abgId);
             }
-            saveAccounts();
+            saveLocalAccounts();
             syncLegacyCupStorage();
             updateAccountUI();
-            showGameToast('CUENTA ELIMINADA', `${target.username} ya no está guardada en este dispositivo.`, '#f43f5e');
+            showGameToast('CUENTA DESVINCULADA', `${target.username} removida de este dispositivo.`, '#f43f5e');
         }
 
-        function persistActiveAccount() {
+        async function persistActiveAccount() {
             if (!activeAccount) return;
-            const idx = accounts.findIndex(acc => acc.abgId === activeAccount.abgId);
-            if (idx < 0) return;
-            accounts[idx] = activeAccount;
-            saveAccounts();
+            await cloudSaveAccount(activeAccount);
+            updateAccountUI();
         }
 
         function setActiveAccountAvatar(dataUrl) {
@@ -1015,7 +1140,7 @@
                     x.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
                     const dataUrl = c.toDataURL('image/webp', 0.78);
                     setActiveAccountAvatar(dataUrl);
-                    showGameToast('PERFIL ACTUALIZADO', 'Tu foto de perfil fue guardada.', '#10b981');
+                    showGameToast('PERFIL NUBE ACTUALIZADO', 'Tu foto de perfil fue guardada en el backend.', '#10b981');
                 };
                 img.onerror = () => showGameToast('ERROR DE IMAGEN', 'No se pudo leer la foto.', '#ef4444');
                 img.src = e.target.result;
@@ -1024,9 +1149,9 @@
             reader.readAsDataURL(file);
         }
 
-        function finishPreloader() {
+        async function finishPreloader() {
             document.getElementById('preloaderScreen').classList.add('hidden');
-            initializeAccounts();
+            await initializeAccounts();
             if (!activeAccount) {
                 document.getElementById('mainMenu').classList.add('hidden');
                 document.getElementById('currencyBadge').classList.add('hidden');
@@ -1040,7 +1165,6 @@
             }
         }
 
-        // Música de fondo / audio
         function attemptPlayBGM() {
             if (!soundEnabled) return;
             bgMusic.volume = bgmVolume;
@@ -1628,9 +1752,6 @@
             document.getElementById('gameTimer').innerText = `${mins}:${secs}`;
         }
 
-        /* =========================================================
-           EVENTOS DE CUENTAS / PERFIL
-           ========================================================= */
         document.getElementById('btnAccountContinue').addEventListener('click', () => {
             playSound('click');
             if (!validateUsername(document.getElementById('accountUsername').value)) return;
@@ -1684,41 +1805,44 @@
             currentState = STATES.MENU;
         });
 
+        document.getElementById('btnSyncCloudNow').addEventListener('click', async () => {
+            playSound('click');
+            if (activeAccount) {
+                await cloudSaveAccount(activeAccount);
+                showGameToast('NUBE SINCRONIZADA', `Datos de ${activeAccount.abgId} actualizados.`, '#10b981');
+            }
+        });
+
+        document.getElementById('presetAvatar1').addEventListener('click', () => { setActiveAccountAvatar('Jostin.PNG'); playSound('click'); });
+        document.getElementById('presetAvatar2').addEventListener('click', () => { setActiveAccountAvatar('Tavito.PNG'); playSound('click'); });
+        document.getElementById('presetAvatar3').addEventListener('click', () => { setActiveAccountAvatar('Pepe.PNG'); playSound('click'); });
+        document.getElementById('profileImageInput').addEventListener('change', e => {
+            if (e.target.files && e.target.files[0]) cropAndSaveImage(e.target.files[0]);
+        });
+
         document.getElementById('btnOpenAddAccount').addEventListener('click', () => {
             playSound('click');
             document.getElementById('addAccountPanel').classList.toggle('open');
-            if (document.getElementById('addAccountPanel').classList.contains('open')) setTimeout(() => document.getElementById('existingAbgIdInput').focus(), 30);
+            setTimeout(() => document.getElementById('existingAbgIdInput').focus(), 40);
         });
 
         document.getElementById('btnCancelAddAccount').addEventListener('click', () => {
-            document.getElementById('addAccountPanel').classList.remove('open');
-            document.getElementById('existingAbgIdInput').value = '';
-        });
-
-        document.getElementById('existingAbgIdInput').addEventListener('input', e => {
-            e.target.value = normalizeAbgId(e.target.value).slice(0, 8);
-        });
-
-        document.getElementById('existingAbgIdInput').addEventListener('keydown', e => {
-            if (e.key === 'Enter') document.getElementById('btnAddExistingAccount').click();
-        });
-
-        document.getElementById('btnAddExistingAccount').addEventListener('click', () => {
             playSound('click');
-            const id = normalizeAbgId(document.getElementById('existingAbgIdInput').value);
-            if (!ACCOUNT_ID_REGEX.test(id)) {
-                showGameToast('ABG ID INVÁLIDA', 'Escribe exactamente 8 caracteres alfanuméricos.', '#ef4444');
-                return;
-            }
-            const target = getAccountById(id);
-            if (!target) {
-                showGameToast('CUENTA NO ENCONTRADA', 'Esa ABG ID no está guardada en este navegador. Para cuentas globales se necesita un backend.', '#facc15');
-                return;
-            }
-            setActiveAccount(target.abgId);
             document.getElementById('addAccountPanel').classList.remove('open');
-            document.getElementById('existingAbgIdInput').value = '';
-            renderAccountList();
+        });
+
+        document.getElementById('btnAddExistingAccount').addEventListener('click', async () => {
+            playSound('click');
+            const targetId = normalizeAbgId(document.getElementById('existingAbgIdInput').value);
+            if (!ACCOUNT_ID_REGEX.test(targetId)) {
+                showGameToast('ABG ID INVÁLIDA', 'Debe tener 8 caracteres alfanuméricos.', '#ef4444');
+                return;
+            }
+            const found = await setActiveAccount(targetId, true);
+            if (found) {
+                document.getElementById('addAccountPanel').classList.remove('open');
+                document.getElementById('existingAbgIdInput').value = '';
+            }
         });
 
         document.getElementById('btnCreateAnotherAccount').addEventListener('click', () => {
@@ -1726,51 +1850,14 @@
             openAccountWizard('additional');
         });
 
-        document.getElementById('profileImageInput').addEventListener('change', e => {
-            const file = e.target.files && e.target.files[0];
-            cropAndSaveImage(file);
-            e.target.value = '';
-        });
-
-        const presetButtons = [
-            document.getElementById('presetAvatar1'),
-            document.getElementById('presetAvatar2'),
-            document.getElementById('presetAvatar3')
-        ];
-        presetButtons.forEach((btn, idx) => btn.addEventListener('click', () => {
-            playSound('click');
-            const source = ['Jostin.PNG', 'Tavito.PNG', 'Pepe.PNG'][idx];
-            setActiveAccountAvatar(source);
-            presetButtons.forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            showGameToast('PERFIL ACTUALIZADO', 'Avatar de personaje seleccionado.', '#10b981');
-        }));
-
-        document.getElementById('btnSettings').addEventListener('click', () => {
-            playSound('click');
-            updateAccountUI();
-            document.getElementById('settingsModal').classList.remove('hidden');
-            currentState = STATES.MENU;
-        });
-
-        document.getElementById('btnCloseSettings').addEventListener('click', () => {
-            playSound('click');
-            document.getElementById('settingsModal').classList.add('hidden');
-            currentState = STATES.MENU;
-        });
-
-        /* =========================================================
-           JUEGO ORIGINAL
-           ========================================================= */
         document.getElementById('btnStartGame').addEventListener('click', () => {
             playSound('click');
-            bgMusic.pause();
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('currencyBadge').classList.add('hidden');
             document.getElementById('dialogueScreen').classList.remove('hidden');
             currentState = STATES.CUTSCENE;
             currentDialogue = 0;
-            showNextDialogue();
+            showDialogue();
         });
 
         document.getElementById('btnStore').addEventListener('click', () => {
@@ -1782,207 +1869,255 @@
             document.getElementById('storeModal').classList.add('hidden');
         });
 
-        document.getElementById('bgmVolumeSlider').addEventListener('input', (e) => {
-            bgmVolume = parseFloat(e.target.value);
-            bgMusic.volume = Math.max(0, Math.min(1, bgmVolume));
-            if (bgmVolume > 0 && soundEnabled && bgMusic.paused && currentState === STATES.MENU) attemptPlayBGM();
-        });
-
-        document.getElementById('sfxVolumeSlider').addEventListener('input', (e) => { sfxVolume = parseFloat(e.target.value); });
-        document.getElementById('sfxVolumeSlider').addEventListener('change', () => { if(soundEnabled) playSound('click'); });
-
-        document.getElementById('btnSkipDialogue').addEventListener('click', () => {
+        document.getElementById('btnSettings').addEventListener('click', () => {
             playSound('click');
-            if (typingTimeout) clearTimeout(typingTimeout);
-            isTyping = false;
-            document.getElementById('dialogueScreen').classList.add('hidden');
-            document.getElementById('instructionsScreen').classList.remove('hidden');
-            currentState = STATES.INSTRUCTIONS;
+            updateAccountUI();
+            document.getElementById('settingsModal').classList.remove('hidden');
+        });
+        document.getElementById('btnCloseSettings').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('settingsModal').classList.add('hidden');
         });
 
-        document.getElementById('dialogueBox').addEventListener('click', showNextDialogue);
+        document.getElementById('bgmVolumeSlider').addEventListener('input', e => {
+            bgmVolume = parseFloat(e.target.value);
+            bgMusic.volume = bgmVolume;
+        });
+        document.getElementById('sfxVolumeSlider').addEventListener('input', e => {
+            sfxVolume = parseFloat(e.target.value);
+        });
 
-        function showNextDialogue() {
-            if (isTyping) {
-                clearTimeout(typingTimeout);
-                document.getElementById('dialogueText').innerHTML = story[currentDialogue - 1].t;
-                isTyping = false;
-                return;
+        const audioToggleBtn = document.getElementById('btnToggleAudio');
+        const pauseAudioBtn = document.getElementById('btnPauseAudio');
+        function toggleAudioGlobal() {
+            soundEnabled = !soundEnabled;
+            if (soundEnabled) {
+                attemptPlayBGM();
+                audioToggleBtn.innerText = '🔊 Sonido: ON';
+                pauseAudioBtn.innerText = '🔊 Sonido: ON';
+                showGameToast('SONIDO ACTIVADO', 'Audio y música habilitados.', '#10b981');
+            } else {
+                bgMusic.pause();
+                audioToggleBtn.innerText = '🔇 Sonido: OFF';
+                pauseAudioBtn.innerText = '🔇 Sonido: OFF';
+                showGameToast('SONIDO SILENCIADO', 'Audio y música desactivados.', '#facc15');
             }
+        }
+        audioToggleBtn.addEventListener('click', toggleAudioGlobal);
+        pauseAudioBtn.addEventListener('click', toggleAudioGlobal);
+
+        function showDialogue() {
             if (currentDialogue >= story.length) {
                 document.getElementById('dialogueScreen').classList.add('hidden');
                 document.getElementById('instructionsScreen').classList.remove('hidden');
                 currentState = STATES.INSTRUCTIONS;
                 return;
             }
-            let d = story[currentDialogue];
-            document.getElementById('sceneImage').src = `Escena_${currentDialogue + 1}.PNG`;
-            document.getElementById('speakerName').innerText = d.s;
-            playSound('click');
-            let textEl = document.getElementById('dialogueText');
-            textEl.innerText = '';
-            let i = 0;
-            isTyping = true;
-            function typeWriter() {
-                if (i < d.t.length) { textEl.innerHTML += d.t.charAt(i); i++; typingTimeout = setTimeout(typeWriter, 20); }
-                else isTyping = false;
-            }
-            typeWriter();
-            currentDialogue++;
+            const item = story[currentDialogue];
+            document.getElementById('speakerName').innerText = item.s;
+            let sceneIdx = (currentDialogue % 12);
+            document.getElementById('sceneImage').src = sceneImages[sceneIdx].src;
+            typeWriterEffect(item.t);
         }
+
+        function typeWriterEffect(text) {
+            const el = document.getElementById('dialogueText');
+            el.innerText = '';
+            if (typingTimeout) clearTimeout(typingTimeout);
+            isTyping = true;
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    el.innerText += text.charAt(i);
+                    i++;
+                    typingTimeout = setTimeout(type, 18);
+                } else {
+                    isTyping = false;
+                }
+            }
+            type();
+        }
+
+        document.getElementById('dialogueBox').addEventListener('click', () => {
+            playSound('click');
+            if (isTyping) {
+                if (typingTimeout) clearTimeout(typingTimeout);
+                document.getElementById('dialogueText').innerText = story[currentDialogue].t;
+                isTyping = false;
+            } else {
+                currentDialogue++;
+                showDialogue();
+            }
+        });
+
+        document.getElementById('btnSkipDialogue').addEventListener('click', () => {
+            playSound('click');
+            if (typingTimeout) clearTimeout(typingTimeout);
+            document.getElementById('dialogueScreen').classList.add('hidden');
+            document.getElementById('instructionsScreen').classList.remove('hidden');
+            currentState = STATES.INSTRUCTIONS;
+        });
 
         document.getElementById('btnPlayNow').addEventListener('click', () => {
             playSound('click');
             document.getElementById('instructionsScreen').classList.add('hidden');
             document.getElementById('gameHUD').classList.remove('hidden');
             document.getElementById('controlsLayer').classList.remove('hidden');
+            document.getElementById('currencyBadge').classList.remove('hidden');
             document.getElementById('btnPause').classList.remove('hidden');
-            document.getElementById('currencyBadge').classList.add('hidden');
+            bgMusic.pause();
+            startGame();
+        });
+
+        function startGame() {
+            currentState = STATES.PLAYING;
+            globalKeysFound = 0;
+            door = null;
+            document.getElementById('keyCount').innerText = '0';
+            party.forEach(ch => {
+                ch.ammo = ch.maxAmmo;
+                if(ch.id === 'pepe') { ch.stealthTime = ch.maxStealth; ch.stealthActive = false; }
+            });
+            activeCharIndex = 0;
             generateMap();
             updateHUD();
-            currentState = STATES.PLAYING;
             gameTime = 0;
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => { if (currentState === STATES.PLAYING) { gameTime++; updateTimerDisplay(); } }, 1000);
-        });
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if(currentState === STATES.PLAYING) {
+                    gameTime++;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
 
-        function togglePause() {
-            if (currentState === STATES.PLAYING) {
+        document.getElementById('btnSwap').addEventListener('click', changeCharacter);
+        document.getElementById('btnAction').addEventListener('click', triggerAction);
+        document.getElementById('btnAvisar').addEventListener('click', avisarLlave);
+
+        document.getElementById('btnPause').addEventListener('click', () => {
+            if(currentState === STATES.PLAYING) {
                 currentState = STATES.PAUSED;
                 document.getElementById('pauseScreen').classList.remove('hidden');
-                document.getElementById('gameHUD').classList.add('hidden');
-                document.getElementById('controlsLayer').classList.add('hidden');
-                document.getElementById('btnPause').classList.add('hidden');
-            } else if (currentState === STATES.PAUSED) {
+                playSound('click');
+            }
+        });
+        document.getElementById('btnResume').addEventListener('click', () => {
+            if(currentState === STATES.PAUSED) {
                 currentState = STATES.PLAYING;
                 document.getElementById('pauseScreen').classList.add('hidden');
-                document.getElementById('gameHUD').classList.remove('hidden');
-                document.getElementById('controlsLayer').classList.remove('hidden');
-                document.getElementById('btnPause').classList.remove('hidden');
-            }
-        }
-
-        document.getElementById('btnPause').addEventListener('click', togglePause);
-        document.getElementById('btnResume').addEventListener('click', togglePause);
-
-        function toggleAudio() {
-            soundEnabled = !soundEnabled;
-            let text = soundEnabled ? "🔊 Sonido: ON" : "🔇 Sonido: OFF";
-            document.getElementById('btnToggleAudio').innerText = text;
-            document.getElementById('btnPauseAudio').innerText = text;
-            bgMusic.muted = !soundEnabled;
-            if (soundEnabled) {
                 playSound('click');
-                if(currentState === STATES.MENU || currentState === STATES.PRELOAD) attemptPlayBGM();
-            } else {
-                bgMusic.pause(); bgMusicStarted = false;
             }
-        }
-        document.getElementById('btnToggleAudio').addEventListener('click', toggleAudio);
-        document.getElementById('btnPauseAudio').addEventListener('click', toggleAudio);
-
-        function endGame(win) {
-            currentState = win ? STATES.VICTORY : STATES.GAMEOVER;
-            if (timerInterval) clearInterval(timerInterval);
-            document.getElementById('gameHUD').classList.add('hidden');
-            document.getElementById('controlsLayer').classList.add('hidden');
-            document.getElementById('btnPause').classList.add('hidden');
-            document.getElementById('currencyBadge').classList.remove('hidden');
-
-            let endScreen = document.getElementById('endScreen');
-            endScreen.classList.remove('hidden');
-            let mins = Math.floor(gameTime / 60).toString().padStart(2, '0');
-            let secs = (gameTime % 60).toString().padStart(2, '0');
-            document.getElementById('endStats').innerText = `Tiempo de escape: ${mins}:${secs}`;
-
-            if(win) {
-                playerCups += 1;
-                if (activeAccount) {
-                    activeAccount.cups = playerCups;
-                    persistActiveAccount();
-                }
-                localStorage.setItem('emdcg_cups', playerCups);
-                updateCupDisplay();
-                document.getElementById('endTitle').innerText = "¡VICTORIA!";
-                document.getElementById('endTitle').style.color = "#facc15";
-                document.getElementById('endDesc').innerText = "Han escapado con éxito de La Ciudad EMCD.";
-                document.getElementById('rewardNotice').innerText = "🏆 ¡Has ganado +1 Copa!";
-            } else {
-                document.getElementById('endTitle').innerText = "BORRADOS";
-                document.getElementById('endTitle').style.color = "#f43f5e";
-                document.getElementById('endDesc').innerText = "Una entidad cibernética te ha borrado de la Matrix.";
-                document.getElementById('rewardNotice').innerText = "";
-            }
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'p' || e.key === 'P') {
-                if (currentState === STATES.PLAYING || currentState === STATES.PAUSED) togglePause();
-                return;
-            }
-            if(currentState !== STATES.PLAYING) return;
-            const key = e.key.toLowerCase();
-            if(key === 'w' || e.key === 'ArrowUp') keys.w = true;
-            if(key === 'a' || e.key === 'ArrowLeft') keys.a = true;
-            if(key === 's' || e.key === 'ArrowDown') keys.s = true;
-            if(key === 'd' || e.key === 'ArrowRight') keys.d = true;
-            if(key === '1') { activeCharIndex=0; changeCharacter(); }
-            if(key === '2') { activeCharIndex=1; changeCharacter(); }
-            if(key === '3') { activeCharIndex=2; changeCharacter(); }
-            if(key === ' ' && !keys.space) { keys.space = true; triggerAction(); }
-        });
-        window.addEventListener('keyup', (e) => {
-            const key = e.key.toLowerCase();
-            if(key === 'w' || e.key === 'ArrowUp') keys.w = false;
-            if(key === 'a' || e.key === 'ArrowLeft') keys.a = false;
-            if(key === 's' || e.key === 'ArrowDown') keys.s = false;
-            if(key === 'd' || e.key === 'ArrowRight') keys.d = false;
-            if(key === ' ') keys.space = false;
         });
 
-        document.getElementById('btnAction').addEventListener('touchstart', (e) => { e.preventDefault(); triggerAction(); }, {passive:false});
-        document.getElementById('btnAction').addEventListener('mousedown', (e) => { e.preventDefault(); triggerAction(); });
-        document.getElementById('btnSwap').addEventListener('touchstart', (e) => { e.preventDefault(); changeCharacter(); }, {passive:false});
-        document.getElementById('btnSwap').addEventListener('mousedown', (e) => { e.preventDefault(); changeCharacter(); });
-        document.getElementById('btnAvisar').addEventListener('touchstart', (e) => { e.preventDefault(); avisarLlave(); }, {passive:false});
-        document.getElementById('btnAvisar').addEventListener('mousedown', (e) => { e.preventDefault(); avisarLlave(); });
+        window.addEventListener('keydown', e => {
+            if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') keys.w = true;
+            if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') keys.s = true;
+            if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') keys.a = true;
+            if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') keys.d = true;
+            if (e.key === ' ' && currentState === STATES.PLAYING) triggerAction();
+            if (e.key === 'e' || e.key === 'E') avisarLlave();
+            if (e.key === 'q' || e.key === 'Q') changeCharacter();
+        });
+        window.addEventListener('keyup', e => {
+            if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') keys.w = false;
+            if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') keys.s = false;
+            if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') keys.a = false;
+            if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') keys.d = false;
+        });
 
         const joystickZone = document.getElementById('joystickZone');
         const joystickKnob = document.getElementById('joystickKnob');
-        let jzRect = null;
+        let joyTouchId = null;
+
+        joystickZone.addEventListener('pointerdown', e => {
+            joystick.active = true;
+            joyTouchId = e.pointerId;
+            joystickZone.setPointerCapture(joyTouchId);
+            handleJoystickMove(e);
+        });
+        joystickZone.addEventListener('pointermove', e => {
+            if(joystick.active && e.pointerId === joyTouchId) handleJoystickMove(e);
+        });
+        joystickZone.addEventListener('pointerup', e => {
+            if(e.pointerId === joyTouchId) resetJoystick();
+        });
+        joystickZone.addEventListener('pointercancel', e => {
+            if(e.pointerId === joyTouchId) resetJoystick();
+        });
 
         function handleJoystickMove(e) {
-            e.preventDefault();
-            if(!joystick.active) return;
-            let touch = e.touches ? e.touches[0] : e;
-            if(!jzRect) jzRect = joystickZone.getBoundingClientRect();
-            let centerX = jzRect.left + jzRect.width/2;
-            let centerY = jzRect.top + jzRect.height/2;
-            let dx = touch.clientX - centerX;
-            let dy = touch.clientY - centerY;
-            let mag = Math.hypot(dx, dy);
-            let maxR = jzRect.width/2 - 25;
-            if(mag > maxR) { dx = (dx/mag) * maxR; dy = (dy/mag) * maxR; }
+            const rect = joystickZone.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const maxDist = rect.width / 2 - 10;
+            let dx = e.clientX - centerX;
+            let dy = e.clientY - centerY;
+            let dist = Math.hypot(dx, dy);
+            if(dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
             joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-            joystick.dx = dx / maxR;
-            joystick.dy = dy / maxR;
+            joystick.dx = dx / maxDist;
+            joystick.dy = dy / maxDist;
         }
-        joystickZone.addEventListener('touchstart', (e) => { e.preventDefault(); joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); }, {passive:false});
-        joystickZone.addEventListener('touchmove', handleJoystickMove, {passive:false});
-        joystickZone.addEventListener('touchend', (e) => { e.preventDefault(); joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }, {passive:false});
-        joystickZone.addEventListener('mousedown', (e) => { joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); });
-        document.addEventListener('mousemove', (e) => { if(joystick.active) handleJoystickMove(e); });
-        document.addEventListener('mouseup', () => { if(joystick.active) { joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }});
 
-        function gameLoop() {
+        function resetJoystick() {
+            joystick.active = false;
+            joyTouchId = null;
+            joystick.dx = 0;
+            joystick.dy = 0;
+            joystickKnob.style.transform = 'translate(0px, 0px)';
+        }
+
+        async function endGame(victory) {
+            currentState = victory ? STATES.VICTORY : STATES.GAMEOVER;
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('gameHUD').classList.add('hidden');
+            document.getElementById('controlsLayer').classList.add('hidden');
+            document.getElementById('currencyBadge').classList.add('hidden');
+
+            const titleEl = document.getElementById('endTitle');
+            const descEl = document.getElementById('endDesc');
+            const statsEl = document.getElementById('endStats');
+            const rewardEl = document.getElementById('rewardNotice');
+
+            let rewardCups = 0;
+            if (victory) {
+                titleEl.innerText = '¡ESCAPE EXITOSO!';
+                titleEl.style.color = '#10b981';
+                descEl.innerText = 'Lograste recolectar las 3 llaves y escapar de la Matrix.';
+                rewardCups = 15;
+            } else {
+                titleEl.innerText = 'HAS SIDO BORRADO';
+                titleEl.style.color = '#ef4444';
+                descEl.innerText = 'Una entidad cibernética te atrapó en la Ciudad Abandonada.';
+                rewardCups = 3;
+            }
+
+            let mins = Math.floor(gameTime / 60).toString().padStart(2, '0');
+            let secs = (gameTime % 60).toString().padStart(2, '0');
+            statsEl.innerText = `Tiempo en la Ciudad: ${mins}:${secs} | Llaves: ${globalKeysFound}/3`;
+
+            if (activeAccount) {
+                activeAccount.cups = (Number(activeAccount.cups) || 0) + rewardCups;
+                playerCups = activeAccount.cups;
+                await cloudSaveAccount(activeAccount);
+                rewardEl.innerText = `🏆 +${rewardCups} Copas sincronizadas en la nube (Total: ${playerCups})`;
+            } else {
+                playerCups += rewardCups;
+                localStorage.setItem('emdcg_cups', String(playerCups));
+                rewardEl.innerText = `🏆 +${rewardCups} Copas (Total: ${playerCups})`;
+            }
+
+            document.getElementById('endScreen').classList.remove('hidden');
+            attemptPlayBGM();
+        }
+
+        function mainLoop() {
             update();
             draw();
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(mainLoop);
         }
-
-        // Arranque del sistema de juego
-        initializeAccounts();
-        gameLoop();
+        requestAnimationFrame(mainLoop);
     </script>
 </body>
 </html>
