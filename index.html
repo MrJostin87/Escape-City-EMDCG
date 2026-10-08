@@ -551,9 +551,38 @@
                 initAudio();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
+                const now = audioCtx.currentTime;
+
+                if (type === 'glitch') {
+                    // NEW MECHANIC: Digital glitch/noise generation using AudioBuffer
+                    const bufferSize = audioCtx.sampleRate * 0.5; // 0.5 seconds of noise
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1; // White noise
+                    }
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+
+                    const biquad = audioCtx.createBiquadFilter();
+                    biquad.type = 'bandpass';
+                    biquad.frequency.setValueAtTime(1000, now);
+                    biquad.frequency.linearRampToValueAtTime(100, now + 0.5);
+
+                    noise.connect(biquad);
+                    biquad.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    gain.gain.setValueAtTime(0.6 * sfxVolume, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+                    noise.start(now);
+                    noise.stop(now + 0.5);
+                    return; // Early return since we don't use 'osc' for noise
+                }
+
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                const now = audioCtx.currentTime;
 
                 if (type === 'shoot') {
                     osc.type = 'square';
@@ -736,11 +765,20 @@
         let door = null;
         let matrixDamage = 0;
         let matrixCracks = [];
+        
+        // NEW MECHANIC VARIABLES: Spawneo Progresivo
+        let matrixDestabilized = false;
+        let enemySpawnTimer = 0;
+        let enemySpawnRate = 120; // in frames (approx 2 secs to start)
+        const MAX_ENEMIES = 220; // Hard cap for performance
 
         function generateMap() {
             map = [];
             matrixDamage = 0;
             matrixCracks = [];
+            matrixDestabilized = false;
+            enemySpawnTimer = 0;
+            enemySpawnRate = 120;
             door = null;
             
             for(let r=0; r<MAP_ROWS; r++) {
@@ -799,26 +837,7 @@
             }
 
             for(let i=0; i<60; i++) {
-                let ex, ey;
-                do {
-                    let c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
-                    let r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
-                    ex = c * TILE_SIZE + TILE_SIZE/2;
-                    ey = r * TILE_SIZE + TILE_SIZE/2;
-                } while (map[Math.floor(ey/TILE_SIZE)][Math.floor(ex/TILE_SIZE)] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*8);
-                
-                enemies.push({ 
-                    x: ex, 
-                    y: ey, 
-                    w: 40,
-                    h: 40, 
-                    speed: 1.4 + Math.random() * 0.6, 
-                    state: 'PATROL',
-                    patrolTarget: { x: ex, y: ey },
-                    patrolTimer: 0,
-                    visionRange: 300,
-                    hp: 3 
-                });
+                spawnSingleEnemy(false); // Base spawn without glitch effects
             }
         }
 
@@ -854,6 +873,40 @@
             if(!placed) items.push({ x: TILE_SIZE * 6, y: TILE_SIZE * 6, id: id, color: color, radius: 14 });
         }
 
+        function spawnSingleEnemy(isGlitchSpawn = true) {
+            if (enemies.length >= MAX_ENEMIES) return;
+            
+            let ex, ey, c, r;
+            let attempts = 0;
+            do {
+                c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
+                r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
+                ex = c * TILE_SIZE + TILE_SIZE/2;
+                ey = r * TILE_SIZE + TILE_SIZE/2;
+                attempts++;
+            } while ((map[r][c] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*10) && attempts < 80);
+
+            if (map[r][c] !== 1) {
+                enemies.push({
+                    x: ex,
+                    y: ey,
+                    w: 40,
+                    h: 40,
+                    // If matrix is destabilized, enemies are slightly faster and have better vision
+                    speed: 1.4 + Math.random() * 0.6 + (matrixDamage * 0.08),
+                    state: isGlitchSpawn ? 'CHASE' : 'PATROL',
+                    patrolTarget: { x: ex, y: ey },
+                    patrolTimer: 0,
+                    visionRange: 300 + (matrixDamage * 30),
+                    hp: 3
+                });
+                
+                if(isGlitchSpawn) {
+                    createParticles(ex, ey, '#ff003c', 12);
+                }
+            }
+        }
+
         function generateMatrixCrack(x, y) {
             let crack = { x: x, y: y, lines: [] };
             let branches = 3 + Math.floor(Math.random() * 3);
@@ -884,6 +937,7 @@
             
             playSound('explosion');
             playSound('alert');
+            playSound('glitch');
             
             let endScreen = document.getElementById('endScreen');
             endScreen.classList.remove('hidden');
@@ -895,7 +949,7 @@
             document.getElementById('endTitle').style.textShadow = "0 0 20px #ef4444, 4px 4px 0 #000";
             
             document.getElementById('endDesc').innerHTML = "<span style='color:#fff; font-size:16px;'>LA MATRIX HA COLAPSADO</span><br><br><span style='color:#94a3b8;'>Has destruido los límites de la simulación.</span>";
-            document.getElementById('endStats').innerText = "ERROR: Sistema de contención comprometido.";
+            document.getElementById('endStats').innerText = "ERROR: Sistema de contención masivamente comprometido (8/8).";
             document.getElementById('rewardNotice').innerText = "Cargando protocolo de reseteo...";
         }
 
@@ -979,6 +1033,20 @@
                 }
             }
 
+            // NEW MECHANIC: Spawneo Progresivo
+            if (matrixDestabilized && enemies.length < MAX_ENEMIES) {
+                enemySpawnTimer--;
+                if (enemySpawnTimer <= 0) {
+                    let enemiesToSpawn = Math.floor(matrixDamage / 2) + 1;
+                    for(let s=0; s<enemiesToSpawn; s++) {
+                        spawnSingleEnemy(true);
+                    }
+                    // Accelerate spawning as time goes on
+                    enemySpawnRate = Math.max(20, enemySpawnRate - 5);
+                    enemySpawnTimer = enemySpawnRate;
+                }
+            }
+
             if (char.id === 'pepe' && char.stealthActive) {
                 char.stealthTime -= 1/60;
                 
@@ -1037,21 +1105,27 @@
                     if (hitSolid) {
                         createParticles(p.x, p.y, '#94a3b8', 6);
                         
-                        // Sistema de Colapso de la Matrix
+                        // NEW MECHANIC: Sistema de Colapso de la Matrix modificado (8 hits + shake fuerte + glitch audio)
                         if (p.type === 'bazooka' && isOuterBoundary) {
                             matrixDamage++;
-                            generateMatrixCrack(p.x, p.y);
-                            screenShakeTimer = 25;
-                            screenShakeIntensity = 12;
-                            playSound('explosion');
+                            matrixDestabilized = true; // Activar spawneo masivo progresivo
                             
-                            if (matrixDamage >= 3) {
+                            generateMatrixCrack(p.x, p.y);
+                            
+                            // Escalar el movimiento de pantalla dependiendo del daño actual
+                            screenShakeTimer = 35 + (matrixDamage * 2);
+                            screenShakeIntensity = 12 + (matrixDamage * 1.5);
+                            
+                            playSound('explosion');
+                            playSound('glitch'); // Sonido de glitch digital
+                            
+                            if (matrixDamage >= 8) { // Cambiado a 8 impactos
                                 triggerMatrixCollapse();
                                 projectiles.splice(i, 1);
                                 continue; 
                             } else {
-                                addFloatingText(`¡ALERTA! DAÑO ${matrixDamage}/3`, p.x, p.y - 20, '#ef4444');
-                                showGameToast("¡DAÑO EN LA MATRIX!", "Estás rompiendo los límites de la simulación.", "#ef4444");
+                                addFloatingText(`¡ALERTA! DAÑO ${matrixDamage}/8`, p.x, p.y - 20, '#ef4444');
+                                showGameToast("¡BRECHA EN LA MATRIX!", "Iniciando protocolos de limpieza. Múltiples entidades detectadas...", "#ef4444");
                             }
                         }
                     }
@@ -1261,7 +1335,7 @@
                         let ty = r * TILE_SIZE;
                         let tileType = map[r][c];
                         
-                        if(tileType === 1) { // Border/Wall - Cyberpunk Style
+                        if(tileType === 1) { 
                             ctx.fillStyle = '#060b14';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
                             
@@ -1281,7 +1355,7 @@
                             ctx.shadowBlur = 8;
                             ctx.fillRect(tx + TILE_SIZE/2 - 2, ty + TILE_SIZE/2 - 2, 4, 4);
                             ctx.shadowBlur = 0;
-                        } else if (tileType === 2) { // Debris/Circuit Area
+                        } else if (tileType === 2) { 
                             ctx.fillStyle = '#03060c';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
                             
@@ -1297,7 +1371,7 @@
                             ctx.moveTo(tx+15, ty+15);
                             ctx.lineTo(tx+37, ty+37);
                             ctx.stroke();
-                        } else if (tileType === 3) { // Intact/Server floor
+                        } else if (tileType === 3) { 
                             ctx.fillStyle = '#080512';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
                             
@@ -1310,7 +1384,7 @@
                                     ctx.fillRect(tx + 12 + i*16, ty + 12 + j*16, 8, 8);
                                 }
                             }
-                        } else { // Normal matrix floor
+                        } else { 
                             ctx.fillStyle = '#020308';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
                             
@@ -1327,7 +1401,6 @@
                 }
             }
 
-            // Draw Matrix Cracks (Debajo de entidades, sobre el mapa)
             ctx.save();
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -1353,7 +1426,6 @@
             }
             ctx.restore();
 
-            // Portal Rediseñado (Puerta Dorada Cyberpunk)
             if (door) {
                 let t = Date.now() / 200;
                 let pulse = Math.sin(t);
@@ -1361,7 +1433,6 @@
                 ctx.save();
                 ctx.translate(door.x, door.y);
                 
-                // Outer Portal Arc
                 ctx.shadowColor = '#facc15';
                 ctx.shadowBlur = 15 + pulse * 10;
                 
@@ -1380,7 +1451,6 @@
                 ctx.fill();
                 ctx.stroke();
                 
-                // Inner vortex
                 let innerPulse = Math.abs(Math.sin(t * 1.5));
                 ctx.fillStyle = `rgba(0, 255, 204, ${0.15 + innerPulse * 0.25})`;
                 ctx.beginPath();
@@ -1393,7 +1463,6 @@
                 ctx.closePath();
                 ctx.fill();
                 
-                // Digital grid lines inside
                 ctx.strokeStyle = 'rgba(0, 255, 204, 0.6)';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
