@@ -19,7 +19,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            background-color: #03050a;
+            background-color: #020308;
             overflow: hidden;
             font-family: 'Press Start 2P', cursive;
             user-select: none;
@@ -50,8 +50,8 @@
         }
         .hidden { display: none !important; }
 
-        #preloaderScreen { background: #03050a; z-index: 100; pointer-events: auto; }
-        #mainMenu { background: rgba(3, 5, 10, 0.95); pointer-events: auto; }
+        #preloaderScreen { background: #020308; z-index: 100; pointer-events: auto; }
+        #mainMenu { background: rgba(2, 3, 8, 0.95); pointer-events: auto; }
         
         .menu-logo-img {
             max-width: 92vw;
@@ -59,13 +59,12 @@
             object-fit: contain;
             image-rendering: pixelated;
             margin-bottom: 2rem;
-            filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.6));
+            filter: drop-shadow(0 0 20px rgba(0, 255, 204, 0.6));
         }
 
-        .title { font-size: 6vw; color: #10b981; text-shadow: 3px 3px 0 #000, 0 0 15px rgba(16,185,129,0.5); text-align: center; margin-bottom: 1.5rem; line-height: 1.4; }
+        .title { font-size: 6vw; color: #00ffcc; text-shadow: 3px 3px 0 #000, 0 0 15px rgba(0,255,204,0.5); text-align: center; margin-bottom: 1.5rem; line-height: 1.4; }
         .subtitle { font-size: 2.5vw; color: #38bdf8; margin-bottom: 2rem; text-align: center; padding: 0 15px; text-shadow: 0 0 8px rgba(56,189,248,0.4); }
         
-        /* Etiqueta de versión en el menú principal */
         .version-label {
             position: absolute;
             bottom: 20px;
@@ -82,19 +81,22 @@
             background: var(--primary); border: 3px solid #fff; color: #000;
             padding: 14px 28px; font-size: 13px; font-family: inherit;
             cursor: pointer; text-transform: uppercase;
-            box-shadow: 4px 4px 0 #000; transition: transform 0.1s, background 0.2s;
+            box-shadow: 4px 4px 0 #000; transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
             pointer-events: auto; border-radius: 4px;
         }
         .btn:active { transform: translate(4px, 4px); box-shadow: none; }
+        .btn:hover { box-shadow: 0 0 15px var(--primary); }
         .btn-secondary { background: #3b82f6; color: #fff; }
+        .btn-secondary:hover { box-shadow: 0 0 15px #3b82f6; }
         .btn-accent { background: #8b5cf6; color: #fff; }
+        .btn-accent:hover { box-shadow: 0 0 15px #8b5cf6; }
 
         .settings-icon-btn {
             position: absolute;
             top: 20px;
             left: 20px;
             background: rgba(15, 23, 42, 0.9);
-            border: 2px solid #38bdf8;
+            border: 2px solid #00ffcc;
             color: #fff;
             width: 44px;
             height: 44px;
@@ -104,14 +106,15 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 12px rgba(0,255,204,0.3);
             pointer-events: auto;
             z-index: 30;
-            transition: transform 0.2s ease, border-color 0.2s;
+            transition: transform 0.2s ease, border-color 0.2s, box-shadow 0.2s;
         }
         .settings-icon-btn:hover {
             transform: rotate(45deg);
             border-color: var(--highlight);
+            box-shadow: 0 4px 15px rgba(250,204,21,0.5);
         }
 
         .skip-dialogue-btn {
@@ -120,8 +123,8 @@
             right: 20px;
             z-index: 10;
             background: rgba(15, 23, 42, 0.85);
-            border: 2px solid #38bdf8;
-            color: #38bdf8;
+            border: 2px solid #00ffcc;
+            color: #00ffcc;
             padding: 8px 14px;
             font-size: 10px;
             border-radius: 6px;
@@ -132,7 +135,7 @@
             transition: background 0.2s, color 0.2s;
         }
         .skip-dialogue-btn:hover {
-            background: #38bdf8;
+            background: #00ffcc;
             color: #000;
         }
 
@@ -146,7 +149,7 @@
             border-radius: 8px;
             font-size: 11px;
             color: var(--highlight);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            box-shadow: 0 0 15px rgba(250,204,21,0.3);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -198,12 +201,12 @@
         }
         .speaker-header { color: var(--highlight); font-size: 12px; font-weight: bold; text-shadow: 0 0 6px rgba(250,204,21,0.4); }
         .dialogue-text-content { color: var(--text-color); font-size: 10px; line-height: 1.6; min-height: 35px; }
-        .click-indicator { position: absolute; bottom: 8px; right: 12px; font-size: 8px; animation: blink 1s infinite; color: #38bdf8; }
+        .click-indicator { position: absolute; bottom: 8px; right: 12px; font-size: 8px; animation: blink 1s infinite; color: #00ffcc; }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         #instructionsScreen { 
-            background: rgba(3, 5, 10, 0.96); 
+            background: rgba(2, 3, 8, 0.96); 
             pointer-events: auto; 
             padding: 20px; 
             text-align: center; 
@@ -226,25 +229,25 @@
         #gameHUD { justify-content: space-between; padding: 15px; box-sizing: border-box; }
         .top-hud { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; gap: 10px; }
         
-        .char-info { background: rgba(10, 15, 30, 0.88); border: 2px solid #38bdf8; padding: 8px; display: flex; gap: 8px; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-radius: 6px; }
+        .char-info { background: rgba(5, 8, 15, 0.88); border: 2px solid #00ffcc; padding: 8px; display: flex; gap: 8px; align-items: center; box-shadow: 0 0 15px rgba(0,255,204,0.3); border-radius: 6px; }
         .hud-avatar { width: 40px; height: 40px; border: 1px solid #777; image-rendering: pixelated; background: #222; object-fit: cover; border-radius: 4px; }
         .stats { display: flex; flex-direction: column; gap: 4px; font-size: 9px; color: #fff; }
         
         .hud-center { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .timer-badge { background: rgba(10, 15, 30, 0.88); border: 2px solid #38bdf8; padding: 8px 12px; color: #60a5fa; font-size: 10px; border-radius: 6px; }
-        .keys-info { background: rgba(10, 15, 30, 0.88); border: 2px solid var(--highlight); padding: 10px 14px; color: var(--highlight); font-size: 11px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border-radius: 6px; }
+        .timer-badge { background: rgba(5, 8, 15, 0.88); border: 2px solid #00ffcc; padding: 8px 12px; color: #00ffcc; font-size: 10px; border-radius: 6px; box-shadow: 0 0 10px rgba(0,255,204,0.2); }
+        .keys-info { background: rgba(5, 8, 15, 0.88); border: 2px solid var(--highlight); padding: 10px 14px; color: var(--highlight); font-size: 11px; box-shadow: 0 0 15px rgba(250,204,21,0.3); border-radius: 6px; }
 
         .minimap-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 
         .minimap-container {
             width: 100px;
             height: 100px;
-            background: rgba(5, 8, 15, 0.95);
-            border: 2px solid #38bdf8;
+            background: rgba(2, 3, 8, 0.95);
+            border: 2px solid #00ffcc;
             position: relative;
             overflow: hidden;
             border-radius: 6px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            box-shadow: 0 0 15px rgba(0,255,204,0.3);
         }
         #minimapCanvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
 
@@ -258,44 +261,45 @@
         }
         
         #joystickZone { 
-            width: 130px; height: 130px; background: rgba(255,255,255,0.08); 
-            border-radius: 50%; border: 2px solid rgba(56, 189, 248, 0.3); 
+            width: 130px; height: 130px; background: rgba(0, 255, 204, 0.05); 
+            border-radius: 50%; border: 2px solid rgba(0, 255, 204, 0.3); 
             position: relative; pointer-events: auto; touch-action: none; 
             display: flex; justify-content: center; align-items: center;
+            box-shadow: inset 0 0 20px rgba(0,255,204,0.1);
         }
-        #joystickKnob { width: 50px; height: 50px; background: rgba(56, 189, 248, 0.5); border-radius: 50%; position: absolute; pointer-events: none; box-shadow: 0 0 10px rgba(56,189,248,0.5); }
+        #joystickKnob { width: 50px; height: 50px; background: rgba(0, 255, 204, 0.5); border-radius: 50%; position: absolute; pointer-events: none; box-shadow: 0 0 15px rgba(0,255,204,0.6); }
 
         .action-buttons { display: flex; flex-direction: column; gap: 10px; pointer-events: auto; align-items: flex-end; }
         .action-btn { 
-            width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; 
-            background: rgba(10, 15, 30, 0.85); color: #fff; font-size: 8px; font-family: inherit;
+            width: 60px; height: 60px; border-radius: 50%; border: 2px solid #00ffcc; 
+            background: rgba(5, 8, 15, 0.85); color: #00ffcc; font-size: 8px; font-family: inherit;
             display: flex; justify-content: center; align-items: center; text-align: center; cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+            box-shadow: 0 0 15px rgba(0,255,204,0.3);
         }
-        .action-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
-        #btnAvisar { border-color: var(--highlight); color: var(--highlight); animation: pulse 2s infinite; display: none; }
-        #btnAction { width: 75px; height: 75px; font-size: 9px; background: rgba(16, 185, 129, 0.5); border-color: #10b981; }
-        #btnPause { width: 100px; height: 32px; pointer-events: auto; z-index: 20; font-size: 9px; border-radius: 6px; border-color: #3b82f6; color: #60a5fa; }
+        .action-btn:active { background: rgba(0,255,204,0.3); transform: scale(0.95); }
+        #btnAvisar { border-color: var(--highlight); color: var(--highlight); box-shadow: 0 0 15px rgba(250,204,21,0.4); animation: pulse 2s infinite; display: none; }
+        #btnAction { width: 75px; height: 75px; font-size: 9px; background: rgba(0, 255, 204, 0.15); }
+        #btnPause { width: 100px; height: 32px; pointer-events: auto; z-index: 20; font-size: 9px; border-radius: 6px; border-color: #3b82f6; color: #60a5fa; box-shadow: 0 0 10px rgba(59,130,246,0.3); }
         
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
-        #pauseScreen, #endScreen, #storeModal, #settingsModal { background: rgba(3, 5, 10, 0.96); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
+        #pauseScreen, #endScreen, #storeModal, #settingsModal { background: rgba(2, 3, 8, 0.96); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
         .menu-buttons { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 15px; }
 
         #storeModal, #settingsModal { z-index: 150; }
         .store-box {
-            background: rgba(15, 23, 42, 0.95);
-            border: 3px solid #38bdf8;
+            background: rgba(5, 8, 15, 0.95);
+            border: 3px solid #00ffcc;
             padding: 30px;
             border-radius: 12px;
             max-width: 400px;
             width: 90%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(0,255,204,0.3);
             text-align: center;
         }
 
         input[type=range] {
-            accent-color: #38bdf8;
+            accent-color: #00ffcc;
             height: 6px;
             border-radius: 4px;
             outline: none;
@@ -307,7 +311,7 @@
         }
         #toastAlertContainer {
             animation: slideDownAlert 0.3s ease-out;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(5, 8, 15, 0.95);
             border: 2px solid #ef4444;
             color: #fff;
             padding: 15px 25px;
@@ -320,7 +324,7 @@
         }
 
         @media (min-width: 1024px) {
-            #joystickZone { opacity: 0.5; }
+            #joystickZone { opacity: 0.6; }
             .inst-content { font-size: 11px; }
             .title { font-size: 3.5vw; }
             .subtitle { font-size: 1.2vw; }
@@ -346,10 +350,10 @@
     </div>
 
     <div id="preloaderScreen" class="ui-layer">
-        <h1 class="title" style="font-size:4vw; color:#10b981;">ESCAPE CITY EMDCG</h1>
+        <h1 class="title" style="font-size:4vw; color:#00ffcc;">ESCAPE CITY EMDCG</h1>
         <p id="loadingText" class="subtitle" style="font-size:11px; color:#fff; margin-bottom:10px;">Cargando recursos... 0%</p>
-        <div style="width:280px; height:22px; border:3px solid #fff; background:#111; border-radius:4px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.8); margin-bottom: 12px;">
-            <div id="loadingBar" style="width:0%; height:100%; background:#10b981; transition:width 0.15s ease-out;"></div>
+        <div style="width:280px; height:22px; border:3px solid #00ffcc; background:#020308; border-radius:4px; overflow:hidden; box-shadow:0 0 15px rgba(0,255,204,0.5); margin-bottom: 12px;">
+            <div id="loadingBar" style="width:0%; height:100%; background:#00ffcc; transition:width 0.15s ease-out;"></div>
         </div>
         <p id="loadingSubtext" style="font-size:9px; color:#38bdf8; margin:0; font-family:inherit; min-height:16px;">Iniciando carga de archivos...</p>
     </div>
@@ -365,8 +369,7 @@
             <button class="btn btn-secondary" id="btnToggleAudio" style="font-size: 10px; padding: 12px 20px;">🔊 Sonido: ON</button>
         </div>
         
-        <!-- Nuevo texto de versión fijo en la parte inferior del menú -->
-        <div class="version-label">v0.1.0-Beta</div>
+        <div class="version-label">v0.1.0-Beta (Cyberpunk Edition)</div>
     </div>
 
     <div id="storeModal" class="ui-layer hidden">
@@ -378,8 +381,8 @@
     </div>
 
     <div id="settingsModal" class="ui-layer hidden">
-        <div class="store-box" style="border-color: #38bdf8;">
-            <h2 style="color: #38bdf8; margin-bottom: 20px; font-size: 16px;">CONFIGURACIÓN ⚙️</h2>
+        <div class="store-box" style="border-color: #00ffcc;">
+            <h2 style="color: #00ffcc; margin-bottom: 20px; font-size: 16px;">CONFIGURACIÓN ⚙️</h2>
             
             <div style="text-align: left; margin-bottom: 20px;">
                 <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;">Música de Fondo (Menú)</label>
@@ -413,19 +416,19 @@
         <div class="inst-content">
             <h2>MISIÓN Y REGLAS</h2>
             <ul>
-                <li>Están atrapados en una Ciudad Abandonada masiva. Encuentren <b>3 LLAVES</b> ocultas.</li>
-                <li><b>Llave 1:</b> En edificios destruidos.</li>
-                <li><b>Llave 2:</b> En zonas abiertas y calles lúgubres.</li>
-                <li><b>Llave 3:</b> En los raros edificios intactos remanentes.</li>
-                <li><b>CUIDADO:</b> Las entidades cibernéticas te borrarán si te tocan.</li>
+                <li>Están atrapados en una Ciudad Cyberpunk Abandonada. Encuentren <b>3 LLAVES</b> ocultas.</li>
+                <li><b>Llave 1:</b> En sectores destruidos.</li>
+                <li><b>Llave 2:</b> En zonas de servidores y calles lúgubres.</li>
+                <li><b>Llave 3:</b> En los raros bloques intactos de la Matrix.</li>
+                <li><b>CUIDADO:</b> Los programas de seguridad te borrarán si te tocan.</li>
             </ul>
             <p style="color:var(--highlight); margin-bottom:5px;"><b>HABILIDADES:</b></p>
             <ul>
                 <li><b>Jostin (Cambio 1):</b> Pistola. Disparo recto. (12 balas)</li>
-                <li><b>Tavito (Cambio 2):</b> Bazuca. Daño en área. (20 bombas)</li>
+                <li><b>Tavito (Cambio 2):</b> Bazuca. Daño en área. (20 bombas) <br><span style="color:#ef4444; font-size:8px;">[Peligro: Dañar los bordes de la simulación puede ser catastrófico]</span></li>
                 <li><b>Pepe (Cambio 3):</b> Sigilo. Invisible 120s. No ataca.</li>
             </ul>
-            <p style="line-height:1.5;">Usa el Joystick para moverte.<br>Explora el mapa y esquiva enemigos.<br>Pisa la llave y pulsa <b>AVISAR</b>.</p>
+            <p style="line-height:1.5;">Usa el Joystick para moverte.<br>Explora el mapa y esquiva entidades.<br>Pisa la llave y pulsa <b>AVISAR</b>.</p>
         </div>
         <button class="btn" id="btnPlayNow" style="margin-bottom: 15px;">¡Entendido!</button>
     </div>
@@ -464,11 +467,11 @@
     </div>
 
     <div id="pauseScreen" class="ui-layer hidden">
-        <h1 class="title" style="font-size: 5vw; color: #60a5fa;">JUEGO PAUSADO</h1>
+        <h1 class="title" style="font-size: 5vw; color: #60a5fa;">SISTEMA PAUSADO</h1>
         <div class="menu-buttons">
             <button class="btn" id="btnResume">Continuar</button>
             <button class="btn btn-secondary" id="btnPauseAudio">🔊 Sonido: ON</button>
-            <button class="btn" style="background:#ef4444; color:#fff;" onclick="location.reload()">Menú Principal</button>
+            <button class="btn" style="background:#ef4444; color:#fff;" onclick="location.reload()">Desconectar</button>
         </div>
     </div>
 
@@ -506,7 +509,6 @@
         const bgMusic = document.getElementById('bgMusic');
         bgMusic.volume = bgmVolume;
 
-        // Intentar reproducir música atrapando errores de Autoplay policy
         function attemptPlayBGM() {
             if (!soundEnabled) return;
             bgMusic.volume = bgmVolume;
@@ -515,25 +517,21 @@
                 playPromise.then(() => {
                     bgMusicStarted = true;
                 }).catch(error => {
-                    // Silenciar advertencias en consola de reproducción automática bloqueada
                     bgMusicStarted = false;
                 });
             }
         }
 
-        // Desbloquear audio en la primera interacción del usuario
         function unlockAudioContext() {
-            initAudio(); // Inicializa o resume el AudioContext
+            initAudio(); 
             if (!bgMusicStarted && soundEnabled && (currentState === STATES.MENU || currentState === STATES.PRELOAD)) {
                 attemptPlayBGM();
             }
-            // Eliminar listeners después de interactuar
             document.removeEventListener('click', unlockAudioContext);
             document.removeEventListener('touchstart', unlockAudioContext);
             document.removeEventListener('keydown', unlockAudioContext);
         }
 
-        // Escuchar eventos globales para garantizar el arranque de la música
         document.addEventListener('click', unlockAudioContext);
         document.addEventListener('touchstart', unlockAudioContext);
         document.addEventListener('keydown', unlockAudioContext);
@@ -568,11 +566,11 @@
                 } else if (type === 'explosion') {
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(120, now);
-                    osc.frequency.linearRampToValueAtTime(30, now + 0.3);
-                    gain.gain.setValueAtTime(0.3 * sfxVolume, now);
-                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.frequency.linearRampToValueAtTime(30, now + 0.4);
+                    gain.gain.setValueAtTime(0.4 * sfxVolume, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
                     osc.start(now);
-                    osc.stop(now + 0.3);
+                    osc.stop(now + 0.4);
                 } else if (type === 'pickup') {
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(400, now);
@@ -592,11 +590,11 @@
                 } else if (type === 'alert') {
                     osc.type = 'square';
                     osc.frequency.setValueAtTime(150, now);
-                    osc.frequency.setValueAtTime(100, now + 0.15);
-                    gain.gain.setValueAtTime(0.3 * sfxVolume, now);
-                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.frequency.setValueAtTime(100, now + 0.25);
+                    gain.gain.setValueAtTime(0.4 * sfxVolume, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
                     osc.start(now);
-                    osc.stop(now + 0.3);
+                    osc.stop(now + 0.25);
                 }
             } catch(e) {}
         }
@@ -625,24 +623,17 @@
         }
         updateCupDisplay();
 
-        const charImages = {
-            jostin: new Image(),
-            tavito: new Image(),
-            pepe: new Image()
-        };
-
+        const charImages = { jostin: new Image(), tavito: new Image(), pepe: new Image() };
         const sceneImages = [];
         for (let s = 1; s <= 12; s++) {
             let img = new Image();
             sceneImages.push({ key: `Escena_${s}.PNG`, img: img, src: `Escena_${s}.PNG` });
         }
-
         const assetList = [
             { key: 'Jostin.PNG', img: charImages.jostin, src: 'Jostin.PNG' },
             { key: 'Tavito.PNG', img: charImages.tavito, src: 'Tavito.PNG' },
             { key: 'Pepe.PNG', img: charImages.pepe, src: 'Pepe.PNG' }
         ];
-        
         const allAssets = assetList.concat(sceneImages);
 
         let loadedCount = 0;
@@ -663,10 +654,7 @@
                     document.getElementById('preloaderScreen').classList.add('hidden');
                     document.getElementById('mainMenu').classList.remove('hidden');
                     currentState = STATES.MENU;
-                    
-                    // Iniciar la música de fondo utilizando la lógica mejorada al entrar al menú
                     attemptPlayBGM();
-                    
                 }, 400);
             }
         }
@@ -744,10 +732,17 @@
         let projectiles = [];
         let particles = [];
         let floatingTexts = [];
+        
         let door = null;
+        let matrixDamage = 0;
+        let matrixCracks = [];
 
         function generateMap() {
             map = [];
+            matrixDamage = 0;
+            matrixCracks = [];
+            door = null;
+            
             for(let r=0; r<MAP_ROWS; r++) {
                 let row = [];
                 for(let c=0; c<MAP_COLS; c++) {
@@ -857,6 +852,51 @@
                 }
             }
             if(!placed) items.push({ x: TILE_SIZE * 6, y: TILE_SIZE * 6, id: id, color: color, radius: 14 });
+        }
+
+        function generateMatrixCrack(x, y) {
+            let crack = { x: x, y: y, lines: [] };
+            let branches = 3 + Math.floor(Math.random() * 3);
+            for(let i=0; i<branches; i++) {
+                let angle = Math.random() * Math.PI * 2;
+                let len = 60 + Math.random() * 80;
+                let segments = [];
+                let cx = 0, cy = 0;
+                for(let j=0; j<5; j++) {
+                    let segLen = len / 5;
+                    let aVar = angle + (Math.random() - 0.5) * 1.5;
+                    let nx = cx + Math.cos(aVar) * segLen;
+                    let ny = cy + Math.sin(aVar) * segLen;
+                    segments.push({x1: cx, y1: cy, x2: nx, y2: ny});
+                    cx = nx; cy = ny;
+                }
+                crack.lines.push(segments);
+            }
+            matrixCracks.push(crack);
+        }
+
+        function triggerMatrixCollapse() {
+            currentState = STATES.GAMEOVER;
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('gameHUD').classList.add('hidden');
+            document.getElementById('controlsLayer').classList.add('hidden');
+            document.getElementById('btnPause').classList.add('hidden');
+            
+            playSound('explosion');
+            playSound('alert');
+            
+            let endScreen = document.getElementById('endScreen');
+            endScreen.classList.remove('hidden');
+            endScreen.style.background = "#000";
+            endScreen.style.justifyContent = "center";
+            
+            document.getElementById('endTitle').innerText = "FATAL ERROR";
+            document.getElementById('endTitle').style.color = "#ef4444";
+            document.getElementById('endTitle').style.textShadow = "0 0 20px #ef4444, 4px 4px 0 #000";
+            
+            document.getElementById('endDesc').innerHTML = "<span style='color:#fff; font-size:16px;'>LA MATRIX HA COLAPSADO</span><br><br><span style='color:#94a3b8;'>Has destruido los límites de la simulación.</span>";
+            document.getElementById('endStats').innerText = "ERROR: Sistema de contención comprometido.";
+            document.getElementById('rewardNotice').innerText = "Cargando protocolo de reseteo...";
         }
 
         function distance(x1, y1, x2, y2) { return Math.hypot(x2-x1, y2-y1); }
@@ -990,9 +1030,30 @@
                 p.x += p.dx; p.y += p.dy; p.life--;
                 
                 let prC = Math.floor(p.x/TILE_SIZE); let prR = Math.floor(p.y/TILE_SIZE);
-                if(p.life <= 0 || isSolid(prC, prR)) {
-                    if (isSolid(prC, prR)) {
+                let hitSolid = isSolid(prC, prR);
+                let isOuterBoundary = (prC === 0 || prC === MAP_COLS-1 || prR === 0 || prR === MAP_ROWS-1);
+
+                if(p.life <= 0 || hitSolid) {
+                    if (hitSolid) {
                         createParticles(p.x, p.y, '#94a3b8', 6);
+                        
+                        // Sistema de Colapso de la Matrix
+                        if (p.type === 'bazooka' && isOuterBoundary) {
+                            matrixDamage++;
+                            generateMatrixCrack(p.x, p.y);
+                            screenShakeTimer = 25;
+                            screenShakeIntensity = 12;
+                            playSound('explosion');
+                            
+                            if (matrixDamage >= 3) {
+                                triggerMatrixCollapse();
+                                projectiles.splice(i, 1);
+                                continue; 
+                            } else {
+                                addFloatingText(`¡ALERTA! DAÑO ${matrixDamage}/3`, p.x, p.y - 20, '#ef4444');
+                                showGameToast("¡DAÑO EN LA MATRIX!", "Estás rompiendo los límites de la simulación.", "#ef4444");
+                            }
+                        }
                     }
                     if(p.type==='bazooka') createExplosion(p.x, p.y);
                     projectiles.splice(i, 1);
@@ -1008,7 +1069,7 @@
                             if(e.hp <= 0) {
                                 enemies.splice(j, 1);
                                 createParticles(e.x, e.y, '#00ffcc');
-                                addFloatingText("-1 Glitch", e.x, e.y, '#38bdf8');
+                                addFloatingText("-1 Programa", e.x, e.y, '#00ffcc');
                             } else {
                                 createParticles(e.x, e.y, '#facc15', 4);
                                 addFloatingText("-1 HP", e.x, e.y - 15, '#facc15');
@@ -1180,7 +1241,7 @@
 
             camera.w = canvas.width; camera.h = canvas.height;
 
-            ctx.fillStyle = '#03050a';
+            ctx.fillStyle = '#020308';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.save();
@@ -1191,6 +1252,8 @@
             let startRow = Math.floor(camera.y / TILE_SIZE);
             let endRow = startRow + (camera.h / TILE_SIZE) + 1;
 
+            ctx.lineWidth = 1;
+            
             for(let r = startRow; r <= endRow; r++) {
                 for(let c = startCol; c <= endCol; c++) {
                     if(map[r] !== undefined && map[r][c] !== undefined) {
@@ -1198,44 +1261,158 @@
                         let ty = r * TILE_SIZE;
                         let tileType = map[r][c];
                         
-                        if(tileType === 1) {
-                            ctx.fillStyle = '#0f172a';
+                        if(tileType === 1) { // Border/Wall - Cyberpunk Style
+                            ctx.fillStyle = '#060b14';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = '#1e293b';
+                            
+                            ctx.strokeStyle = 'rgba(0, 255, 204, 0.15)';
+                            ctx.beginPath();
+                            ctx.moveTo(tx + TILE_SIZE/2, ty);
+                            ctx.lineTo(tx + TILE_SIZE/2, ty + TILE_SIZE);
+                            ctx.moveTo(tx, ty + TILE_SIZE/2);
+                            ctx.lineTo(tx + TILE_SIZE, ty + TILE_SIZE/2);
+                            ctx.stroke();
+
+                            ctx.strokeStyle = 'rgba(0, 255, 204, 0.8)';
                             ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = '#10b981';
-                            ctx.fillRect(tx + 4, ty + 4, 3, 3);
-                        } else if (tileType === 2) {
-                            ctx.fillStyle = '#090d16';
+                            
+                            ctx.fillStyle = '#00ffcc';
+                            ctx.shadowColor = '#00ffcc';
+                            ctx.shadowBlur = 8;
+                            ctx.fillRect(tx + TILE_SIZE/2 - 2, ty + TILE_SIZE/2 - 2, 4, 4);
+                            ctx.shadowBlur = 0;
+                        } else if (tileType === 2) { // Debris/Circuit Area
+                            ctx.fillStyle = '#03060c';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
-                            ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = '#1e1b4b';
-                            ctx.fillRect(tx+10, ty+10, 18, 18);
-                            ctx.fillRect(tx+34, ty+34, 14, 14);
-                        } else if (tileType === 3) {
-                            ctx.fillStyle = '#010203'; 
+                            
+                            ctx.strokeStyle = 'rgba(255, 0, 60, 0.3)';
+                            ctx.strokeRect(tx+4, ty+4, TILE_SIZE-8, TILE_SIZE-8);
+                            
+                            ctx.fillStyle = '#ff003c';
+                            ctx.fillRect(tx+12, ty+12, 6, 6);
+                            ctx.fillRect(tx+32, ty+32, 10, 10);
+                            
+                            ctx.strokeStyle = 'rgba(255, 0, 60, 0.6)';
+                            ctx.beginPath();
+                            ctx.moveTo(tx+15, ty+15);
+                            ctx.lineTo(tx+37, ty+37);
+                            ctx.stroke();
+                        } else if (tileType === 3) { // Intact/Server floor
+                            ctx.fillStyle = '#080512';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+                            
+                            ctx.strokeStyle = 'rgba(168, 85, 247, 0.2)';
                             ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                        } else {
-                            ctx.fillStyle = '#05080e';
+                            
+                            ctx.fillStyle = 'rgba(168, 85, 247, 0.4)';
+                            for(let i=0; i<3; i++) {
+                                for(let j=0; j<3; j++) {
+                                    ctx.fillRect(tx + 12 + i*16, ty + 12 + j*16, 8, 8);
+                                }
+                            }
+                        } else { // Normal matrix floor
+                            ctx.fillStyle = '#020308';
                             ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
-                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+                            
+                            ctx.strokeStyle = 'rgba(0, 255, 204, 0.04)';
                             ctx.strokeRect(tx, ty, TILE_SIZE, TILE_SIZE);
+                            
+                            if ((r * 13 + c * 7) % 5 === 0) {
+                                ctx.fillStyle = 'rgba(0, 255, 204, 0.1)';
+                                ctx.fillRect(tx + 10, ty + 20, 2, 8);
+                                ctx.fillRect(tx + 40, ty + 10, 2, 12);
+                            }
                         }
                     }
                 }
             }
 
+            // Draw Matrix Cracks (Debajo de entidades, sobre el mapa)
+            ctx.save();
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            for (let c of matrixCracks) {
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                let glitch = Math.random() > 0.7;
+                ctx.shadowBlur = glitch ? 20 : 8;
+                ctx.shadowColor = glitch ? '#ff003c' : '#00ffcc';
+                ctx.strokeStyle = glitch ? '#ff003c' : '#00ffcc';
+                ctx.lineWidth = glitch ? 4 : 2;
+                
+                for(let branch of c.lines) {
+                    ctx.beginPath();
+                    for(let i=0; i<branch.length; i++) {
+                        let seg = branch[i];
+                        if(i===0) ctx.moveTo(seg.x1, seg.y1);
+                        ctx.lineTo(seg.x2, seg.y2);
+                    }
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+            ctx.restore();
+
+            // Portal Rediseñado (Puerta Dorada Cyberpunk)
             if (door) {
-                ctx.fillStyle = '#facc15';
-                ctx.fillRect(door.x - 32, door.y - 45, 64, 90);
-                ctx.fillStyle = '#111';
-                ctx.fillRect(door.x - 24, door.y - 37, 48, 74);
+                let t = Date.now() / 200;
+                let pulse = Math.sin(t);
+                
+                ctx.save();
+                ctx.translate(door.x, door.y);
+                
+                // Outer Portal Arc
+                ctx.shadowColor = '#facc15';
+                ctx.shadowBlur = 15 + pulse * 10;
+                
+                ctx.fillStyle = '#000';
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 4;
+                
+                ctx.beginPath();
+                ctx.moveTo(-32, -45);
+                ctx.lineTo(32, -45);
+                ctx.lineTo(40, -35);
+                ctx.lineTo(40, 45);
+                ctx.lineTo(-40, 45);
+                ctx.lineTo(-40, -35);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                
+                // Inner vortex
+                let innerPulse = Math.abs(Math.sin(t * 1.5));
+                ctx.fillStyle = `rgba(0, 255, 204, ${0.15 + innerPulse * 0.25})`;
+                ctx.beginPath();
+                ctx.moveTo(-24, -38);
+                ctx.lineTo(24, -38);
+                ctx.lineTo(32, -30);
+                ctx.lineTo(32, 38);
+                ctx.lineTo(-32, 38);
+                ctx.lineTo(-32, -30);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Digital grid lines inside
+                ctx.strokeStyle = 'rgba(0, 255, 204, 0.6)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for(let i=-20; i<=20; i+=10) {
+                    ctx.moveTo(i, -35);
+                    ctx.lineTo(i, 35);
+                }
+                for(let j=-25; j<=25; j+=10) {
+                    ctx.moveTo(-25, j);
+                    ctx.lineTo(25, j);
+                }
+                ctx.stroke();
+                
+                ctx.shadowBlur = 0;
                 ctx.fillStyle = '#fff';
-                ctx.font = '9px "Press Start 2P"';
-                ctx.fillText("SALIDA", door.x - 26, door.y - 55);
+                ctx.font = '10px "Press Start 2P"';
+                ctx.fillText("EXIT", -18, -55);
+                
+                ctx.restore();
             }
 
             for(let item of items) {
@@ -1245,7 +1422,7 @@
                     ctx.rotate(-Math.PI / 6);
 
                     ctx.shadowColor = item.color;
-                    ctx.shadowBlur = 8;
+                    ctx.shadowBlur = 12;
                     
                     ctx.fillStyle = item.color;
                     ctx.strokeStyle = '#fff';
@@ -1452,7 +1629,7 @@
         }
 
         function drawMinimap() {
-            minimapCtx.fillStyle = '#03050a';
+            minimapCtx.fillStyle = '#020308';
             minimapCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
 
             let scaleX = minimapCanvas.width / (MAP_COLS * TILE_SIZE);
@@ -1461,11 +1638,15 @@
             for(let r=0; r<MAP_ROWS; r+=2) {
                 for(let c=0; c<MAP_COLS; c+=2) {
                     if(map[r] && map[r][c] === 1) {
-                        minimapCtx.fillStyle = '#1e293b';
+                        minimapCtx.fillStyle = '#00ffcc';
+                        minimapCtx.globalAlpha = 0.4;
                         minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
+                        minimapCtx.globalAlpha = 1.0;
                     } else if (map[r] && map[r][c] === 2) {
-                        minimapCtx.fillStyle = '#0f172a';
+                        minimapCtx.fillStyle = '#ff003c';
+                        minimapCtx.globalAlpha = 0.3;
                         minimapCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 2, 2);
+                        minimapCtx.globalAlpha = 1.0;
                     }
                 }
             }
@@ -1555,7 +1736,6 @@
             document.getElementById('settingsModal').classList.add('hidden');
         });
         
-        // Volumen dinámico de la música para no requerir pausas ni reinicios
         document.getElementById('bgmVolumeSlider').addEventListener('input', (e) => {
             bgmVolume = parseFloat(e.target.value);
             bgMusic.volume = Math.max(0, Math.min(1, bgmVolume));
@@ -1662,7 +1842,6 @@
         document.getElementById('btnPause').addEventListener('click', togglePause);
         document.getElementById('btnResume').addEventListener('click', togglePause);
 
-        // Control dinámico de Sonido Robusto
         function toggleAudio() {
             soundEnabled = !soundEnabled;
             let text = soundEnabled ? "🔊 Sonido: ON" : "🔇 Sonido: OFF";
@@ -1673,7 +1852,6 @@
 
             if (soundEnabled) {
                 playSound('click');
-                // Intentar recuperar la música de fondo solo si estamos en los menús apropiados
                 if(currentState === STATES.MENU || currentState === STATES.PRELOAD) {
                     attemptPlayBGM();
                 }
@@ -1697,6 +1875,8 @@
 
             let endScreen = document.getElementById('endScreen');
             endScreen.classList.remove('hidden');
+            endScreen.style.background = "rgba(2, 3, 8, 0.96)";
+            endScreen.style.justifyContent = "center";
             
             let mins = Math.floor(gameTime / 60).toString().padStart(2, '0');
             let secs = (gameTime % 60).toString().padStart(2, '0');
@@ -1709,12 +1889,14 @@
 
                 document.getElementById('endTitle').innerText = "¡VICTORIA!";
                 document.getElementById('endTitle').style.color = "#facc15";
-                document.getElementById('endDesc').innerText = "Han escapado con éxito de La Ciudad EMCD.";
+                document.getElementById('endTitle').style.textShadow = "3px 3px 0 #000, 0 0 15px rgba(250,204,21,0.5)";
+                document.getElementById('endDesc').innerHTML = "Han escapado con éxito de la simulación.";
                 document.getElementById('rewardNotice').innerText = "🏆 ¡Has ganado +1 Copa!";
             } else {
                 document.getElementById('endTitle').innerText = "BORRADOS";
                 document.getElementById('endTitle').style.color = "#f43f5e";
-                document.getElementById('endDesc').innerText = "Una entidad cibernética te ha borrado de la Matrix.";
+                document.getElementById('endTitle').style.textShadow = "3px 3px 0 #000, 0 0 15px rgba(244,63,94,0.5)";
+                document.getElementById('endDesc').innerHTML = "Un programa de seguridad te ha eliminado.";
                 document.getElementById('rewardNotice').innerText = "";
             }
         }
