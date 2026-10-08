@@ -578,7 +578,7 @@
 
                     noise.start(now);
                     noise.stop(now + 0.5);
-                    return; // Early return since we don't use 'osc' for noise
+                    return; 
                 }
 
                 osc.connect(gain);
@@ -769,8 +769,8 @@
         // NEW MECHANIC VARIABLES: Spawneo Progresivo
         let matrixDestabilized = false;
         let enemySpawnTimer = 0;
-        let enemySpawnRate = 120; // in frames (approx 2 secs to start)
-        const MAX_ENEMIES = 220; // Hard cap for performance
+        let enemySpawnRate = 120; 
+        const MAX_ENEMIES = 220; 
 
         function generateMap() {
             map = [];
@@ -837,7 +837,7 @@
             }
 
             for(let i=0; i<60; i++) {
-                spawnSingleEnemy(false); // Base spawn without glitch effects
+                spawnSingleEnemy(false, false); // Base spawn without glitch effects
             }
         }
 
@@ -873,36 +873,70 @@
             if(!placed) items.push({ x: TILE_SIZE * 6, y: TILE_SIZE * 6, id: id, color: color, radius: 14 });
         }
 
-        function spawnSingleEnemy(isGlitchSpawn = true) {
+        // UPDATED: Mecánica de Spawneo (Horda y Control de Distancia)
+        function spawnSingleEnemy(isGlitchSpawn = true, nearPlayer = false) {
             if (enemies.length >= MAX_ENEMIES) return;
             
             let ex, ey, c, r;
             let attempts = 0;
-            do {
-                c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
-                r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
-                ex = c * TILE_SIZE + TILE_SIZE/2;
-                ey = r * TILE_SIZE + TILE_SIZE/2;
-                attempts++;
-            } while ((map[r][c] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*10) && attempts < 80);
+            let spawned = false;
 
-            if (map[r][c] !== 1) {
+            if (nearPlayer) {
+                // Forzar aparición en un radio alrededor del jugador (tensión inmediata pero fuera de muros)
+                do {
+                    let angle = Math.random() * Math.PI * 2;
+                    let distTiles = 5 + Math.random() * 7; // Entre 5 y 12 bloques de distancia
+                    ex = player.x + Math.cos(angle) * (distTiles * TILE_SIZE);
+                    ey = player.y + Math.sin(angle) * (distTiles * TILE_SIZE);
+                    
+                    c = Math.floor(ex / TILE_SIZE);
+                    r = Math.floor(ey / TILE_SIZE);
+                    
+                    // Asegurar estar dentro del mapa
+                    c = Math.max(1, Math.min(MAP_COLS - 2, c));
+                    r = Math.max(1, Math.min(MAP_ROWS - 2, r));
+                    
+                    ex = c * TILE_SIZE + TILE_SIZE/2;
+                    ey = r * TILE_SIZE + TILE_SIZE/2;
+
+                    attempts++;
+                } while (map[r][c] === 1 && attempts < 50);
+
+                if (map[r][c] !== 1) spawned = true;
+            }
+
+            if (!spawned) {
+                // Lógica original aleatoria en todo el mapa
+                attempts = 0;
+                do {
+                    c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
+                    r = Math.floor(Math.random() * (MAP_ROWS - 4)) + 2;
+                    ex = c * TILE_SIZE + TILE_SIZE/2;
+                    ey = r * TILE_SIZE + TILE_SIZE/2;
+                    attempts++;
+                } while ((map[r][c] === 1 || distance(player.x, player.y, ex, ey) < TILE_SIZE*10) && attempts < 80);
+                
+                if (map[r][c] !== 1) spawned = true;
+            }
+
+            if (spawned) {
                 enemies.push({
                     x: ex,
                     y: ey,
                     w: 40,
                     h: 40,
-                    // If matrix is destabilized, enemies are slightly faster and have better vision
-                    speed: 1.4 + Math.random() * 0.6 + (matrixDamage * 0.08),
+                    // Agresividad escalable por matrixDamage
+                    speed: 1.4 + Math.random() * 0.6 + (matrixDamage * 0.15),
                     state: isGlitchSpawn ? 'CHASE' : 'PATROL',
                     patrolTarget: { x: ex, y: ey },
                     patrolTimer: 0,
-                    visionRange: 300 + (matrixDamage * 30),
+                    // Visión masiva escalable por matrixDamage
+                    visionRange: 300 + (matrixDamage * 45),
                     hp: 3
                 });
                 
                 if(isGlitchSpawn) {
-                    createParticles(ex, ey, '#ff003c', 12);
+                    createParticles(ex, ey, '#ff003c', 15);
                 }
             }
         }
@@ -1033,16 +1067,18 @@
                 }
             }
 
-            // NEW MECHANIC: Spawneo Progresivo
+            // UPDATED: Spawneo Progresivo Acelerado y Agresivo
             if (matrixDestabilized && enemies.length < MAX_ENEMIES) {
                 enemySpawnTimer--;
                 if (enemySpawnTimer <= 0) {
-                    let enemiesToSpawn = Math.floor(matrixDamage / 2) + 1;
+                    // Multiplicar cantidad de horda progresivamente
+                    let enemiesToSpawn = Math.floor(matrixDamage * 1.5) + (matrixDamage > 4 ? 3 : 1);
                     for(let s=0; s<enemiesToSpawn; s++) {
-                        spawnSingleEnemy(true);
+                        // Aparecen cerca del jugador de forma asegurada
+                        spawnSingleEnemy(true, true);
                     }
-                    // Accelerate spawning as time goes on
-                    enemySpawnRate = Math.max(20, enemySpawnRate - 5);
+                    // Aceleración drástica de la tasa de spawneo
+                    enemySpawnRate = Math.max(15, 120 - (matrixDamage * 15));
                     enemySpawnTimer = enemySpawnRate;
                 }
             }
@@ -1105,21 +1141,26 @@
                     if (hitSolid) {
                         createParticles(p.x, p.y, '#94a3b8', 6);
                         
-                        // NEW MECHANIC: Sistema de Colapso de la Matrix modificado (8 hits + shake fuerte + glitch audio)
+                        // UPDATED: Agresividad y Reacción del Límite Exterior
                         if (p.type === 'bazooka' && isOuterBoundary) {
                             matrixDamage++;
-                            matrixDestabilized = true; // Activar spawneo masivo progresivo
+                            matrixDestabilized = true; 
                             
+                            // Spawneo de castigo INMEDIATO cerca del jugador
+                            let immediatePunishment = Math.floor(matrixDamage * 2);
+                            for(let s=0; s<immediatePunishment; s++) {
+                                spawnSingleEnemy(true, true);
+                            }
+
                             generateMatrixCrack(p.x, p.y);
                             
-                            // Escalar el movimiento de pantalla dependiendo del daño actual
                             screenShakeTimer = 35 + (matrixDamage * 2);
                             screenShakeIntensity = 12 + (matrixDamage * 1.5);
                             
                             playSound('explosion');
-                            playSound('glitch'); // Sonido de glitch digital
+                            playSound('glitch'); 
                             
-                            if (matrixDamage >= 8) { // Cambiado a 8 impactos
+                            if (matrixDamage >= 8) { 
                                 triggerMatrixCollapse();
                                 projectiles.splice(i, 1);
                                 continue; 
