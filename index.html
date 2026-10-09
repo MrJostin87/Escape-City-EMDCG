@@ -553,13 +553,60 @@
                 const gain = audioCtx.createGain();
                 const now = audioCtx.currentTime;
 
-                if (type === 'glitch') {
-                    // NEW MECHANIC: Digital glitch/noise generation using AudioBuffer
-                    const bufferSize = audioCtx.sampleRate * 0.5; // 0.5 seconds of noise
+                // --- NUEVO SONIDO: COLAPSO MASIVO Y DISTORSIONADO ---
+                if (type === 'matrix_collapse') {
+                    const bufferSize = audioCtx.sampleRate * 2.5; // 2.5 Segundos de ruido
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
-                        data[i] = Math.random() * 2 - 1; // White noise
+                        data[i] = (Math.random() * 2 - 1); 
+                    }
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+
+                    // WaveShaperNode para Distorsión Extrema (Saturación Digital/Overdrive)
+                    const waveShaper = audioCtx.createWaveShaper();
+                    const curve = new Float32Array(4096);
+                    for (let i = 0; i < 4096; i++) {
+                        const x = (i * 2) / 4096 - 1;
+                        // Formula abrasiva que rompe brutalmente el audio
+                        curve[i] = (50 + 20) * x * 20 * (Math.PI / 180) / (Math.PI + 20 * Math.abs(x));
+                    }
+                    waveShaper.curve = curve;
+                    waveShaper.oversample = '4x';
+
+                    // Lowpass que va reduciéndose simulando una explosión profunda
+                    const biquad = audioCtx.createBiquadFilter();
+                    biquad.type = 'lowpass';
+                    biquad.frequency.setValueAtTime(4000, now);
+                    biquad.frequency.exponentialRampToValueAtTime(30, now + 2.0);
+
+                    // Refuerzo inmenso de graves (Lowshelf)
+                    const biquad2 = audioCtx.createBiquadFilter();
+                    biquad2.type = 'lowshelf';
+                    biquad2.frequency.value = 200;
+                    biquad2.gain.value = 15;
+
+                    noise.connect(waveShaper);
+                    waveShaper.connect(biquad);
+                    biquad.connect(biquad2);
+                    biquad2.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    gain.gain.setValueAtTime(0.9 * sfxVolume, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 2.4);
+
+                    noise.start(now);
+                    noise.stop(now + 2.5);
+                    return;
+                }
+
+                if (type === 'glitch') {
+                    const bufferSize = audioCtx.sampleRate * 0.5;
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
                     }
                     const noise = audioCtx.createBufferSource();
                     noise.buffer = buffer;
@@ -766,7 +813,6 @@
         let matrixDamage = 0;
         let matrixCracks = [];
         
-        // NEW MECHANIC VARIABLES: Spawneo Progresivo
         let matrixDestabilized = false;
         let enemySpawnTimer = 0;
         let enemySpawnRate = 120; 
@@ -837,7 +883,7 @@
             }
 
             for(let i=0; i<60; i++) {
-                spawnSingleEnemy(false, false); // Base spawn without glitch effects
+                spawnSingleEnemy(false, false);
             }
         }
 
@@ -873,7 +919,6 @@
             if(!placed) items.push({ x: TILE_SIZE * 6, y: TILE_SIZE * 6, id: id, color: color, radius: 14 });
         }
 
-        // UPDATED: Mecánica de Spawneo (Horda y Control de Distancia)
         function spawnSingleEnemy(isGlitchSpawn = true, nearPlayer = false) {
             if (enemies.length >= MAX_ENEMIES) return;
             
@@ -882,17 +927,15 @@
             let spawned = false;
 
             if (nearPlayer) {
-                // Forzar aparición en un radio alrededor del jugador (tensión inmediata pero fuera de muros)
                 do {
                     let angle = Math.random() * Math.PI * 2;
-                    let distTiles = 5 + Math.random() * 7; // Entre 5 y 12 bloques de distancia
+                    let distTiles = 5 + Math.random() * 7; 
                     ex = player.x + Math.cos(angle) * (distTiles * TILE_SIZE);
                     ey = player.y + Math.sin(angle) * (distTiles * TILE_SIZE);
                     
                     c = Math.floor(ex / TILE_SIZE);
                     r = Math.floor(ey / TILE_SIZE);
                     
-                    // Asegurar estar dentro del mapa
                     c = Math.max(1, Math.min(MAP_COLS - 2, c));
                     r = Math.max(1, Math.min(MAP_ROWS - 2, r));
                     
@@ -906,7 +949,6 @@
             }
 
             if (!spawned) {
-                // Lógica original aleatoria en todo el mapa
                 attempts = 0;
                 do {
                     c = Math.floor(Math.random() * (MAP_COLS - 4)) + 2;
@@ -925,12 +967,10 @@
                     y: ey,
                     w: 40,
                     h: 40,
-                    // Agresividad escalable por matrixDamage
                     speed: 1.4 + Math.random() * 0.6 + (matrixDamage * 0.15),
                     state: isGlitchSpawn ? 'CHASE' : 'PATROL',
                     patrolTarget: { x: ex, y: ey },
                     patrolTimer: 0,
-                    // Visión masiva escalable por matrixDamage
                     visionRange: 300 + (matrixDamage * 45),
                     hp: 3
                 });
@@ -962,6 +1002,7 @@
             matrixCracks.push(crack);
         }
 
+        // --- ACTUALIZADO: COLAPSO MASIVO CON AUDIO DISTORSIONADO ---
         function triggerMatrixCollapse() {
             currentState = STATES.GAMEOVER;
             if (timerInterval) clearInterval(timerInterval);
@@ -969,9 +1010,8 @@
             document.getElementById('controlsLayer').classList.add('hidden');
             document.getElementById('btnPause').classList.add('hidden');
             
-            playSound('explosion');
-            playSound('alert');
-            playSound('glitch');
+            // Audio brutal del nuevo sistema
+            playSound('matrix_collapse');
             
             let endScreen = document.getElementById('endScreen');
             endScreen.classList.remove('hidden');
@@ -1067,17 +1107,13 @@
                 }
             }
 
-            // UPDATED: Spawneo Progresivo Acelerado y Agresivo
             if (matrixDestabilized && enemies.length < MAX_ENEMIES) {
                 enemySpawnTimer--;
                 if (enemySpawnTimer <= 0) {
-                    // Multiplicar cantidad de horda progresivamente
                     let enemiesToSpawn = Math.floor(matrixDamage * 1.5) + (matrixDamage > 4 ? 3 : 1);
                     for(let s=0; s<enemiesToSpawn; s++) {
-                        // Aparecen cerca del jugador de forma asegurada
                         spawnSingleEnemy(true, true);
                     }
-                    // Aceleración drástica de la tasa de spawneo
                     enemySpawnRate = Math.max(15, 120 - (matrixDamage * 15));
                     enemySpawnTimer = enemySpawnRate;
                 }
@@ -1141,12 +1177,10 @@
                     if (hitSolid) {
                         createParticles(p.x, p.y, '#94a3b8', 6);
                         
-                        // UPDATED: Agresividad y Reacción del Límite Exterior
                         if (p.type === 'bazooka' && isOuterBoundary) {
                             matrixDamage++;
                             matrixDestabilized = true; 
                             
-                            // Spawneo de castigo INMEDIATO cerca del jugador
                             let immediatePunishment = Math.floor(matrixDamage * 2);
                             for(let s=0; s<immediatePunishment; s++) {
                                 spawnSingleEnemy(true, true);
@@ -1733,6 +1767,91 @@
                         ctx.restore();
                     }
                 }
+            }
+
+            // --- NUEVO SISTEMA VISUAL: GRIETAS Y GLITCHES EN BORDES ---
+            if (matrixDamage > 0) {
+                ctx.save();
+                // Reiniciamos la transformación de la cámara para dibujar en espacio de pantalla (sobre la UI local)
+                ctx.setTransform(1, 0, 0, 1, 0, 0); 
+                
+                let intensity = matrixDamage / 8; // Escalado de daño (0.125 a 1.0)
+                let maxDist = 40 + (intensity * 120); 
+                let glitchItems = Math.floor(Math.random() * 30 * intensity) + (matrixDamage * 8);
+                
+                // 1. Dibujar rectángulos de glitch y estática en los bordes
+                for(let i = 0; i < glitchItems; i++) {
+                    let edge = Math.floor(Math.random() * 4);
+                    let cx, cy, cw, ch;
+                    
+                    let isBright = Math.random() > 0.85;
+                    ctx.fillStyle = isBright ? '#ffffff' : (Math.random() > 0.5 ? '#ff003c' : '#00ffcc');
+                    ctx.globalAlpha = Math.random() * 0.7 + 0.1;
+                    
+                    if (edge === 0) { // Arriba
+                        cx = Math.random() * canvas.width;
+                        cy = Math.random() * maxDist;
+                        cw = Math.random() * 80 + 10;
+                        ch = Math.random() * 12 + 2;
+                    } else if (edge === 1) { // Derecha
+                        cx = canvas.width - (Math.random() * maxDist);
+                        cy = Math.random() * canvas.height;
+                        cw = Math.random() * 12 + 2;
+                        ch = Math.random() * 80 + 10;
+                    } else if (edge === 2) { // Abajo
+                        cx = Math.random() * canvas.width;
+                        cy = canvas.height - (Math.random() * maxDist);
+                        cw = Math.random() * 80 + 10;
+                        ch = Math.random() * 12 + 2;
+                    } else { // Izquierda
+                        cx = Math.random() * maxDist;
+                        cy = Math.random() * canvas.height;
+                        cw = Math.random() * 12 + 2;
+                        ch = Math.random() * 80 + 10;
+                    }
+                    
+                    if (Math.random() < 0.2) ctx.globalCompositeOperation = 'overlay';
+                    ctx.fillRect(cx, cy, cw, ch);
+                    ctx.globalCompositeOperation = 'source-over'; // Reset
+                }
+
+                // 2. Dibujar fracturas gigantes si el daño es alto (>= 3)
+                if (matrixDamage >= 3) {
+                    ctx.strokeStyle = Math.random() > 0.5 ? '#ff003c' : (Math.random() > 0.5 ? '#000000' : '#00ffcc');
+                    ctx.beginPath();
+                    let crackCount = Math.floor(matrixDamage);
+                    for (let c = 0; c < crackCount; c++) {
+                        ctx.lineWidth = Math.random() * 4 + 1;
+                        let edge = Math.floor(Math.random() * 4);
+                        let startX, startY;
+                        
+                        if (edge === 0) { startX = Math.random() * canvas.width; startY = 0; }
+                        else if (edge === 1) { startX = canvas.width; startY = Math.random() * canvas.height; }
+                        else if (edge === 2) { startX = Math.random() * canvas.width; startY = canvas.height; }
+                        else { startX = 0; startY = Math.random() * canvas.height; }
+
+                        ctx.moveTo(startX, startY);
+                        let curX = startX, curY = startY;
+                        let length = 40 + matrixDamage * 25;
+                        for(let seg=0; seg<6; seg++) {
+                            // Crecimiento hacia el centro
+                            curX += (Math.random() - 0.5) * length * (edge===1||edge===3 ? 2 : 1);
+                            curY += (Math.random() - 0.5) * length * (edge===0||edge===2 ? 2 : 1);
+                            ctx.lineTo(curX, curY);
+                        }
+                    }
+                    ctx.stroke();
+                }
+
+                // 3. Estática extrema a pantalla completa en niveles críticos
+                if (matrixDamage >= 5 && Math.random() < (intensity * 0.2)) {
+                     ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 0, 60, 0.4)' : 'rgba(0, 255, 204, 0.4)';
+                     ctx.globalCompositeOperation = 'difference';
+                     ctx.fillRect(0, 0, canvas.width, canvas.height);
+                     ctx.globalCompositeOperation = 'source-over';
+                }
+
+                ctx.restore();
             }
 
             drawMinimap();
