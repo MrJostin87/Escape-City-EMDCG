@@ -286,23 +286,12 @@
             border-radius: 6px;
             box-shadow: 0 0 15px rgba(0,255,204,0.3);
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            pointer-events: auto;
+            transition: transform 0.2s, border-color 0.2s;
         }
         .minimap-container:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0,255,204,0.6);
-        }
-        .minimap-hint {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 7px;
-            color: #00ffcc;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 3px 0;
-            pointer-events: none;
-            letter-spacing: 1px;
+            border-color: var(--highlight);
         }
         #minimapCanvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
 
@@ -353,35 +342,36 @@
             text-align: center;
         }
 
-        /* Estilos del Mapa Completo (Modal) */
+        /* ESTILOS DEL MAPA TÁCTICO */
         #fullMapModal {
             background: rgba(2, 3, 8, 0.98);
-            z-index: 150;
-            padding: 20px;
-            display: flex;
+            z-index: 250;
+            pointer-events: auto;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            pointer-events: auto;
         }
-        .full-map-container {
-            position: relative;
-            width: 90vw;
-            max-width: 600px;
-            height: 90vw;
-            max-height: 600px;
-            background: #000;
-            border: 4px solid #00ffcc;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.4);
-            margin-bottom: 20px;
-            overflow: hidden;
+        .full-map-box {
+            background: rgba(5, 8, 15, 0.95);
+            border: 3px solid #00ffcc;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(0,255,204,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 95vw;
         }
         #fullMapCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
+            background: #020308;
+            border: 2px solid #334155;
             image-rendering: pixelated;
+            width: 100%;
+            max-width: 512px;
+            aspect-ratio: 1/1;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            border-radius: 4px;
         }
 
         input[type=range] {
@@ -533,21 +523,22 @@
                 <div class="timer-badge" id="gameTimer">00:00</div>
             </div>
             <div class="minimap-wrapper">
-                <div class="minimap-container" id="btnOpenFullMap">
+                <!-- MODIFICADO: Ahora el tooltip y el evento visual indican su función -->
+                <div class="minimap-container" id="btnOpenMap" title="Abrir Mapa Táctico">
                     <canvas id="minimapCanvas" width="100" height="100"></canvas>
-                    <div class="minimap-hint">CLICK: MAPA</div>
                 </div>
                 <button class="action-btn hidden" id="btnPause">⏸ PAUSA</button>
             </div>
         </div>
     </div>
 
+    <!-- NUEVO: VENTANA MODAL DEL MAPA TÁCTICO -->
     <div id="fullMapModal" class="ui-layer hidden">
-        <h2 style="color: #00ffcc; margin-bottom: 15px; font-size: 16px; text-shadow: 0 0 10px rgba(0,255,204,0.5);">MAPA TÁCTICO DE LA MATRIX</h2>
-        <div class="full-map-container">
-            <canvas id="fullMapCanvas" width="1024" height="1024"></canvas>
+        <div class="full-map-box">
+            <h2 style="color: #00ffcc; margin-top: 0; margin-bottom: 15px; font-size: 16px; text-shadow: 0 0 10px rgba(0,255,204,0.5); text-align: center;">MAPA TÁCTICO EMDCG</h2>
+            <canvas id="fullMapCanvas" width="512" height="512"></canvas>
+            <button class="btn" id="btnCloseMap">Cerrar Mapa</button>
         </div>
-        <button class="btn" id="btnCloseFullMap">Cerrar Mapa</button>
     </div>
 
     <div id="controlsLayer" class="controls-area hidden">
@@ -583,8 +574,6 @@
         const ctx = canvas.getContext('2d');
         const minimapCanvas = document.getElementById('minimapCanvas');
         const minimapCtx = minimapCanvas.getContext('2d');
-        const fullMapCanvas = document.getElementById('fullMapCanvas');
-        const fullMapCtx = fullMapCanvas.getContext('2d');
         
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -853,7 +842,8 @@
             bgMusic.load();
         }
 
-        const STATES = { PRELOAD: 0, MENU: 1, CUTSCENE: 2, INSTRUCTIONS: 3, PLAYING: 4, PAUSED: 5, GAMEOVER: 6, VICTORY: 7 };
+        // NUEVO ESTADO: STATES.MAP (Táctico)
+        const STATES = { PRELOAD: 0, MENU: 1, CUTSCENE: 2, INSTRUCTIONS: 3, PLAYING: 4, PAUSED: 5, GAMEOVER: 6, VICTORY: 7, MAP: 8 };
         let currentState = STATES.PRELOAD;
 
         const story = [
@@ -912,56 +902,6 @@
         let enemySpawnRate = 120; 
         const MAX_ENEMIES = 220; 
 
-        // Patrones geométricos masivos para Matrix Intacta
-        const qPattern = [
-            " 1111 ",
-            "11  11",
-            "    11",
-            "   11 ",
-            "  11  ",
-            "      ",
-            "  11  "
-        ];
-        const excPattern = [
-            "11",
-            "11",
-            "11",
-            "11",
-            "  ",
-            "11"
-        ];
-
-        function placeShape(startR, startC, scale, pattern) {
-            let w = pattern[0].length * scale;
-            let h = pattern.length * scale;
-            
-            // Genera área limpia (camino) alrededor de la forma para que resalte
-            for(let r = startR - 2; r < startR + h + 2; r++) {
-                for(let c = startC - 2; c < startC + w + 2; c++) {
-                    if (r > 0 && r < MAP_ROWS-1 && c > 0 && c < MAP_COLS-1) {
-                        map[r][c] = 0;
-                    }
-                }
-            }
-
-            // Dibuja el patrón con muros/edificios indestructibles
-            for(let i=0; i<pattern.length; i++) {
-                for(let j=0; j<pattern[i].length; j++) {
-                    if(pattern[i][j] === '1') {
-                        for(let sr=0; sr<scale; sr++) {
-                            for(let sc=0; sc<scale; sc++) {
-                                let r = startR + i*scale + sr;
-                                let c = startC + j*scale + sc;
-                                if (r > 0 && r < MAP_ROWS-1 && c > 0 && c < MAP_COLS-1) {
-                                    map[r][c] = 1; 
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         function generateMap() {
             map = [];
             matrixDamage = 0;
@@ -1002,10 +942,6 @@
                     }
                 }
             });
-
-            // Insertar los bloques intactos masivos "?" y "!"
-            placeShape(25, 75, 4, qPattern);
-            placeShape(75, 25, 4, excPattern);
 
             for(let r=1; r<=3; r++) {
                 for(let c=1; c<=3; c++) {
@@ -1531,72 +1467,6 @@
             door.y = Math.max(TILE_SIZE, Math.min(door.y, (MAP_ROWS-1)*TILE_SIZE));
         }
 
-        function drawFullMap() {
-            fullMapCtx.fillStyle = '#020308';
-            fullMapCtx.fillRect(0, 0, fullMapCanvas.width, fullMapCanvas.height);
-
-            let sX = fullMapCanvas.width / MAP_COLS;
-            let sY = fullMapCanvas.height / MAP_ROWS;
-
-            // Renderizar el mapa táctico
-            for(let r=0; r<MAP_ROWS; r++) {
-                for(let c=0; c<MAP_COLS; c++) {
-                    if(map[r] && map[r][c] === 1) {
-                        fullMapCtx.fillStyle = '#00ffcc';
-                        fullMapCtx.globalAlpha = 0.5;
-                        fullMapCtx.fillRect(c * sX, r * sY, sX, sY);
-                        fullMapCtx.globalAlpha = 1.0;
-                    } else if (map[r] && map[r][c] === 2) {
-                        fullMapCtx.fillStyle = '#ff003c';
-                        fullMapCtx.globalAlpha = 0.3;
-                        fullMapCtx.fillRect(c * sX, r * sY, sX, sY);
-                        fullMapCtx.globalAlpha = 1.0;
-                    } else if (map[r] && map[r][c] === 3) {
-                        fullMapCtx.fillStyle = '#a855f7';
-                        fullMapCtx.globalAlpha = 0.3;
-                        fullMapCtx.fillRect(c * sX, r * sY, sX, sY);
-                        fullMapCtx.globalAlpha = 1.0;
-                    }
-                }
-            }
-
-            // Renderizar Llaves y Objetos
-            let mapTime = Date.now() / 200;
-            let itemPulse = Math.abs(Math.sin(mapTime));
-            for(let item of items) {
-                fullMapCtx.fillStyle = item.color;
-                fullMapCtx.beginPath();
-                fullMapCtx.arc((item.x / TILE_SIZE) * sX, (item.y / TILE_SIZE) * sY, sX * (1.2 + itemPulse * 0.4), 0, Math.PI * 2);
-                fullMapCtx.fill();
-            }
-
-            // Renderizar Puerta de Escape
-            if (door) {
-                fullMapCtx.fillStyle = `rgba(250, 204, 21, ${0.7 + itemPulse * 0.3})`;
-                fullMapCtx.fillRect((door.x / TILE_SIZE) * sX - sX*2, (door.y / TILE_SIZE) * sY - sY*2, sX*4, sY*4);
-            }
-
-            // Renderizar Enemigos (Latiendo)
-            let enemyPulse = Math.abs(Math.sin(mapTime * 1.5));
-            fullMapCtx.fillStyle = `rgba(239, 68, 68, ${0.6 + enemyPulse * 0.4})`;
-            for(let e of enemies) {
-                fullMapCtx.beginPath();
-                fullMapCtx.arc((e.x / TILE_SIZE) * sX, (e.y / TILE_SIZE) * sY, sX * 1.3, 0, Math.PI * 2);
-                fullMapCtx.fill();
-            }
-
-            // Renderizar Jugador
-            fullMapCtx.fillStyle = '#38bdf8';
-            fullMapCtx.beginPath();
-            fullMapCtx.arc((player.x / TILE_SIZE) * sX, (player.y / TILE_SIZE) * sY, sX * 2.2, 0, Math.PI * 2);
-            fullMapCtx.fill();
-            
-            // Área visible de la cámara
-            fullMapCtx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-            fullMapCtx.lineWidth = 3;
-            fullMapCtx.strokeRect((camera.x / TILE_SIZE) * sX, (camera.y / TILE_SIZE) * sY, (camera.w / TILE_SIZE) * sX, (camera.h / TILE_SIZE) * sY);
-        }
-
         function draw() {
             if (currentState !== STATES.PLAYING) return;
 
@@ -2061,11 +1931,6 @@
             }
 
             drawMinimap();
-
-            // Dibujar Mapa Táctico Completo en tiempo real si el modal está abierto
-            if (!document.getElementById('fullMapModal').classList.contains('hidden')) {
-                drawFullMap();
-            }
         }
 
         function drawMinimap() {
@@ -2104,6 +1969,104 @@
             minimapCtx.fillStyle = '#38bdf8';
             minimapCtx.fillRect(player.x * scaleX - 2, player.y * scaleY - 2, 4, 4);
         }
+
+        // NUEVO: Función para dibujar el Mapa Táctico en alta resolución
+        function drawFullMap() {
+            const fMapCanvas = document.getElementById('fullMapCanvas');
+            const fCtx = fMapCanvas.getContext('2d');
+            const w = fMapCanvas.width;
+            const h = fMapCanvas.height;
+            const scaleX = w / MAP_COLS;
+            const scaleY = h / MAP_ROWS;
+
+            fCtx.fillStyle = '#020308';
+            fCtx.fillRect(0, 0, w, h);
+
+            // Dibujar Estructuras
+            for(let r=0; r<MAP_ROWS; r++) {
+                for(let c=0; c<MAP_COLS; c++) {
+                    if(!map[r]) continue;
+                    let type = map[r][c];
+                    if (type === 1) { 
+                        fCtx.fillStyle = 'rgba(0, 255, 204, 0.4)'; // Muros celestes
+                        fCtx.fillRect(c*scaleX, r*scaleY, scaleX, scaleY);
+                    } else if (type === 2) { 
+                        fCtx.fillStyle = 'rgba(255, 0, 60, 0.3)'; // Zonas destruidas rojas
+                        fCtx.fillRect(c*scaleX, r*scaleY, scaleX, scaleY);
+                    } else if (type === 3) {
+                        fCtx.fillStyle = 'rgba(168, 85, 247, 0.3)'; // Servidores morados
+                        fCtx.fillRect(c*scaleX, r*scaleY, scaleX, scaleY);
+                    }
+                }
+            }
+
+            // Dibujar Puerta de Salida
+            if (door) {
+                fCtx.fillStyle = '#fff';
+                fCtx.shadowColor = '#facc15';
+                fCtx.shadowBlur = 10;
+                fCtx.fillRect(door.x / TILE_SIZE * scaleX - 3, door.y / TILE_SIZE * scaleY - 3, 6, 6);
+                fCtx.shadowBlur = 0;
+            }
+
+            // Dibujar Objetos (Llaves resaltadas)
+            for(let item of items) {
+                if (item.id.startsWith('key')) {
+                    fCtx.fillStyle = item.color;
+                    fCtx.shadowColor = item.color;
+                    fCtx.shadowBlur = 12;
+                    fCtx.beginPath();
+                    fCtx.arc(item.x / TILE_SIZE * scaleX, item.y / TILE_SIZE * scaleY, 4, 0, Math.PI*2);
+                    fCtx.fill();
+                    fCtx.shadowBlur = 0;
+                }
+            }
+
+            // Dibujar Enemigos (Puntos Rojos Parpadeantes)
+            let timePulse = Math.abs(Math.sin(Date.now() / 200));
+            fCtx.fillStyle = '#f43f5e';
+            fCtx.shadowColor = '#ff003c';
+            fCtx.shadowBlur = 5 + (timePulse * 12);
+            for(let e of enemies) {
+                fCtx.beginPath();
+                fCtx.arc(e.x / TILE_SIZE * scaleX, e.y / TILE_SIZE * scaleY, 2.5 + timePulse * 1.5, 0, Math.PI*2);
+                fCtx.fill();
+            }
+            fCtx.shadowBlur = 0;
+
+            // Dibujar al Jugador (Punto Celeste/Azul brillante)
+            fCtx.fillStyle = '#38bdf8';
+            fCtx.shadowColor = '#38bdf8';
+            fCtx.shadowBlur = 12;
+            fCtx.beginPath();
+            fCtx.arc(player.x / TILE_SIZE * scaleX, player.y / TILE_SIZE * scaleY, 4, 0, Math.PI*2);
+            fCtx.fill();
+            fCtx.shadowBlur = 0;
+        }
+
+        // LÓGICA PARA ABRIR/CERRAR EL MAPA TÁCTICO
+        const btnOpenMap = document.getElementById('btnOpenMap');
+        const btnCloseMap = document.getElementById('btnCloseMap');
+        
+        function toggleTacticalMap() {
+            if (currentState === STATES.PLAYING) {
+                playSound('click');
+                currentState = STATES.MAP;
+                document.getElementById('fullMapModal').classList.remove('hidden');
+                document.getElementById('controlsLayer').classList.add('hidden'); // Ocultar joysticks para interacción segura
+            } else if (currentState === STATES.MAP) {
+                playSound('click');
+                currentState = STATES.PLAYING;
+                document.getElementById('fullMapModal').classList.add('hidden');
+                document.getElementById('controlsLayer').classList.remove('hidden');
+            }
+        }
+
+        btnOpenMap.addEventListener('click', toggleTacticalMap);
+        btnOpenMap.addEventListener('touchstart', (e) => { e.preventDefault(); toggleTacticalMap(); });
+        btnCloseMap.addEventListener('click', toggleTacticalMap);
+        btnCloseMap.addEventListener('touchstart', (e) => { e.preventDefault(); toggleTacticalMap(); });
+
 
         function changeCharacter() {
             activeCharIndex = (activeCharIndex + 1) % party.length;
@@ -2144,30 +2107,6 @@
             let secs = (gameTime % 60).toString().padStart(2, '0');
             document.getElementById('gameTimer').innerText = `${mins}:${secs}`;
         }
-
-        // Lógica del Modal del Mapa Completo
-        document.getElementById('btnOpenFullMap').addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (currentState !== STATES.PLAYING) return;
-            playSound('click');
-            document.getElementById('fullMapModal').classList.remove('hidden');
-        });
-        document.getElementById('btnOpenFullMap').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (currentState !== STATES.PLAYING) return;
-            playSound('click');
-            document.getElementById('fullMapModal').classList.remove('hidden');
-        });
-        document.getElementById('btnCloseFullMap').addEventListener('click', () => {
-            playSound('click');
-            document.getElementById('fullMapModal').classList.add('hidden');
-        });
-        document.getElementById('btnCloseFullMap').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            playSound('click');
-            document.getElementById('fullMapModal').classList.add('hidden');
-        });
 
         document.getElementById('btnStartGame').addEventListener('click', () => {
             playSound('click');
@@ -2366,6 +2305,11 @@
         }
 
         window.addEventListener('keydown', (e) => {
+            // NUEVO: Atajo de teclado para abrir el mapa
+            if (e.key === 'm' || e.key === 'M') {
+                if (currentState === STATES.PLAYING || currentState === STATES.MAP) toggleTacticalMap();
+                return;
+            }
             if (e.key === 'p' || e.key === 'P') {
                 if (currentState === STATES.PLAYING || currentState === STATES.PAUSED) togglePause();
                 return;
@@ -2473,8 +2417,14 @@
         }
 
         function gameLoop() {
-            update();
-            draw();
+            if (currentState === STATES.MAP) {
+                // Durante el Mapa Táctico, congelamos `update()` y `draw()` principales,
+                // pero continuamos renderizando dinámicamente el mapa para efectos visuales fluidos.
+                drawFullMap();
+            } else {
+                update();
+                draw();
+            }
             requestAnimationFrame(gameLoop);
         }
         requestAnimationFrame(gameLoop);
