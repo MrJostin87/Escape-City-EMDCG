@@ -285,6 +285,24 @@
             overflow: hidden;
             border-radius: 6px;
             box-shadow: 0 0 15px rgba(0,255,204,0.3);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .minimap-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0,255,204,0.6);
+        }
+        .minimap-hint {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 7px;
+            color: #00ffcc;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 3px 0;
+            pointer-events: none;
+            letter-spacing: 1px;
         }
         #minimapCanvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
 
@@ -333,6 +351,37 @@
             width: 90%;
             box-shadow: 0 0 30px rgba(0,255,204,0.3);
             text-align: center;
+        }
+
+        /* Estilos del Mapa Completo (Modal) */
+        #fullMapModal {
+            background: rgba(2, 3, 8, 0.98);
+            z-index: 150;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+        }
+        .full-map-container {
+            position: relative;
+            width: 90vw;
+            max-width: 600px;
+            height: 90vw;
+            max-height: 600px;
+            background: #000;
+            border: 4px solid #00ffcc;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.4);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        #fullMapCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            image-rendering: pixelated;
         }
 
         input[type=range] {
@@ -484,12 +533,21 @@
                 <div class="timer-badge" id="gameTimer">00:00</div>
             </div>
             <div class="minimap-wrapper">
-                <div class="minimap-container">
+                <div class="minimap-container" id="btnOpenFullMap">
                     <canvas id="minimapCanvas" width="100" height="100"></canvas>
+                    <div class="minimap-hint">CLICK: MAPA</div>
                 </div>
                 <button class="action-btn hidden" id="btnPause">⏸ PAUSA</button>
             </div>
         </div>
+    </div>
+
+    <div id="fullMapModal" class="ui-layer hidden">
+        <h2 style="color: #00ffcc; margin-bottom: 15px; font-size: 16px; text-shadow: 0 0 10px rgba(0,255,204,0.5);">MAPA TÁCTICO DE LA MATRIX</h2>
+        <div class="full-map-container">
+            <canvas id="fullMapCanvas" width="1024" height="1024"></canvas>
+        </div>
+        <button class="btn" id="btnCloseFullMap">Cerrar Mapa</button>
     </div>
 
     <div id="controlsLayer" class="controls-area hidden">
@@ -525,6 +583,8 @@
         const ctx = canvas.getContext('2d');
         const minimapCanvas = document.getElementById('minimapCanvas');
         const minimapCtx = minimapCanvas.getContext('2d');
+        const fullMapCanvas = document.getElementById('fullMapCanvas');
+        const fullMapCtx = fullMapCanvas.getContext('2d');
         
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -852,6 +912,56 @@
         let enemySpawnRate = 120; 
         const MAX_ENEMIES = 220; 
 
+        // Patrones geométricos masivos para Matrix Intacta
+        const qPattern = [
+            " 1111 ",
+            "11  11",
+            "    11",
+            "   11 ",
+            "  11  ",
+            "      ",
+            "  11  "
+        ];
+        const excPattern = [
+            "11",
+            "11",
+            "11",
+            "11",
+            "  ",
+            "11"
+        ];
+
+        function placeShape(startR, startC, scale, pattern) {
+            let w = pattern[0].length * scale;
+            let h = pattern.length * scale;
+            
+            // Genera área limpia (camino) alrededor de la forma para que resalte
+            for(let r = startR - 2; r < startR + h + 2; r++) {
+                for(let c = startC - 2; c < startC + w + 2; c++) {
+                    if (r > 0 && r < MAP_ROWS-1 && c > 0 && c < MAP_COLS-1) {
+                        map[r][c] = 0;
+                    }
+                }
+            }
+
+            // Dibuja el patrón con muros/edificios indestructibles
+            for(let i=0; i<pattern.length; i++) {
+                for(let j=0; j<pattern[i].length; j++) {
+                    if(pattern[i][j] === '1') {
+                        for(let sr=0; sr<scale; sr++) {
+                            for(let sc=0; sc<scale; sc++) {
+                                let r = startR + i*scale + sr;
+                                let c = startC + j*scale + sc;
+                                if (r > 0 && r < MAP_ROWS-1 && c > 0 && c < MAP_COLS-1) {
+                                    map[r][c] = 1; 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         function generateMap() {
             map = [];
             matrixDamage = 0;
@@ -892,6 +1002,10 @@
                     }
                 }
             });
+
+            // Insertar los bloques intactos masivos "?" y "!"
+            placeShape(25, 75, 4, qPattern);
+            placeShape(75, 25, 4, excPattern);
 
             for(let r=1; r<=3; r++) {
                 for(let c=1; c<=3; c++) {
@@ -1417,6 +1531,72 @@
             door.y = Math.max(TILE_SIZE, Math.min(door.y, (MAP_ROWS-1)*TILE_SIZE));
         }
 
+        function drawFullMap() {
+            fullMapCtx.fillStyle = '#020308';
+            fullMapCtx.fillRect(0, 0, fullMapCanvas.width, fullMapCanvas.height);
+
+            let sX = fullMapCanvas.width / MAP_COLS;
+            let sY = fullMapCanvas.height / MAP_ROWS;
+
+            // Renderizar el mapa táctico
+            for(let r=0; r<MAP_ROWS; r++) {
+                for(let c=0; c<MAP_COLS; c++) {
+                    if(map[r] && map[r][c] === 1) {
+                        fullMapCtx.fillStyle = '#00ffcc';
+                        fullMapCtx.globalAlpha = 0.5;
+                        fullMapCtx.fillRect(c * sX, r * sY, sX, sY);
+                        fullMapCtx.globalAlpha = 1.0;
+                    } else if (map[r] && map[r][c] === 2) {
+                        fullMapCtx.fillStyle = '#ff003c';
+                        fullMapCtx.globalAlpha = 0.3;
+                        fullMapCtx.fillRect(c * sX, r * sY, sX, sY);
+                        fullMapCtx.globalAlpha = 1.0;
+                    } else if (map[r] && map[r][c] === 3) {
+                        fullMapCtx.fillStyle = '#a855f7';
+                        fullMapCtx.globalAlpha = 0.3;
+                        fullMapCtx.fillRect(c * sX, r * sY, sX, sY);
+                        fullMapCtx.globalAlpha = 1.0;
+                    }
+                }
+            }
+
+            // Renderizar Llaves y Objetos
+            let mapTime = Date.now() / 200;
+            let itemPulse = Math.abs(Math.sin(mapTime));
+            for(let item of items) {
+                fullMapCtx.fillStyle = item.color;
+                fullMapCtx.beginPath();
+                fullMapCtx.arc((item.x / TILE_SIZE) * sX, (item.y / TILE_SIZE) * sY, sX * (1.2 + itemPulse * 0.4), 0, Math.PI * 2);
+                fullMapCtx.fill();
+            }
+
+            // Renderizar Puerta de Escape
+            if (door) {
+                fullMapCtx.fillStyle = `rgba(250, 204, 21, ${0.7 + itemPulse * 0.3})`;
+                fullMapCtx.fillRect((door.x / TILE_SIZE) * sX - sX*2, (door.y / TILE_SIZE) * sY - sY*2, sX*4, sY*4);
+            }
+
+            // Renderizar Enemigos (Latiendo)
+            let enemyPulse = Math.abs(Math.sin(mapTime * 1.5));
+            fullMapCtx.fillStyle = `rgba(239, 68, 68, ${0.6 + enemyPulse * 0.4})`;
+            for(let e of enemies) {
+                fullMapCtx.beginPath();
+                fullMapCtx.arc((e.x / TILE_SIZE) * sX, (e.y / TILE_SIZE) * sY, sX * 1.3, 0, Math.PI * 2);
+                fullMapCtx.fill();
+            }
+
+            // Renderizar Jugador
+            fullMapCtx.fillStyle = '#38bdf8';
+            fullMapCtx.beginPath();
+            fullMapCtx.arc((player.x / TILE_SIZE) * sX, (player.y / TILE_SIZE) * sY, sX * 2.2, 0, Math.PI * 2);
+            fullMapCtx.fill();
+            
+            // Área visible de la cámara
+            fullMapCtx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+            fullMapCtx.lineWidth = 3;
+            fullMapCtx.strokeRect((camera.x / TILE_SIZE) * sX, (camera.y / TILE_SIZE) * sY, (camera.w / TILE_SIZE) * sX, (camera.h / TILE_SIZE) * sY);
+        }
+
         function draw() {
             if (currentState !== STATES.PLAYING) return;
 
@@ -1881,6 +2061,11 @@
             }
 
             drawMinimap();
+
+            // Dibujar Mapa Táctico Completo en tiempo real si el modal está abierto
+            if (!document.getElementById('fullMapModal').classList.contains('hidden')) {
+                drawFullMap();
+            }
         }
 
         function drawMinimap() {
@@ -1959,6 +2144,30 @@
             let secs = (gameTime % 60).toString().padStart(2, '0');
             document.getElementById('gameTimer').innerText = `${mins}:${secs}`;
         }
+
+        // Lógica del Modal del Mapa Completo
+        document.getElementById('btnOpenFullMap').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentState !== STATES.PLAYING) return;
+            playSound('click');
+            document.getElementById('fullMapModal').classList.remove('hidden');
+        });
+        document.getElementById('btnOpenFullMap').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (currentState !== STATES.PLAYING) return;
+            playSound('click');
+            document.getElementById('fullMapModal').classList.remove('hidden');
+        });
+        document.getElementById('btnCloseFullMap').addEventListener('click', () => {
+            playSound('click');
+            document.getElementById('fullMapModal').classList.add('hidden');
+        });
+        document.getElementById('btnCloseFullMap').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            playSound('click');
+            document.getElementById('fullMapModal').classList.add('hidden');
+        });
 
         document.getElementById('btnStartGame').addEventListener('click', () => {
             playSound('click');
