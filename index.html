@@ -88,8 +88,45 @@
         .btn:hover { box-shadow: 0 0 15px var(--primary); }
         .btn-secondary { background: #3b82f6; color: #fff; }
         .btn-secondary:hover { box-shadow: 0 0 15px #3b82f6; }
-        .btn-accent { background: #8b5cf6; color: #fff; }
-        .btn-accent:hover { box-shadow: 0 0 15px #8b5cf6; }
+
+        .btn-rgb-store {
+            position: relative;
+            background: #0f172a !important;
+            color: #ffffff !important;
+            border: none !important;
+            padding: 14px 32px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            z-index: 1;
+        }
+        .btn-rgb-store::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            background: linear-gradient(45deg, #ff0055, #ffcc00, #00ffcc, #0066ff, #9900ff, #ff0055);
+            background-size: 400%;
+            z-index: -2;
+            animation: rgbBorderAnimation 5s linear infinite;
+            border-radius: 8px;
+        }
+        .btn-rgb-store::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: #090d16;
+            border-radius: 5px;
+            z-index: -1;
+        }
+        @keyframes rgbBorderAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .btn-rgb-store:hover {
+            box-shadow: 0 0 30px #00ffcc, 0 0 50px #ff0055;
+            transform: scale(1.04);
+        }
 
         .settings-icon-btn {
             position: absolute;
@@ -365,7 +402,7 @@
         <p class="subtitle">Un fallo en la Matrix...</p>
         <div class="menu-buttons">
             <button class="btn" id="btnStartGame">Iniciar Juego</button>
-            <button class="btn btn-accent" id="btnStore">Tienda</button>
+            <button class="btn btn-rgb-store" id="btnStore">ABG Store</button>
             <button class="btn btn-secondary" id="btnToggleAudio" style="font-size: 10px; padding: 12px 20px;">🔊 Sonido: ON</button>
         </div>
         
@@ -374,7 +411,7 @@
 
     <div id="storeModal" class="ui-layer hidden">
         <div class="store-box">
-            <h2 style="color:var(--highlight); margin-bottom: 20px; font-size: 16px;">TIENDA EMDCG</h2>
+            <h2 style="color:var(--highlight); margin-bottom: 20px; font-size: 16px;">ABG STORE EMDCG</h2>
             <p id="storeMessage" style="font-size: 13px; color:#fff; margin-bottom: 25px; line-height: 1.6;">Próximamente ;)</p>
             <button class="btn" id="btnCloseStore">Cerrar</button>
         </div>
@@ -553,9 +590,8 @@
                 const gain = audioCtx.createGain();
                 const now = audioCtx.currentTime;
 
-                // --- NUEVO SONIDO: COLAPSO MASIVO Y DISTORSIONADO ---
                 if (type === 'matrix_collapse') {
-                    const bufferSize = audioCtx.sampleRate * 2.5; // 2.5 Segundos de ruido
+                    const bufferSize = audioCtx.sampleRate * 2.5; 
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
@@ -564,24 +600,20 @@
                     const noise = audioCtx.createBufferSource();
                     noise.buffer = buffer;
 
-                    // WaveShaperNode para Distorsión Extrema (Saturación Digital/Overdrive)
                     const waveShaper = audioCtx.createWaveShaper();
                     const curve = new Float32Array(4096);
                     for (let i = 0; i < 4096; i++) {
                         const x = (i * 2) / 4096 - 1;
-                        // Formula abrasiva que rompe brutalmente el audio
                         curve[i] = (50 + 20) * x * 20 * (Math.PI / 180) / (Math.PI + 20 * Math.abs(x));
                     }
                     waveShaper.curve = curve;
                     waveShaper.oversample = '4x';
 
-                    // Lowpass que va reduciéndose simulando una explosión profunda
                     const biquad = audioCtx.createBiquadFilter();
                     biquad.type = 'lowpass';
                     biquad.frequency.setValueAtTime(4000, now);
                     biquad.frequency.exponentialRampToValueAtTime(30, now + 2.0);
 
-                    // Refuerzo inmenso de graves (Lowshelf)
                     const biquad2 = audioCtx.createBiquadFilter();
                     biquad2.type = 'lowshelf';
                     biquad2.frequency.value = 200;
@@ -726,12 +758,14 @@
             }
 
             if (loadedCount >= totalAssets) {
+                document.getElementById('loadingSubtext').innerText = "¡Todos los recursos ya están cargados!";
+                document.getElementById('loadingSubtext').style.color = "#10b981";
                 setTimeout(() => {
                     document.getElementById('preloaderScreen').classList.add('hidden');
                     document.getElementById('mainMenu').classList.remove('hidden');
                     currentState = STATES.MENU;
                     attemptPlayBGM();
-                }, 400);
+                }, 600);
             }
         }
 
@@ -1002,7 +1036,6 @@
             matrixCracks.push(crack);
         }
 
-        // --- ACTUALIZADO: COLAPSO MASIVO CON AUDIO DISTORSIONADO ---
         function triggerMatrixCollapse() {
             currentState = STATES.GAMEOVER;
             if (timerInterval) clearInterval(timerInterval);
@@ -1010,7 +1043,6 @@
             document.getElementById('controlsLayer').classList.add('hidden');
             document.getElementById('btnPause').classList.add('hidden');
             
-            // Audio brutal del nuevo sistema
             playSound('matrix_collapse');
             
             let endScreen = document.getElementById('endScreen');
@@ -1769,17 +1801,14 @@
                 }
             }
 
-            // --- NUEVO SISTEMA VISUAL: GRIETAS Y GLITCHES EN BORDES ---
             if (matrixDamage > 0) {
                 ctx.save();
-                // Reiniciamos la transformación de la cámara para dibujar en espacio de pantalla (sobre la UI local)
                 ctx.setTransform(1, 0, 0, 1, 0, 0); 
                 
-                let intensity = matrixDamage / 8; // Escalado de daño (0.125 a 1.0)
+                let intensity = matrixDamage / 8;
                 let maxDist = 40 + (intensity * 120); 
                 let glitchItems = Math.floor(Math.random() * 30 * intensity) + (matrixDamage * 8);
                 
-                // 1. Dibujar rectángulos de glitch y estática en los bordes
                 for(let i = 0; i < glitchItems; i++) {
                     let edge = Math.floor(Math.random() * 4);
                     let cx, cy, cw, ch;
@@ -1788,22 +1817,22 @@
                     ctx.fillStyle = isBright ? '#ffffff' : (Math.random() > 0.5 ? '#ff003c' : '#00ffcc');
                     ctx.globalAlpha = Math.random() * 0.7 + 0.1;
                     
-                    if (edge === 0) { // Arriba
+                    if (edge === 0) {
                         cx = Math.random() * canvas.width;
                         cy = Math.random() * maxDist;
                         cw = Math.random() * 80 + 10;
                         ch = Math.random() * 12 + 2;
-                    } else if (edge === 1) { // Derecha
+                    } else if (edge === 1) {
                         cx = canvas.width - (Math.random() * maxDist);
                         cy = Math.random() * canvas.height;
                         cw = Math.random() * 12 + 2;
                         ch = Math.random() * 80 + 10;
-                    } else if (edge === 2) { // Abajo
+                    } else if (edge === 2) {
                         cx = Math.random() * canvas.width;
                         cy = canvas.height - (Math.random() * maxDist);
                         cw = Math.random() * 80 + 10;
                         ch = Math.random() * 12 + 2;
-                    } else { // Izquierda
+                    } else {
                         cx = Math.random() * maxDist;
                         cy = Math.random() * canvas.height;
                         cw = Math.random() * 12 + 2;
@@ -1812,10 +1841,9 @@
                     
                     if (Math.random() < 0.2) ctx.globalCompositeOperation = 'overlay';
                     ctx.fillRect(cx, cy, cw, ch);
-                    ctx.globalCompositeOperation = 'source-over'; // Reset
+                    ctx.globalCompositeOperation = 'source-over';
                 }
 
-                // 2. Dibujar fracturas gigantes si el daño es alto (>= 3)
                 if (matrixDamage >= 3) {
                     ctx.strokeStyle = Math.random() > 0.5 ? '#ff003c' : (Math.random() > 0.5 ? '#000000' : '#00ffcc');
                     ctx.beginPath();
@@ -1834,7 +1862,6 @@
                         let curX = startX, curY = startY;
                         let length = 40 + matrixDamage * 25;
                         for(let seg=0; seg<6; seg++) {
-                            // Crecimiento hacia el centro
                             curX += (Math.random() - 0.5) * length * (edge===1||edge===3 ? 2 : 1);
                             curY += (Math.random() - 0.5) * length * (edge===0||edge===2 ? 2 : 1);
                             ctx.lineTo(curX, curY);
@@ -1843,7 +1870,6 @@
                     ctx.stroke();
                 }
 
-                // 3. Estática extrema a pantalla completa en niveles críticos
                 if (matrixDamage >= 5 && Math.random() < (intensity * 0.2)) {
                      ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 0, 60, 0.4)' : 'rgba(0, 255, 204, 0.4)';
                      ctx.globalCompositeOperation = 'difference';
@@ -2170,49 +2196,79 @@
 
         const joystickZone = document.getElementById('joystickZone');
         const joystickKnob = document.getElementById('joystickKnob');
-        let jzRect = null;
+        let joystickTouchId = null;
 
-        function handleJoystickMove(e) {
+        joystickZone.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if(!joystick.active) return;
-            
-            let touch = e.touches ? e.touches[0] : e;
-            if(!jzRect) jzRect = joystickZone.getBoundingClientRect();
-            
-            let centerX = jzRect.left + jzRect.width/2;
-            let centerY = jzRect.top + jzRect.height/2;
-            
-            let dx = touch.clientX - centerX;
-            let dy = touch.clientY - centerY;
-            
-            let mag = Math.hypot(dx, dy);
-            let maxR = jzRect.width/2 - 25;
-            
-            if(mag > maxR) {
-                dx = (dx/mag) * maxR;
-                dy = (dy/mag) * maxR;
+            if (joystickTouchId === null) {
+                const touch = e.changedTouches[0];
+                joystickTouchId = touch.identifier;
+                joystick.active = true;
+                updateJoystickPosition(touch);
             }
-            
-            joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-            joystick.dx = dx / maxR;
-            joystick.dy = dy / maxR;
+        });
+
+        joystickZone.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (joystick.active) {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === joystickTouchId) {
+                        updateJoystickPosition(e.changedTouches[i]);
+                        break;
+                    }
+                }
+            }
+        });
+
+        function endJoystick() {
+            joystick.active = false;
+            joystickTouchId = null;
+            joystickKnob.style.transform = `translate(0px, 0px)`;
+            joystick.dx = 0; joystick.dy = 0;
         }
 
-        joystickZone.addEventListener('touchstart', (e) => { e.preventDefault(); joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); }, {passive:false});
-        joystickZone.addEventListener('touchmove', handleJoystickMove, {passive:false});
-        joystickZone.addEventListener('touchend', (e) => { e.preventDefault(); joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }, {passive:false});
-        
-        joystickZone.addEventListener('mousedown', (e) => { joystick.active = true; jzRect = joystickZone.getBoundingClientRect(); handleJoystickMove(e); });
-        document.addEventListener('mousemove', (e) => { if(joystick.active) handleJoystickMove(e); });
-        document.addEventListener('mouseup', () => { if(joystick.active) { joystick.active = false; joystick.dx=0; joystick.dy=0; joystickKnob.style.transform = `translate(0px, 0px)`; }});
+        joystickZone.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === joystickTouchId) {
+                    endJoystick();
+                    break;
+                }
+            }
+        });
+
+        joystickZone.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            endJoystick();
+        });
+
+        function updateJoystickPosition(touch) {
+            const rect = joystickZone.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            let diffX = touch.clientX - centerX;
+            let diffY = touch.clientY - centerY;
+            
+            const maxDist = 45;
+            const distance = Math.hypot(diffX, diffY);
+            
+            if (distance > maxDist) {
+                diffX = (diffX / distance) * maxDist;
+                diffY = (diffY / distance) * maxDist;
+            }
+            
+            joystickKnob.style.transform = `translate(${diffX}px, ${diffY}px)`;
+            joystick.dx = diffX / maxDist;
+            joystick.dy = diffY / maxDist;
+        }
 
         function gameLoop() {
             update();
             draw();
             requestAnimationFrame(gameLoop);
         }
-
-        gameLoop();
+        requestAnimationFrame(gameLoop);
     </script>
 </body>
 </html>
