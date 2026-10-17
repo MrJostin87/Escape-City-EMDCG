@@ -21,7 +21,7 @@
             height: 100%;
             background-color: #020308;
             overflow: hidden;
-            font-family: 'Press Start 2P', 'Courier New', sans-serif; /* Fallbacks para idiomas no latinos */
+            font-family: 'Press Start 2P', cursive;
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
@@ -327,10 +327,10 @@
         
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
-        #pauseScreen, #endScreen, #storeModal, #settingsModal, #languageModal { background: rgba(2, 3, 8, 0.96); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
+        #pauseScreen, #endScreen, #storeModal, #settingsModal { background: rgba(2, 3, 8, 0.96); pointer-events: auto; flex-direction: column; text-align: center; padding: 20px;}
         .menu-buttons { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 15px; }
 
-        #storeModal, #settingsModal, #languageModal { z-index: 150; }
+        #storeModal, #settingsModal { z-index: 150; }
         .store-box {
             background: rgba(5, 8, 15, 0.95);
             border: 3px solid #00ffcc;
@@ -399,30 +399,6 @@
             max-width: 80%;
         }
 
-        /* Estilos Ventana Idiomas */
-        .lang-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); 
-            gap: 8px; 
-            max-height: 45vh; 
-            overflow-y: auto; 
-            margin-bottom: 20px; 
-            padding: 5px; 
-        }
-        .lang-btn { 
-            background: rgba(15,23,42,0.8); 
-            border: 1px solid #38bdf8; 
-            color: #fff; 
-            border-radius: 4px; 
-            padding: 10px 5px; 
-            font-family: inherit; 
-            font-size: 9px; 
-            cursor: pointer; 
-            transition: background 0.2s, color 0.2s; 
-        }
-        .lang-btn:hover { background: #38bdf8; color: #000; }
-        .lang-btn.active { background: #00ffcc; color: #000; border-color: #00ffcc; font-weight: bold;}
-
         @media (min-width: 1024px) {
             #joystickZone { opacity: 0.6; }
             .inst-content { font-size: 11px; }
@@ -438,7 +414,7 @@
     <audio id="bgMusic" src="Escape_City_EMDCG_Music_1.mp3" loop preload="auto"></audio>
 
     <div class="currency-badge" id="currencyBadge">
-        <span><span data-i18n="cups">🏆 Copas:</span> <span id="cupCount">0</span></span>
+        <span>🏆 Copas: <span id="cupCount">0</span></span>
     </div>
 
     <!-- Contenedor para Notificaciones Flotantes / Toast -->
@@ -462,11 +438,11 @@
         <button class="settings-icon-btn" id="btnSettings" title="Configuración">⚙️</button>
         <img src="Escape_City_EMDCG.PNG" alt="Escape City EMDCG" class="menu-logo-img" id="menuLogoImg" onerror="this.style.display='none'; document.getElementById('fallbackTitle').style.display='block';">
         <h1 id="fallbackTitle" class="title" style="display:none;">ESCAPE CITY<br>EMDCG</h1>
-        <p class="subtitle" data-i18n="menu_subtitle">Un fallo en la Matrix...</p>
+        <p class="subtitle">Un fallo en la Matrix...</p>
         <div class="menu-buttons">
-            <button class="btn" id="btnStartGame" data-i18n="start_game">Iniciar Juego</button>
-            <button class="btn btn-rgb-store" id="btnStore" data-i18n="store">ABG Store</button>
-            <button class="btn btn-secondary" id="btnToggleAudio" style="font-size: 10px; padding: 12px 20px;" data-i18n="sound_on">🔊 Sonido: ON</button>
+            <button class="btn" id="btnStartGame">Iniciar Juego</button>
+            <button class="btn btn-rgb-store" id="btnStore">ABG Store</button>
+            <button class="btn btn-secondary" id="btnToggleAudio" style="font-size: 10px; padding: 12px 20px;">🔊 Sonido: ON</button>
         </div>
         
         <div class="version-label">v0.1.0-Beta</div>
@@ -474,77 +450,63 @@
 
     <div id="storeModal" class="ui-layer hidden">
         <div class="store-box">
-            <h2 style="color:var(--highlight); margin-bottom: 20px; font-size: 16px;" data-i18n="store_title">ABG STORE EMDCG</h2>
-            <p id="storeMessage" style="font-size: 13px; color:#fff; margin-bottom: 25px; line-height: 1.6;" data-i18n="coming_soon">Próximamente ;)</p>
-            <button class="btn" id="btnCloseStore" data-i18n="close">Cerrar</button>
+            <h2 style="color:var(--highlight); margin-bottom: 20px; font-size: 16px;">ABG STORE EMDCG</h2>
+            <p id="storeMessage" style="font-size: 13px; color:#fff; margin-bottom: 25px; line-height: 1.6;">Próximamente ;)</p>
+            <button class="btn" id="btnCloseStore">Cerrar</button>
         </div>
     </div>
 
     <div id="settingsModal" class="ui-layer hidden">
         <div class="store-box" style="border-color: #00ffcc;">
-            <h2 style="color: #00ffcc; margin-bottom: 20px; font-size: 16px;" data-i18n="settings_title">CONFIGURACIÓN ⚙️</h2>
+            <h2 style="color: #00ffcc; margin-bottom: 20px; font-size: 16px;">CONFIGURACIÓN ⚙️</h2>
             
             <div style="text-align: left; margin-bottom: 20px;">
-                <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;" data-i18n="bgm_label">Música de Fondo (Menú)</label>
+                <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;">Música de Fondo (Menú)</label>
                 <input type="range" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="width: 100%; cursor: pointer;">
             </div>
             
-            <div style="text-align: left; margin-bottom: 20px;">
-                <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;" data-i18n="sfx_label">Efectos de Sonido (Juego)</label>
+            <div style="text-align: left; margin-bottom: 30px;">
+                <label style="font-size: 11px; color: #fff; display: block; margin-bottom: 10px;">Efectos de Sonido (Juego)</label>
                 <input type="range" id="sfxVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="width: 100%; cursor: pointer;">
             </div>
 
-            <!-- Botón del Sistema de Idiomas -->
-            <button class="btn btn-secondary" id="btnOpenLanguage" style="width:100%; margin-bottom: 20px; font-size: 10px; padding: 12px; border-color: #38bdf8;" data-i18n="languages_btn">🆔 Idiomas</button>
+            <p style="font-size: 8px; color: #94a3b8; margin-bottom: 20px; line-height: 1.5; font-family: inherit;">© 2026 ABG Productions & Sprunki Animations Studios Todos los derechos reservados</p>
 
-            <p style="font-size: 8px; color: #94a3b8; margin-bottom: 20px; line-height: 1.5; font-family: inherit;" data-i18n="rights">© 2026 ABG Productions & Sprunki Animations Studios Todos los derechos reservados</p>
-
-            <button class="btn" id="btnCloseSettings" data-i18n="close">Cerrar</button>
-        </div>
-    </div>
-
-    <!-- Nuevo Modal: Selección de Idioma -->
-    <div id="languageModal" class="ui-layer hidden">
-        <div class="store-box" style="border-color: #38bdf8; max-width: 500px;">
-            <h2 style="color: #38bdf8; margin-bottom: 15px; font-size: 14px;" data-i18n="select_lang">SELECCIONAR IDIOMA</h2>
-            <div id="languageList" class="lang-grid">
-                <!-- Se llenará dinámicamente -->
-            </div>
-            <button class="btn btn-secondary" id="btnCloseLanguage" data-i18n="close">Cerrar</button>
+            <button class="btn" id="btnCloseSettings">Cerrar</button>
         </div>
     </div>
 
     <div id="dialogueScreen" class="ui-layer hidden">
-        <button class="skip-dialogue-btn" id="btnSkipDialogue" data-i18n="skip">SALTAR ⏭</button>
+        <button class="skip-dialogue-btn" id="btnSkipDialogue">SALTAR ⏭</button>
         <div class="scene-container">
             <img id="sceneImage" class="scene-img" src="" alt="Escena 16:9">
         </div>
         <div class="dialogue-overlay-box" id="dialogueBox">
             <div id="speakerName" class="speaker-header">Nombre</div>
             <div id="dialogueText" class="dialogue-text-content">Texto...</div>
-            <div class="click-indicator" data-i18n="tap_continue">Toca para continuar ▼</div>
+            <div class="click-indicator">Toca para continuar ▼</div>
         </div>
     </div>
 
     <div id="instructionsScreen" class="ui-layer hidden">
         <div class="inst-content">
-            <h2 data-i18n="mission_title">MISIÓN Y REGLAS</h2>
-            <ul id="inst_list_1">
-                <li data-i18n="inst_1">Están atrapados en La Ciudad EMCD. Encuentren <b>3 LLAVES</b> ocultas.</li>
-                <li data-i18n="inst_2"><b>Llave 1:</b> En sectores destruidos.</li>
-                <li data-i18n="inst_3"><b>Llave 2:</b> En zonas de servidores y calles lúgubres.</li>
-                <li data-i18n="inst_4"><b>Llave 3:</b> En los raros edificios intactos de la Matrix.</li>
-                <li data-i18n="inst_5"><b>CUIDADO:</b> Las Entidades te borrarán si te tocan.</li>
+            <h2>MISIÓN Y REGLAS</h2>
+            <ul>
+                <li>Están atrapados en La Ciudad EMCD. Encuentren <b>3 LLAVES</b> ocultas.</li>
+                <li><b>Llave 1:</b> En sectores destruidos.</li>
+                <li><b>Llave 2:</b> En zonas de servidores y calles lúgubres.</li>
+                <li><b>Llave 3:</b> En los raros edificios intactos de la Matrix.</li>
+                <li><b>CUIDADO:</b> Las Entidades te borrarán si te tocan.</li>
             </ul>
-            <p style="color:var(--highlight); margin-bottom:5px;" data-i18n="skills"><b>HABILIDADES:</b></p>
-            <ul id="inst_list_2">
-                <li data-i18n="skill_j"><b>Jostin (Cambio 1):</b> Pistola. Disparo recto. (12 balas)</li>
-                <li data-i18n="skill_t"><b>Tavito (Cambio 2):</b> Bazuca. Daño en área. (20 bombas) <br><span style="color:#ef4444; font-size:8px;">[Peligro: Dañar los bordes del mapa puede ser catastrófico]</span></li>
-                <li data-i18n="skill_p"><b>Pepe (Cambio 3):</b> Sigilo. Invisible 120s. No ataca.</li>
+            <p style="color:var(--highlight); margin-bottom:5px;"><b>HABILIDADES:</b></p>
+            <ul>
+                <li><b>Jostin (Cambio 1):</b> Pistola. Disparo recto. (12 balas)</li>
+                <li><b>Tavito (Cambio 2):</b> Bazuca. Daño en área. (20 bombas) <br><span style="color:#ef4444; font-size:8px;">[Peligro: Dañar los bordes del mapa puede ser catastrófico]</span></li>
+                <li><b>Pepe (Cambio 3):</b> Sigilo. Invisible 120s. No ataca.</li>
             </ul>
-            <p style="line-height:1.5;" id="inst_6" data-i18n="inst_6">Usa el Joystick para moverte.<br>Explora el mapa y esquiva entidades.<br>Pisa la llave y pulsa <b>AVISAR</b>.</p>
+            <p style="line-height:1.5;">Usa el Joystick para moverte.<br>Explora el mapa y esquiva entidades.<br>Pisa la llave y pulsa <b>AVISAR</b>.</p>
         </div>
-        <button class="btn" id="btnPlayNow" style="margin-bottom: 15px;" data-i18n="understood">¡Entendido!</button>
+        <button class="btn" id="btnPlayNow" style="margin-bottom: 15px;">¡Entendido!</button>
     </div>
 
     <div id="gameHUD" class="ui-layer hidden" style="pointer-events: none;">
@@ -557,23 +519,25 @@
                 </div>
             </div>
             <div class="hud-center">
-                <div class="keys-info"><span id="keysLabel" data-i18n="keys_label">LLAVES:</span> <span id="keyCount">0</span>/3</div>
+                <div class="keys-info">LLAVES: <span id="keyCount">0</span>/3</div>
                 <div class="timer-badge" id="gameTimer">00:00</div>
             </div>
             <div class="minimap-wrapper">
+                <!-- MODIFICADO: Ahora el tooltip y el evento visual indican su función -->
                 <div class="minimap-container" id="btnOpenMap" title="Abrir Mapa Táctico">
                     <canvas id="minimapCanvas" width="100" height="100"></canvas>
                 </div>
-                <button class="action-btn hidden" id="btnPause" data-i18n="pause">⏸ PAUSA</button>
+                <button class="action-btn hidden" id="btnPause">⏸ PAUSA</button>
             </div>
         </div>
     </div>
 
+    <!-- NUEVO: VENTANA MODAL DEL MAPA TÁCTICO -->
     <div id="fullMapModal" class="ui-layer hidden">
         <div class="full-map-box">
-            <h2 style="color: #00ffcc; margin-top: 0; margin-bottom: 15px; font-size: 16px; text-shadow: 0 0 10px rgba(0,255,204,0.5); text-align: center;" data-i18n="tactical_map">MAPA TÁCTICO EMDCG</h2>
+            <h2 style="color: #00ffcc; margin-top: 0; margin-bottom: 15px; font-size: 16px; text-shadow: 0 0 10px rgba(0,255,204,0.5); text-align: center;">MAPA TÁCTICO EMDCG</h2>
             <canvas id="fullMapCanvas" width="512" height="512"></canvas>
-            <button class="btn" id="btnCloseMap" data-i18n="close_map">Cerrar Mapa</button>
+            <button class="btn" id="btnCloseMap">Cerrar Mapa</button>
         </div>
     </div>
 
@@ -582,18 +546,18 @@
             <div id="joystickKnob"></div>
         </div>
         <div class="action-buttons">
-            <div id="btnAvisar" class="action-btn" data-i18n="notify">AVISAR</div>
-            <div id="btnSwap" class="action-btn" data-i18n="swap">CAMBIAR</div>
-            <div id="btnAction" class="action-btn" data-i18n="action">ACCIÓN</div>
+            <div id="btnAvisar" class="action-btn">AVISAR</div>
+            <div id="btnSwap" class="action-btn">CAMBIAR</div>
+            <div id="btnAction" class="action-btn">ACCIÓN</div>
         </div>
     </div>
 
     <div id="pauseScreen" class="ui-layer hidden">
-        <h1 class="title" style="font-size: 5vw; color: #60a5fa;" data-i18n="paused">JUEGO PAUSADO</h1>
+        <h1 class="title" style="font-size: 5vw; color: #60a5fa;">JUEGO PAUSADO</h1>
         <div class="menu-buttons">
-            <button class="btn" id="btnResume" data-i18n="resume">Continuar</button>
-            <button class="btn btn-secondary" id="btnPauseAudio" data-i18n="sound_on">🔊 Sonido: ON</button>
-            <button class="btn" style="background:#ef4444; color:#fff;" onclick="location.reload()" data-i18n="exit">Salir</button>
+            <button class="btn" id="btnResume">Continuar</button>
+            <button class="btn btn-secondary" id="btnPauseAudio">🔊 Sonido: ON</button>
+            <button class="btn" style="background:#ef4444; color:#fff;" onclick="location.reload()">Salir</button>
         </div>
     </div>
 
@@ -602,184 +566,10 @@
         <p id="endDesc" class="subtitle" style="font-size: 12px; line-height: 1.6;"></p>
         <p id="endStats" style="color:#60a5fa; font-size:10px; margin-bottom: 15px;"></p>
         <p id="rewardNotice" style="color:var(--highlight); font-size:11px; margin-bottom: 15px;"></p>
-        <button class="btn" onclick="location.reload()" style="margin-top: 10px;" data-i18n="main_menu">Menú Principal</button>
+        <button class="btn" onclick="location.reload()" style="margin-top: 10px;">Menú Principal</button>
     </div>
 
     <script>
-        // --- SISTEMA GLOBAL DE IDIOMAS (i18n) ---
-        const i18n = {
-            es: {
-                loading: "Cargando recursos...", loading_sub: "Iniciando carga de archivos...", loading_done: "¡Todos los recursos ya están cargados!",
-                menu_subtitle: "Un fallo en la Matrix...", start_game: "Iniciar Juego", store: "ABG Store",
-                sound_on: "🔊 Sonido: ON", sound_off: "🔇 Sonido: OFF", coming_soon: "Próximamente ;)",
-                close: "Cerrar", settings_title: "CONFIGURACIÓN ⚙️", bgm_label: "Música de Fondo (Menú)",
-                sfx_label: "Efectos de Sonido (Juego)", languages_btn: "🆔 Idiomas", rights: "© 2026 ABG Productions & Sprunki Animations Studios Todos los derechos reservados",
-                select_lang: "SELECCIONAR IDIOMA", skip: "SALTAR ⏭", tap_continue: "Toca para continuar ▼",
-                mission_title: "MISIÓN Y REGLAS", inst_1: "Están atrapados en La Ciudad EMCD. Encuentren <b>3 LLAVES</b> ocultas.",
-                inst_2: "<b>Llave 1:</b> En sectores destruidos.", inst_3: "<b>Llave 2:</b> En zonas de servidores y calles lúgubres.",
-                inst_4: "<b>Llave 3:</b> En los raros edificios intactos de la Matrix.", inst_5: "<b>CUIDADO:</b> Las Entidades te borrarán si te tocan.",
-                skills: "<b>HABILIDADES:</b>", skill_j: "<b>Jostin (Cambio 1):</b> Pistola. Disparo recto. (12 balas)",
-                skill_t: "<b>Tavito (Cambio 2):</b> Bazuca. Daño en área. (20 bombas) <br><span style='color:#ef4444; font-size:8px;'>[Peligro: Dañar bordes del mapa es catastrófico]</span>",
-                skill_p: "<b>Pepe (Cambio 3):</b> Sigilo. Invisible 120s. No ataca.", inst_6: "Usa el Joystick para moverte.<br>Explora el mapa y esquiva entidades.<br>Pisa la llave y pulsa <b>AVISAR</b>.",
-                understood: "¡Entendido!", cups: "🏆 Copas:", keys_label: "LLAVES:", pause: "⏸ PAUSE",
-                tactical_map: "MAPA TÁCTICO EMDCG", close_map: "Cerrar Mapa", notify: "AVISAR", swap: "CAMBIAR", action: "ACCIÓN",
-                paused: "JUEGO PAUSADO", resume: "Continuar", exit: "Salir", main_menu: "Menú Principal",
-                matrix_limit: "¡LÍMITE DE LA MATRIX!", stealth_ex: "¡SIGILO AGOTADO!", find_mags: "Busca cargadores",
-                stealth_pepe_ex: "¡SIGILO DE PEPE AGOTADO!", stealth_pepe_desc: "Debes conseguir cargadores azules por el mapa para volver a usarlo.",
-                bullets: "Balas", bombs: "Bombas", stealth: "Sigilo", no_stealth: "¡NO TIENES SIGILO!",
-                alert_dmg: "¡ALERTA! DAÑO", breach: "¡BRECHA EN LA MATRIX!", breach_desc: "Iniciando protocolos de limpieza. Múltiples entidades detectadas...",
-                prog_minus: "-1 Programa", hp_minus: "-1 HP", boom: "¡BOOM!", key_secured: "¡LLAVE ASEGURADA!",
-                time_escape: "Tiempo de escape: ",
-                fatal_error: "FATAL ERROR", matrix_collapsed: "<span style='color:#fff; font-size:16px;'>LA MATRIX HA COLAPSADO</span><br><br><span style='color:#94a3b8;'>Has destruido los límites de la simulación.</span>",
-                error_sys: "ERROR: Sistema de contención masivamente comprometido (8/8).", resetting: "Cargando protocolo de reseteo...",
-                victory: "¡VICTORIA!", escaped: "Han escapado con éxito de la simulación.", won_cup: "🏆 ¡Has ganado +1 Copa!",
-                erased: "BORRADOS", erased_desc: "Un programa de seguridad te ha eliminado.",
-                story: [
-                    { s: 'Jostin', t: 'Estábamos tranquilos, Pepe y yo jugando en la Play… y, de repente… ¿qué pasó?' },
-                    { s: 'Tavito', t: '¡¿Qué es esto?! ¡¿Dónde estamos?! ¡Yo solo estaba en mi celular! ¡¿Cómo terminamos aquí?!' },
-                    { s: 'Pepe', t: '¿Q-Qué…? ¡¿Dónde estamos?! Tengo… tengo miedo…' },
-                    { s: 'Pollito Guía', t: '¡ATENCIÓN, VIAJEROS! Por un error en la Matrix… ¡han sido transportados a La Ciudad EMCD! Para poder escapar, tendrán que encontrar 3 llaves.' },
-                    { s: 'Jostin', t: '¿3 llaves? Bah… suena fácil.' },
-                    { s: 'Pollito Guía', t: 'No será tan fácil… Tendrán que protegerse de las entidades que habitan por todo el mapa. Y si alguna de ellas logra matarlos…' },
-                    { s: 'Tavito', t: '¿Qué pasa si nos mata?' },
-                    { s: 'Pollito Guía', t: 'Simplemente… desaparecen.' },
-                    { s: 'Tavito', t: 'Bueno… entonces será mejor que prepare mi bazuca.' },
-                    { s: 'Jostin', t: 'Y yo ya tengo mi pistola cargada.' },
-                    { s: 'Jostin', t: 'Así que…' },
-                    { s: 'Jostin', t: '¡¡VAMOS ALLÁ!!' }
-                ]
-            },
-            en: {
-                loading: "Loading resources...", loading_sub: "Starting file load...", loading_done: "All resources loaded!",
-                menu_subtitle: "A glitch in the Matrix...", start_game: "Start Game", store: "ABG Store",
-                sound_on: "🔊 Sound: ON", sound_off: "🔇 Sound: OFF", coming_soon: "Coming soon ;)",
-                close: "Close", settings_title: "SETTINGS ⚙️", bgm_label: "Background Music (Menu)",
-                sfx_label: "Sound Effects (Game)", languages_btn: "🆔 Languages", rights: "© 2026 ABG Productions & Sprunki Animations Studios All rights reserved",
-                select_lang: "SELECT LANGUAGE", skip: "SKIP ⏭", tap_continue: "Tap to continue ▼",
-                mission_title: "MISSION & RULES", inst_1: "You're trapped in EMCD City. Find <b>3 KEYS</b>.",
-                inst_2: "<b>Key 1:</b> In destroyed sectors.", inst_3: "<b>Key 2:</b> Server zones & gloomy streets.",
-                inst_4: "<b>Key 3:</b> Intact Matrix buildings.", inst_5: "<b>BEWARE:</b> Entities will erase you on touch.",
-                skills: "<b>ABILITIES:</b>", skill_j: "<b>Jostin (Swap 1):</b> Pistol. Straight shot. (12 bullets)",
-                skill_t: "<b>Tavito (Swap 2):</b> Bazooka. AoE damage. (20 bombs) <br><span style='color:#ef4444; font-size:8px;'>[Danger: Damaging map borders is catastrophic]</span>",
-                skill_p: "<b>Pepe (Swap 3):</b> Stealth. Invisible 120s. No attacks.", inst_6: "Use Joystick to move.<br>Explore & dodge entities.<br>Step on keys & press <b>NOTIFY</b>.",
-                understood: "Got it!", cups: "🏆 Cups:", keys_label: "KEYS:", pause: "⏸ PAUSE",
-                tactical_map: "TACTICAL MAP EMDCG", close_map: "Close Map", notify: "NOTIFY", swap: "SWAP", action: "ACTION",
-                paused: "GAME PAUSED", resume: "Resume", exit: "Exit", main_menu: "Main Menu",
-                matrix_limit: "MATRIX LIMIT!", stealth_ex: "STEALTH DEPLETED!", find_mags: "Find magazines",
-                stealth_pepe_ex: "PEPE'S STEALTH DEPLETED!", stealth_pepe_desc: "Find blue magazines around the map to use it again.",
-                bullets: "Bullets", bombs: "Bombs", stealth: "Stealth", no_stealth: "NO STEALTH!",
-                alert_dmg: "ALERT! DAMAGE", breach: "MATRIX BREACH!", breach_desc: "Initiating cleaning protocols. Multiple entities detected...",
-                prog_minus: "-1 Program", hp_minus: "-1 HP", boom: "BOOM!", key_secured: "KEY SECURED!",
-                time_escape: "Escape time: ",
-                fatal_error: "FATAL ERROR", matrix_collapsed: "<span style='color:#fff; font-size:16px;'>THE MATRIX HAS COLLAPSED</span><br><br><span style='color:#94a3b8;'>You destroyed the limits of the simulation.</span>",
-                error_sys: "ERROR: Containment system massively compromised (8/8).", resetting: "Loading reset protocol...",
-                victory: "VICTORY!", escaped: "You successfully escaped the simulation.", won_cup: "🏆 You won +1 Cup!",
-                erased: "ERASED", erased_desc: "A security program has deleted you.",
-                story: [
-                    { s: 'Jostin', t: 'We were just chilling, Pepe and I playing PlayStation… then, suddenly… what happened?' },
-                    { s: 'Tavito', t: 'What is this?! Where are we?! I was just on my phone! How did we end up here?!' },
-                    { s: 'Pepe', t: 'W-What…? Where are we?! I… I’m scared…' },
-                    { s: 'Guide Chick', t: 'ATTENTION TRAVELERS! Due to a Matrix error… you’ve been transported to EMCD City! To escape, you must find 3 keys.' },
-                    { s: 'Jostin', t: '3 keys? Bah… sounds easy.' },
-                    { s: 'Guide Chick', t: 'It won’t be. You must protect yourselves from entities roaming the map. If one kills you…' },
-                    { s: 'Tavito', t: 'What happens if they kill us?' },
-                    { s: 'Guide Chick', t: 'You simply… cease to exist.' },
-                    { s: 'Tavito', t: 'Well… better get my bazooka ready.' },
-                    { s: 'Jostin', t: 'And my pistol is loaded.' },
-                    { s: 'Jostin', t: 'So…' },
-                    { s: 'Jostin', t: 'LET’S DO THIS!!' }
-                ]
-            },
-            pt: {
-                loading: "Carregando recursos...", loading_sub: "Iniciando carregamento...", loading_done: "Recursos carregados!",
-                menu_subtitle: "Uma falha na Matrix...", start_game: "Iniciar Jogo", store: "ABG Store",
-                sound_on: "🔊 Som: ON", sound_off: "🔇 Som: OFF", coming_soon: "Em breve ;)",
-                close: "Fechar", settings_title: "CONFIGURAÇÕES ⚙️", bgm_label: "Música de Fundo",
-                sfx_label: "Efeitos Sonoros", languages_btn: "🆔 Idiomas", rights: "© 2026 ABG Productions Todos os direitos reservados",
-                select_lang: "SELECIONE O IDIOMA", skip: "PULAR ⏭", tap_continue: "Toque para continuar ▼",
-                mission_title: "MISSÃO E REGRAS", inst_1: "Vocês estão presos. Encontrem <b>3 CHAVES</b>.",
-                inst_2: "<b>Chave 1:</b> Setores destruídos.", inst_3: "<b>Chave 2:</b> Servidores e ruas sombrias.",
-                inst_4: "<b>Chave 3:</b> Prédios intactos da Matrix.", inst_5: "<b>CUIDADO:</b> Entidades apagarão você no toque.",
-                skills: "<b>HABILIDADES:</b>", skill_j: "<b>Jostin (Troca 1):</b> Pistola. (12 balas)",
-                skill_t: "<b>Tavito (Troca 2):</b> Bazuca. (20 bombas) <br><span style='color:#ef4444; font-size:8px;'>[Perigo: Danificar bordas é fatal]</span>",
-                skill_p: "<b>Pepe (Troca 3):</b> Furtivo 120s. Sem ataques.", inst_6: "Mova-se, explore e avise ao achar chaves.",
-                understood: "Entendido!", cups: "🏆 Copas:", keys_label: "CHAVES:", pause: "⏸ PAUSA",
-                tactical_map: "MAPA TÁTICO", close_map: "Fechar Mapa", notify: "AVISAR", swap: "TROCAR", action: "AÇÃO",
-                paused: "JOGO PAUSADO", resume: "Continuar", exit: "Sair", main_menu: "Menu Principal",
-                matrix_limit: "LIMITE DA MATRIX!", stealth_ex: "FURTIVIDADE ESGOTADA!", find_mags: "Busque munição",
-                stealth_pepe_ex: "FURTIVIDADE DE PEPE ESGOTADA!", stealth_pepe_desc: "Ache carregadores azuis para usar novamente.",
-                bullets: "Balas", bombs: "Bombas", stealth: "Furtivo", no_stealth: "SEM FURTIVIDADE!",
-                alert_dmg: "ALERTA! DANO", breach: "BRECHA NA MATRIX!", breach_desc: "Limpando protocolos. Múltiplas entidades...",
-                prog_minus: "-1 Programa", hp_minus: "-1 HP", boom: "BUM!", key_secured: "CHAVE SEGURA!",
-                time_escape: "Tempo de fuga: ", fatal_error: "ERRO FATAL", matrix_collapsed: "<span style='color:#fff;'>A MATRIX COLAPSOU</span>",
-                error_sys: "ERRO: Sistema de contenção comprometido.", resetting: "Reiniciando...",
-                victory: "VITÓRIA!", escaped: "Vocês escaparam da simulação.", won_cup: "🏆 +1 Copa!",
-                erased: "APAGADOS", erased_desc: "Programa de segurança deletou vocês.",
-                story: [
-                    { s: 'Jostin', t: 'Estávamos jogando Play e do nada...' }, { s: 'Tavito', t: 'Onde estamos?!' },
-                    { s: 'Pepe', t: 'Estou com medo...' }, { s: 'Guia', t: 'Bem-vindos a EMCD! Achem 3 chaves para fugir.' },
-                    { s: 'Jostin', t: 'Fácil.' }, { s: 'Guia', t: 'Cuidado com as entidades. Se tocarem, você some.' },
-                    { s: 'Tavito', t: 'Bazuca pronta.' }, { s: 'Jostin', t: 'Pistola carregada. VAMOS LÁ!' }
-                ]
-            }
-        };
-
-        const langList = [
-            {c:'af',n:'Afrikaans'},{c:'sq',n:'Shqip'},{c:'am',n:'አማርኛ'},{c:'ar',n:'العربية'},{c:'hy',n:'Հայերեն'},{c:'az',n:'Azərbaycan'},{c:'eu',n:'Euskara'},{c:'be',n:'Беларуская'},{c:'bn',n:'বাংলা'},{c:'bs',n:'Bosanski'},
-            {c:'bg',n:'Български'},{c:'ca',n:'Català'},{c:'ceb',n:'Cebuano'},{c:'zh',n:'中文'},{c:'co',n:'Corsu'},{c:'hr',n:'Hrvatski'},{c:'cs',n:'Čeština'},{c:'da',n:'Dansk'},{c:'nl',n:'Nederlands'},{c:'en',n:'English'},
-            {c:'eo',n:'Esperanto'},{c:'et',n:'Eesti'},{c:'fi',n:'Suomi'},{c:'fr',n:'Français'},{c:'fy',n:'Frysk'},{c:'gl',n:'Galego'},{c:'ka',n:'ქართული'},{c:'de',n:'Deutsch'},{c:'el',n:'Ελληνικά'},{c:'gu',n:'ગુજરાતી'},
-            {c:'ht',n:'Kreyòl Ayisyen'},{c:'ha',n:'Hausa'},{c:'haw',n:'ʻŌlelo Hawaiʻi'},{c:'he',n:'עברית'},{c:'hi',n:'हिन्दी'},{c:'hmn',n:'Hmoob'},{c:'hu',n:'Magyar'},{c:'is',n:'Íslenska'},{c:'ig',n:'Igbo'},{c:'id',n:'Indonesia'},
-            {c:'ga',n:'Gaeilge'},{c:'it',n:'Italiano'},{c:'ja',n:'日本語'},{c:'jv',n:'Jawa'},{c:'kn',n:'ಕನ್ನಡ'},{c:'kk',n:'Қазақ'},{c:'km',n:'ខ្មែរ'},{c:'rw',n:'Kinyarwanda'},{c:'ko',n:'한국어'},{c:'ku',n:'Kurdî'},
-            {c:'ky',n:'Кыргызча'},{c:'lo',n:'ລາວ'},{c:'la',n:'Latina'},{c:'lv',n:'Latviešu'},{c:'lt',n:'Lietuvių'},{c:'lb',n:'Lëtzebuergesch'},{c:'mk',n:'Македонски'},{c:'mg',n:'Malagasy'},{c:'ms',n:'Melayu'},{c:'ml',n:'മലയാളം'},
-            {c:'mt',n:'Malti'},{c:'mi',n:'Māori'},{c:'mr',n:'मराठी'},{c:'mn',n:'Монгол'},{c:'my',n:'မြန်မာ'},{c:'ne',n:'नेपाली'},{c:'no',n:'Norsk'},{c:'ny',n:'Nyanja'},{c:'or',n:'ଓଡ଼ିଆ'},{c:'ps',n:'پښتو'},
-            {c:'fa',n:'فارسی'},{c:'pl',n:'Polski'},{c:'pt',n:'Português'},{c:'pa',n:'ਪੰਜਾਬੀ'},{c:'ro',n:'Română'},{c:'ru',n:'Русский'},{c:'sm',n:'Samoa'},{c:'gd',n:'Gàidhlig'},{c:'sr',n:'Српски'},{c:'st',n:'Sesotho'},
-            {c:'sn',n:'Shona'},{c:'sd',n:'سنڌي'},{c:'si',n:'සිංහල'},{c:'sk',n:'Slovenčina'},{c:'sl',n:'Slovenščina'},{c:'so',n:'Soomaali'},{c:'es',n:'Español'},{c:'su',n:'Sunda'},{c:'sw',n:'Kiswahili'},{c:'sv',n:'Svenska'},
-            {c:'tl',n:'Tagalog'},{c:'tg',n:'Тоҷикӣ'},{c:'ta',n:'தமிழ்'},{c:'tt',n:'Татар'},{c:'te',n:'తెలుగు'},{c:'th',n:'ไทย'},{c:'tr',n:'Türkçe'},{c:'tk',n:'Türkmen'},{c:'uk',n:'Українська'},{c:'ur',n:'اردو'},
-            {c:'ug',n:'Uyghur'},{c:'uz',n:'Oʻzbek'},{c:'vi',n:'Tiếng Việt'},{c:'cy',n:'Cymraeg'},{c:'xh',n:'isiXhosa'},{c:'yi',n:'ייִדיש'},{c:'yo',n:'Yorùbá'},{c:'zu',n:'isiZulu'}
-        ];
-
-        let currentLang = localStorage.getItem('emdcg_lang') || 'es';
-
-        function t(key) {
-            let dic = i18n[currentLang];
-            if (!dic) dic = i18n['en']; // Fallback robusto a inglés si el idioma seleccionado no está completamente mapeado
-            if (dic[key]) return dic[key];
-            if (i18n['en'][key]) return i18n['en'][key];
-            return key; // Si no existe en ningún lado
-        }
-
-        function applyLanguage() {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                el.innerHTML = t(key); // Usamos innerHTML para retener formato como <b>
-            });
-            updateToggleAudioText();
-            updateHUD();
-        }
-
-        function buildLanguageList() {
-            const listContainer = document.getElementById('languageList');
-            listContainer.innerHTML = '';
-            langList.forEach(l => {
-                const btn = document.createElement('button');
-                btn.className = `lang-btn ${l.c === currentLang ? 'active' : ''}`;
-                btn.innerText = l.n;
-                btn.onclick = () => {
-                    playSound('click');
-                    currentLang = l.c;
-                    localStorage.setItem('emdcg_lang', currentLang);
-                    
-                    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    applyLanguage();
-                    document.getElementById('languageModal').classList.add('hidden');
-                };
-                listContainer.appendChild(btn);
-            });
-        }
-        // --- FIN SISTEMA I18N ---
-
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const minimapCanvas = document.getElementById('minimapCanvas');
@@ -1009,15 +799,15 @@
         function updatePreloader(assetName) {
             loadedCount++;
             let pct = Math.floor((loadedCount / totalAssets) * 100);
-            document.getElementById('loadingText').innerText = `${t('loading')} ${pct}%`;
+            document.getElementById('loadingText').innerText = `Cargando recursos... ${pct}%`;
             document.getElementById('loadingBar').style.width = `${pct}%`;
             
             if(assetName) {
-                document.getElementById('loadingSubtext').innerText = `[${loadedCount}/${totalAssets}] : ${assetName}`;
+                document.getElementById('loadingSubtext').innerText = `[${loadedCount}/${totalAssets}] Cargado: ${assetName}`;
             }
 
             if (loadedCount >= totalAssets) {
-                document.getElementById('loadingSubtext').innerText = t('loading_done');
+                document.getElementById('loadingSubtext').innerText = "¡Todos los recursos ya están cargados!";
                 document.getElementById('loadingSubtext').style.color = "#10b981";
                 setTimeout(() => {
                     document.getElementById('preloaderScreen').classList.add('hidden');
@@ -1028,8 +818,48 @@
             }
         }
 
+        allAssets.forEach(item => {
+            item.img.onload = () => updatePreloader(item.key);
+            item.img.onerror = () => updatePreloader(item.key);
+            item.img.src = item.src;
+        });
+
+        if (bgMusic.readyState >= 3) {
+            updatePreloader("Escape_City_EMDCG_Music_1.mp3 (Ya listo)");
+        } else {
+            bgMusic.addEventListener('canplaythrough', () => {
+                if (!bgMusic._preloadedReported) {
+                    bgMusic._preloadedReported = true;
+                    updatePreloader("Escape_City_EMDCG_Music_1.mp3");
+                }
+            }, { once: true });
+            bgMusic.addEventListener('error', () => {
+                if (!bgMusic._preloadedReported) {
+                    bgMusic._preloadedReported = true;
+                    updatePreloader("Escape_City_EMDCG_Music_1.mp3 (Omitido)");
+                }
+            }, { once: true });
+            bgMusic.load();
+        }
+
+        // NUEVO ESTADO: STATES.MAP (Táctico)
         const STATES = { PRELOAD: 0, MENU: 1, CUTSCENE: 2, INSTRUCTIONS: 3, PLAYING: 4, PAUSED: 5, GAMEOVER: 6, VICTORY: 7, MAP: 8 };
         let currentState = STATES.PRELOAD;
+
+        const story = [
+            { s: 'Jostin', t: 'Estábamos tranquilos, Pepe y yo jugando en la Play… y, de repente… ¿qué pasó?' },
+            { s: 'Tavito', t: '¡¿Qué es esto?! ¡¿Dónde estamos?! ¡Yo solo estaba en mi celular! ¡¿Cómo terminamos aquí?!' },
+            { s: 'Pepe', t: '¿Q-Qué…? ¡¿Dónde estamos?! Tengo… tengo miedo…' },
+            { s: 'Pollito Guía', t: '¡ATENCIÓN, VIAJEROS! Por un error en la Matrix… ¡han sido transportados a La Ciudad EMCD! Para poder escapar, tendrán que encontrar 3 llaves.' },
+            { s: 'Jostin', t: '¿3 llaves? Bah… suena fácil.' },
+            { s: 'Pollito Guía', t: 'No será tan fácil… Tendrán que protegerse de las entidades que habitan por todo el mapa. Y si alguna de ellas logra matarlos…' },
+            { s: 'Tavito', t: '¿Qué pasa si nos mata?' },
+            { s: 'Pollito Guía', t: 'Simplemente… desaparecen.' },
+            { s: 'Tavito', t: 'Bueno… entonces será mejor que prepare mi bazuca.' },
+            { s: 'Jostin', t: 'Y yo ya tengo mi pistola cargada.' },
+            { s: 'Jostin', t: 'Así que…' },
+            { s: 'Jostin', t: '¡¡VAMOS ALLÁ!!' }
+        ];
         let currentDialogue = 0;
         let isTyping = false;
 
@@ -1270,13 +1100,13 @@
             endScreen.style.background = "#000";
             endScreen.style.justifyContent = "center";
             
-            document.getElementById('endTitle').innerText = t('fatal_error');
+            document.getElementById('endTitle').innerText = "FATAL ERROR";
             document.getElementById('endTitle').style.color = "#ef4444";
             document.getElementById('endTitle').style.textShadow = "0 0 20px #ef4444, 4px 4px 0 #000";
             
-            document.getElementById('endDesc').innerHTML = t('matrix_collapsed');
-            document.getElementById('endStats').innerText = t('error_sys');
-            document.getElementById('rewardNotice').innerText = t('resetting');
+            document.getElementById('endDesc').innerHTML = "<span style='color:#fff; font-size:16px;'>LA MATRIX HA COLAPSADO</span><br><br><span style='color:#94a3b8;'>Has destruido los límites de la simulación.</span>";
+            document.getElementById('endStats').innerText = "ERROR: Sistema de contención masivamente comprometido (8/8).";
+            document.getElementById('rewardNotice').innerText = "Cargando protocolo de reseteo...";
         }
 
         function distance(x1, y1, x2, y2) { return Math.hypot(x2-x1, y2-y1); }
@@ -1354,7 +1184,7 @@
             if (player.x < TILE_SIZE * 1.5 || player.x > (MAP_COLS - 1.5) * TILE_SIZE || 
                 player.y < TILE_SIZE * 1.5 || player.y > (MAP_ROWS - 1.5) * TILE_SIZE) {
                 if (Date.now() - lastBoundaryWarning > 3000) {
-                    addFloatingText(t('matrix_limit'), player.x, player.y - 30, '#ef4444');
+                    addFloatingText("¡LÍMITE DE LA MATRIX!", player.x, player.y - 30, '#ef4444');
                     lastBoundaryWarning = Date.now();
                 }
             }
@@ -1379,11 +1209,11 @@
                     char.stealthActive = false;
                     
                     createParticles(player.x, player.y, '#ef4444', 25);
-                    addFloatingText(t('stealth_ex'), player.x, player.y - 45, '#ef4444');
-                    addFloatingText(t('find_mags'), player.x, player.y - 25, '#38bdf8');
+                    addFloatingText("¡SIGILO AGOTADO!", player.x, player.y - 45, '#ef4444');
+                    addFloatingText("Busca cargadores", player.x, player.y - 25, '#38bdf8');
                     playSound('alert');
                     
-                    showGameToast(t('stealth_pepe_ex'), t('stealth_pepe_desc'), "#ef4444");
+                    showGameToast("¡SIGILO DE PEPE AGOTADO!", "Debes conseguir cargadores azules por el mapa para volver a usarlo.", "#ef4444");
                 }
                 updateHUD();
             }
@@ -1398,15 +1228,15 @@
                         keyToAvisar = item;
                         document.getElementById('btnAvisar').style.display = 'flex';
                     } else if (item.id === 'ammo_jostin' && char.id === 'jostin') {
-                        char.ammo += 5; items.splice(i,1); createParticles(item.x, item.y, '#ff3333'); addFloatingText(`+5 ${t('bullets')}`, item.x, item.y, '#ff3333'); playSound('pickup'); updateHUD();
+                        char.ammo += 5; items.splice(i,1); createParticles(item.x, item.y, '#ff3333'); addFloatingText("+5 Balas", item.x, item.y, '#ff3333'); playSound('pickup'); updateHUD();
                     } else if (item.id === 'ammo_tavito' && char.id === 'tavito') {
-                        char.ammo += 10; items.splice(i,1); createParticles(item.x, item.y, '#a855f7'); addFloatingText(`+10 ${t('bombs')}`, item.x, item.y, '#c084fc'); playSound('pickup'); updateHUD();
+                        char.ammo += 10; items.splice(i,1); createParticles(item.x, item.y, '#a855f7'); addFloatingText("+10 Bombas", item.x, item.y, '#c084fc'); playSound('pickup'); updateHUD();
                     } 
                     else if (item.id === 'stealth_pepe' && char.id === 'pepe') {
                         char.stealthTime = Math.min(char.maxStealth, char.stealthTime + 80); 
                         items.splice(i,1); 
                         createParticles(item.x, item.y, '#38bdf8'); 
-                        addFloatingText(`+80s ${t('stealth')}`, item.x, item.y, '#38bdf8'); 
+                        addFloatingText("+80s Sigilo", item.x, item.y, '#38bdf8'); 
                         playSound('pickup'); 
                         updateHUD();
                     }
@@ -1451,8 +1281,8 @@
                                 projectiles.splice(i, 1);
                                 continue; 
                             } else {
-                                addFloatingText(`${t('alert_dmg')} ${matrixDamage}/8`, p.x, p.y - 20, '#ef4444');
-                                showGameToast(t('breach'), t('breach_desc'), "#ef4444");
+                                addFloatingText(`¡ALERTA! DAÑO ${matrixDamage}/8`, p.x, p.y - 20, '#ef4444');
+                                showGameToast("¡BRECHA EN LA MATRIX!", "Iniciando protocolos de limpieza. Múltiples entidades detectadas...", "#ef4444");
                             }
                         }
                     }
@@ -1470,10 +1300,10 @@
                             if(e.hp <= 0) {
                                 enemies.splice(j, 1);
                                 createParticles(e.x, e.y, '#00ffcc');
-                                addFloatingText(t('prog_minus'), e.x, e.y, '#00ffcc');
+                                addFloatingText("-1 Programa", e.x, e.y, '#00ffcc');
                             } else {
                                 createParticles(e.x, e.y, '#facc15', 4);
-                                addFloatingText(t('hp_minus'), e.x, e.y - 15, '#facc15');
+                                addFloatingText("-1 HP", e.x, e.y - 15, '#facc15');
                             }
                         } else if(p.type === 'bazooka') {
                             createExplosion(p.x, p.y); 
@@ -1575,7 +1405,7 @@
                     updateHUD();
                 } else {
                     char.stealthActive = false;
-                    showGameToast(t('no_stealth'), t('stealth_pepe_desc'), "#ef4444");
+                    showGameToast("¡NO TIENES SIGILO!", "Debes conseguir cargadores azules.", "#ef4444");
                 }
             }
         }
@@ -1585,7 +1415,7 @@
             playSound('explosion');
             screenShakeTimer = 16;
             screenShakeIntensity = 9;
-            addFloatingText(t('boom'), ex, ey, '#facc15');
+            addFloatingText("¡BOOM!", ex, ey, '#facc15');
             let killed = 0;
             for(let j=enemies.length-1; j>=0; j--) {
                 if(killed >= 5) break;
@@ -1623,7 +1453,7 @@
                 
                 createParticles(player.x, player.y, '#facc15', 35);
                 playSound('pickup');
-                addFloatingText(t('key_secured'), player.x, player.y - 20, '#facc15');
+                addFloatingText("¡LLAVE ASEGURADA!", player.x, player.y - 20, '#facc15');
 
                 if(globalKeysFound >= 3) {
                     spawnDoor();
@@ -2140,6 +1970,7 @@
             minimapCtx.fillRect(player.x * scaleX - 2, player.y * scaleY - 2, 4, 4);
         }
 
+        // NUEVO: Función para dibujar el Mapa Táctico en alta resolución
         function drawFullMap() {
             const fMapCanvas = document.getElementById('fullMapCanvas');
             const fCtx = fMapCanvas.getContext('2d');
@@ -2151,23 +1982,25 @@
             fCtx.fillStyle = '#020308';
             fCtx.fillRect(0, 0, w, h);
 
+            // Dibujar Estructuras
             for(let r=0; r<MAP_ROWS; r++) {
                 for(let c=0; c<MAP_COLS; c++) {
                     if(!map[r]) continue;
                     let type = map[r][c];
                     if (type === 1) { 
-                        fCtx.fillStyle = 'rgba(0, 255, 204, 0.4)'; 
+                        fCtx.fillStyle = 'rgba(0, 255, 204, 0.4)'; // Muros celestes
                         fCtx.fillRect(c*scaleX, r*scaleY, scaleX, scaleY);
                     } else if (type === 2) { 
-                        fCtx.fillStyle = 'rgba(255, 0, 60, 0.3)'; 
+                        fCtx.fillStyle = 'rgba(255, 0, 60, 0.3)'; // Zonas destruidas rojas
                         fCtx.fillRect(c*scaleX, r*scaleY, scaleX, scaleY);
                     } else if (type === 3) {
-                        fCtx.fillStyle = 'rgba(168, 85, 247, 0.3)'; 
+                        fCtx.fillStyle = 'rgba(168, 85, 247, 0.3)'; // Servidores morados
                         fCtx.fillRect(c*scaleX, r*scaleY, scaleX, scaleY);
                     }
                 }
             }
 
+            // Dibujar Puerta de Salida
             if (door) {
                 fCtx.fillStyle = '#fff';
                 fCtx.shadowColor = '#facc15';
@@ -2176,6 +2009,7 @@
                 fCtx.shadowBlur = 0;
             }
 
+            // Dibujar Objetos (Llaves resaltadas)
             for(let item of items) {
                 if (item.id.startsWith('key')) {
                     fCtx.fillStyle = item.color;
@@ -2188,6 +2022,7 @@
                 }
             }
 
+            // Dibujar Enemigos (Puntos Rojos Parpadeantes)
             let timePulse = Math.abs(Math.sin(Date.now() / 200));
             fCtx.fillStyle = '#f43f5e';
             fCtx.shadowColor = '#ff003c';
@@ -2199,6 +2034,7 @@
             }
             fCtx.shadowBlur = 0;
 
+            // Dibujar al Jugador (Punto Celeste/Azul brillante)
             fCtx.fillStyle = '#38bdf8';
             fCtx.shadowColor = '#38bdf8';
             fCtx.shadowBlur = 12;
@@ -2208,6 +2044,7 @@
             fCtx.shadowBlur = 0;
         }
 
+        // LÓGICA PARA ABRIR/CERRAR EL MAPA TÁCTICO
         const btnOpenMap = document.getElementById('btnOpenMap');
         const btnCloseMap = document.getElementById('btnCloseMap');
         
@@ -2216,7 +2053,7 @@
                 playSound('click');
                 currentState = STATES.MAP;
                 document.getElementById('fullMapModal').classList.remove('hidden');
-                document.getElementById('controlsLayer').classList.add('hidden'); 
+                document.getElementById('controlsLayer').classList.add('hidden'); // Ocultar joysticks para interacción segura
             } else if (currentState === STATES.MAP) {
                 playSound('click');
                 currentState = STATES.PLAYING;
@@ -2256,15 +2093,13 @@
             const varHighlight = getComputedStyle(document.documentElement).getPropertyValue('--highlight').trim();
             
             let abilityText = '';
-            if (char.id === 'jostin') abilityText = `${t('bullets')}: ${char.ammo}`;
-            else if (char.id === 'tavito') abilityText = `${t('bombs')}: ${char.ammo}`;
+            if (char.id === 'jostin') abilityText = `Balas: ${char.ammo}`;
+            else if (char.id === 'tavito') abilityText = `Bombas: ${char.ammo}`;
             else if (char.id === 'pepe') {
-                abilityText = `${t('stealth')}: ${Math.ceil(char.stealthTime)}s`;
+                abilityText = `Sigilo: ${Math.ceil(char.stealthTime)}s`;
             }
             document.getElementById('hudAbility').innerText = abilityText;
             document.getElementById('hudName').style.color = (char.id === 'pepe' && char.stealthActive) ? '#38bdf8' : varHighlight;
-            
-            document.getElementById('keysLabel').innerText = t('keys_label');
         }
 
         function updateTimerDisplay() {
@@ -2303,19 +2138,6 @@
             playSound('click');
             document.getElementById('settingsModal').classList.add('hidden');
         });
-
-        // Eventos Modal de Idiomas
-        document.getElementById('btnOpenLanguage').addEventListener('click', () => {
-            playSound('click');
-            document.getElementById('settingsModal').classList.add('hidden');
-            buildLanguageList();
-            document.getElementById('languageModal').classList.remove('hidden');
-        });
-        document.getElementById('btnCloseLanguage').addEventListener('click', () => {
-            playSound('click');
-            document.getElementById('languageModal').classList.add('hidden');
-            document.getElementById('settingsModal').classList.remove('hidden');
-        });
         
         document.getElementById('bgmVolumeSlider').addEventListener('input', (e) => {
             bgmVolume = parseFloat(e.target.value);
@@ -2344,24 +2166,21 @@
         document.getElementById('dialogueBox').addEventListener('click', showNextDialogue);
 
         function showNextDialogue() {
-            // Obtenemos la historia del idioma actual
-            let currentStory = i18n[currentLang]?.story || i18n['en'].story;
-
             if (isTyping) {
                 clearTimeout(typingTimeout);
-                document.getElementById('dialogueText').innerHTML = currentStory[currentDialogue - 1].t;
+                document.getElementById('dialogueText').innerHTML = story[currentDialogue - 1].t;
                 isTyping = false;
                 return;
             }
 
-            if (currentDialogue >= currentStory.length) {
+            if (currentDialogue >= story.length) {
                 document.getElementById('dialogueScreen').classList.add('hidden');
                 document.getElementById('instructionsScreen').classList.remove('hidden');
                 currentState = STATES.INSTRUCTIONS;
                 return;
             }
             
-            let d = currentStory[currentDialogue];
+            let d = story[currentDialogue];
             document.getElementById('sceneImage').src = `Escena_${currentDialogue + 1}.PNG`;
             document.getElementById('speakerName').innerText = d.s;
             playSound('click');
@@ -2426,15 +2245,12 @@
         document.getElementById('btnPause').addEventListener('click', togglePause);
         document.getElementById('btnResume').addEventListener('click', togglePause);
 
-        function updateToggleAudioText() {
-            let text = soundEnabled ? t('sound_on') : t('sound_off');
-            document.getElementById('btnToggleAudio').innerText = text;
-            document.getElementById('btnPauseAudio').innerText = text;
-        }
-
         function toggleAudio() {
             soundEnabled = !soundEnabled;
-            updateToggleAudioText();
+            let text = soundEnabled ? "🔊 Sonido: ON" : "🔇 Sonido: OFF";
+            document.getElementById('btnToggleAudio').innerText = text;
+            document.getElementById('btnPauseAudio').innerText = text;
+            
             bgMusic.muted = !soundEnabled; 
 
             if (soundEnabled) {
@@ -2467,28 +2283,29 @@
             
             let mins = Math.floor(gameTime / 60).toString().padStart(2, '0');
             let secs = (gameTime % 60).toString().padStart(2, '0');
-            document.getElementById('endStats').innerText = `${t('time_escape')}${mins}:${secs}`;
+            document.getElementById('endStats').innerText = `Tiempo de escape: ${mins}:${secs}`;
 
             if(win) {
                 playerCups += 1;
                 localStorage.setItem('emdcg_cups', playerCups);
                 updateCupDisplay();
 
-                document.getElementById('endTitle').innerText = t('victory');
+                document.getElementById('endTitle').innerText = "¡VICTORIA!";
                 document.getElementById('endTitle').style.color = "#facc15";
                 document.getElementById('endTitle').style.textShadow = "3px 3px 0 #000, 0 0 15px rgba(250,204,21,0.5)";
-                document.getElementById('endDesc').innerHTML = t('escaped');
-                document.getElementById('rewardNotice').innerText = t('won_cup');
+                document.getElementById('endDesc').innerHTML = "Han escapado con éxito de la simulación.";
+                document.getElementById('rewardNotice').innerText = "🏆 ¡Has ganado +1 Copa!";
             } else {
-                document.getElementById('endTitle').innerText = t('erased');
+                document.getElementById('endTitle').innerText = "BORRADOS";
                 document.getElementById('endTitle').style.color = "#f43f5e";
                 document.getElementById('endTitle').style.textShadow = "3px 3px 0 #000, 0 0 15px rgba(244,63,94,0.5)";
-                document.getElementById('endDesc').innerHTML = t('erased_desc');
+                document.getElementById('endDesc').innerHTML = "Un programa de seguridad te ha eliminado.";
                 document.getElementById('rewardNotice').innerText = "";
             }
         }
 
         window.addEventListener('keydown', (e) => {
+            // NUEVO: Atajo de teclado para abrir el mapa
             if (e.key === 'm' || e.key === 'M') {
                 if (currentState === STATES.PLAYING || currentState === STATES.MAP) toggleTacticalMap();
                 return;
@@ -2601,6 +2418,8 @@
 
         function gameLoop() {
             if (currentState === STATES.MAP) {
+                // Durante el Mapa Táctico, congelamos `update()` y `draw()` principales,
+                // pero continuamos renderizando dinámicamente el mapa para efectos visuales fluidos.
                 drawFullMap();
             } else {
                 update();
@@ -2608,10 +2427,6 @@
             }
             requestAnimationFrame(gameLoop);
         }
-        
-        // Aplicar idioma cargado al arrancar
-        applyLanguage();
-        
         requestAnimationFrame(gameLoop);
     </script>
 </body>
