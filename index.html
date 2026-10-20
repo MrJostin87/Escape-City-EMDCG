@@ -303,15 +303,60 @@
             padding: 20px; box-sizing: border-box; z-index: 15;
             padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
-        
+
+        /* --- REDISEÑO CYBERPUNK DEL JOYSTICK --- */
         #joystickZone { 
-            width: 130px; height: 130px; background: rgba(0, 255, 204, 0.05); 
-            border-radius: 50%; border: 2px solid rgba(0, 255, 204, 0.3); 
+            width: 140px; height: 140px; 
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.05) 0%, rgba(5, 8, 15, 0.8) 100%);
+            border-radius: 50%; 
+            border: 2px solid rgba(0, 255, 204, 0.8); 
             position: relative; pointer-events: auto; touch-action: none; 
             display: flex; justify-content: center; align-items: center;
-            box-shadow: inset 0 0 20px rgba(0,255,204,0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3), inset 0 0 30px rgba(0, 255, 204, 0.2);
+            overflow: hidden;
         }
-        #joystickKnob { width: 50px; height: 50px; background: rgba(0, 255, 204, 0.5); border-radius: 50%; position: absolute; pointer-events: none; box-shadow: 0 0 15px rgba(0,255,204,0.6); }
+        #joystickZone::before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 50%;
+            border: 2px dashed rgba(0, 255, 204, 0.5);
+            pointer-events: none;
+            animation: radarSpin 8s linear infinite;
+        }
+        #joystickZone::after {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background:
+                linear-gradient(90deg, transparent 49%, rgba(0, 255, 204, 0.4) 49%, rgba(0, 255, 204, 0.4) 51%, transparent 51%),
+                linear-gradient(0deg, transparent 49%, rgba(0, 255, 204, 0.4) 49%, rgba(0, 255, 204, 0.4) 51%, transparent 51%);
+            pointer-events: none;
+        }
+        #joystickKnob { 
+            width: 50px; height: 50px; 
+            background: radial-gradient(circle, #00ffcc 20%, #0369a1 90%);
+            border: 2px solid #ffffff; 
+            border-radius: 50%; 
+            position: absolute; pointer-events: none; 
+            box-shadow: 0 0 25px #00ffcc, inset 0 0 15px rgba(255,255,255,0.8);
+            z-index: 5;
+        }
+        #joystickKnob::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #ffffff, 0 0 30px #00ffcc;
+        }
+        @keyframes radarSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
         .action-buttons { display: flex; flex-direction: column; gap: 10px; pointer-events: auto; align-items: flex-end; }
         .action-btn { 
@@ -400,7 +445,7 @@
         }
 
         @media (min-width: 1024px) {
-            #joystickZone { opacity: 0.6; }
+            #joystickZone { opacity: 0.8; }
             .inst-content { font-size: 11px; }
             .title { font-size: 3.5vw; }
             .subtitle { font-size: 1.2vw; }
@@ -502,7 +547,7 @@
             <ul>
                 <li><b>Jostin (Cambio 1):</b> Pistola. Disparo recto. (12 balas)</li>
                 <li><b>Tavito (Cambio 2):</b> Bazuca. Daño en área. (20 bombas) <br><span style="color:#ef4444; font-size:8px;">[Peligro: Dañar los bordes del mapa puede ser catastrófico]</span></li>
-                <li><b>Pepe (Cambio 3):</b> Sigilo. Invisible 120s. No ataca.</li>
+                <li><b>Pepe (Cambio 3):</b> Sigilo. Invisible 80s. No ataca.</li>
             </ul>
             <p style="line-height:1.5;">Usa el Joystick para moverte.<br>Explora el mapa y esquiva entidades.<br>Pisa la llave y pulsa <b>AVISAR</b>.</p>
         </div>
@@ -879,7 +924,7 @@
         const party = [
             { id: 'jostin', name: 'Jostin', color: '#ff0000', speed: 4, ammo: 12, maxAmmo: 12, ability: 'Pistola', img: charImages.jostin },
             { id: 'tavito', name: 'Tavito', color: '#888888', speed: 3.5, ammo: 20, maxAmmo: 20, ability: 'Bazuca', img: charImages.tavito },
-            { id: 'pepe', name: 'Pepe', color: '#ffff00', speed: 5, stealthTime: 120, maxStealth: 120, stealthActive: false, ability: 'Sigilo', img: charImages.pepe }
+            { id: 'pepe', name: 'Pepe', color: '#ffff00', speed: 5, stealthTime: 80, maxStealth: 80, stealthActive: false, ability: 'Sigilo', img: charImages.pepe }
         ];
         let activeCharIndex = 0;
         let globalKeysFound = 0;
@@ -2403,7 +2448,7 @@
             let diffX = touch.clientX - centerX;
             let diffY = touch.clientY - centerY;
             
-            const maxDist = 45;
+            const maxDist = 50;
             const distance = Math.hypot(diffX, diffY);
             
             if (distance > maxDist) {
